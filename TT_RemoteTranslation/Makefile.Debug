@@ -166,34 +166,34 @@ debug/BB_Instance.o: BBTT/BB_Instance.cpp BBTT/BB_Instance.h \
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug\BB_Instance.o BBTT\BB_Instance.cpp
 
 debug/BB_ClientConfigMgr.o: BBTT/BB_ClientConfigMgr.cpp BBTT/BB_ClientConfigMgr.h \
-		BBTT/ticpp.h \
-		BBTT/tinyxml.h \
-		BBTT/tinystr.h \
-		BBTT/ticpprc.h
+		TICPP/ticpp.h \
+		TICPP/tinyxml.h \
+		TICPP/tinystr.h \
+		TICPP/ticpprc.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug\BB_ClientConfigMgr.o BBTT\BB_ClientConfigMgr.cpp
 
 debug/tinyxmlerror.o: Ticpp/tinyxmlerror.cpp Ticpp/tinyxml.h \
-		BBTT/tinystr.h \
-		BBTT/ticpprc.h
+		TICPP/tinystr.h \
+		TICPP/ticpprc.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug\tinyxmlerror.o Ticpp\tinyxmlerror.cpp
 
 debug/tinyxml.o: Ticpp/tinyxml.cpp Ticpp/tinyxml.h \
-		BBTT/tinystr.h \
-		BBTT/ticpprc.h
+		TICPP/tinystr.h \
+		TICPP/ticpprc.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug\tinyxml.o Ticpp\tinyxml.cpp
 
-debug/tinystr.o: Ticpp/tinystr.cpp BBTT/tinystr.h
+debug/tinystr.o: Ticpp/tinystr.cpp TICPP/tinystr.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug\tinystr.o Ticpp\tinystr.cpp
 
 debug/ticpp.o: Ticpp/ticpp.cpp Ticpp/ticpp.h \
 		Ticpp/tinyxml.h \
-		BBTT/tinystr.h \
-		BBTT/ticpprc.h
+		TICPP/tinystr.h \
+		TICPP/ticpprc.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug\ticpp.o Ticpp\ticpp.cpp
 
 debug/tinyxmlparser.o: Ticpp/tinyxmlparser.cpp Ticpp/tinyxml.h \
-		BBTT/tinystr.h \
-		BBTT/ticpprc.h
+		TICPP/tinystr.h \
+		TICPP/ticpprc.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug\tinyxmlparser.o Ticpp\tinyxmlparser.cpp
 
 debug/moc_remotetranslatorui.o: debug/moc_remotetranslatorui.cpp 

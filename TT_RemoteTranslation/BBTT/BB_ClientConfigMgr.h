@@ -5,7 +5,7 @@
 
 
 #include <string>
-#include "BBTT/ticpp.h"
+#include "Ticpp/ticpp.h"
 
 const std::string NODE_BBCONFIG("BBconfig"); 
 const std::string NODE_SERVER_CONNECT("ServerConnect");
