@@ -1,0 +1,13 @@
+INPUT(
+./release\main.o
+./release\remotetranslatorui.o
+./release\BB_Translator.o
+./release\BB_Instance.o
+./release\BB_ClientConfigMgr.o
+./release\tinyxmlerror.o
+./release\tinyxml.o
+./release\tinystr.o
+./release\ticpp.o
+./release\tinyxmlparser.o
+./release\moc_remotetranslatorui.o
+);

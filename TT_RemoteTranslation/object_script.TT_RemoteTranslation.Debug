@@ -1,0 +1,13 @@
+INPUT(
+./debug\main.o
+./debug\remotetranslatorui.o
+./debug\BB_Translator.o
+./debug\BB_Instance.o
+./debug\BB_ClientConfigMgr.o
+./debug\tinyxmlerror.o
+./debug\tinyxml.o
+./debug\tinystr.o
+./debug\ticpp.o
+./debug\tinyxmlparser.o
+./debug\moc_remotetranslatorui.o
+);
