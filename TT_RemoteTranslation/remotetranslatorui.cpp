@@ -92,11 +92,19 @@ static void GetHapsData(vector<HapData>& haps)
 
 static int GetMicLevel()
 {
+    static INT32 i,f;
+    INT32 xx;
+    //int i;/* initialize random seed: */
+//    srand ( time(NULL) );
+    if (i==0)
+    {
+        i=3;
+        f=7;
+    }
+    i = abs(i*f);
 
-    int i;/* initialize random seed: */
-    srand ( time(NULL) );
-    i = rand() % 100;
-    return i;
+    xx = i % 19;
+    return xx;
 }
 
 RemoteTranslatorUI::RemoteTranslatorUI(QWidget *parent) :
@@ -114,14 +122,14 @@ RemoteTranslatorUI::RemoteTranslatorUI(QWidget *parent) :
     ui->MicGainSld->setMaximum(SOUND_GAIN_MAX);
     ui->MicGainSld->setValue(ConfigUI.m_MicGainLevel);
 
-
+    ui->MicMuteBut->setCheckable(true);
     ui->MicLevelInd->setMinimum(0);
-    ui->MicLevelInd->setMaximum(100);
+//    ui->MicLevelInd->setMaximum(100);
 
     //Timer for progress bar
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(on_Timeout()));
-    timer->start(10);
+    timer->start(100);
 
     //Initialize ComboBoxes
     InitHapsMenu(haps_from_mgr, ui);
@@ -131,7 +139,7 @@ RemoteTranslatorUI::RemoteTranslatorUI(QWidget *parent) :
 
 void RemoteTranslatorUI::on_Timeout()
 {
-    ui->MicLevelInd->setValue(0);
+//    ui->MicLevelInd->setValue(0);
     ui->MicLevelInd->setValue(GetMicLevel());
 }
 
@@ -160,3 +168,20 @@ void RemoteTranslatorUI::on_MicGainSld_valueChanged(int val)
     ConfigUI.m_MicGainLevel = ui->MicGainSld->value();
 }
 
+void RemoteTranslatorUI::on_MicMuteBut_clicked(bool checked)
+{
+    if (checked)
+        ui->MicStatusLbl->setText(QApplication::translate("RemoteTranslatorUI", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+                                                          "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+                                                          "p, li { white-space: pre-wrap;  background-color:red;}\n"
+                                                          "</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
+                                                          "<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:12pt; font-weight:600; color:#5500ff;\">Microphone</span></p>\n"
+                                                          "<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:12pt; font-weight:600; color:#5500ff;\"> muted</span></p></body></html>", 0, QApplication::UnicodeUTF8));
+    else
+        ui->MicStatusLbl->setText(QApplication::translate("RemoteTranslatorUI", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+                                                          "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+                                                          "p, li { white-space: pre-wrap;  background-color:green;}\n"
+                                                          "</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
+                                                          "<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:12pt; font-weight:600; color:white;\">Microphone</span></p>\n"
+                                                          "<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:12pt; font-weight:600; color:white;\"> active</span></p></body></html>", 0, QApplication::UnicodeUTF8));
+}

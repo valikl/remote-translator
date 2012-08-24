@@ -173,7 +173,9 @@ public:
         MicLevelInd = new QProgressBar(centralWidget);
         MicLevelInd->setObjectName(QString::fromUtf8("MicLevelInd"));
         MicLevelInd->setGeometry(QRect(460, 120, 191, 23));
-        MicLevelInd->setValue(24);
+        MicLevelInd->setMaximum(20);
+        MicLevelInd->setValue(0);
+        MicLevelInd->setFormat(QString());
         label_12 = new QLabel(centralWidget);
         label_12->setObjectName(QString::fromUtf8("label_12"));
         label_12->setGeometry(QRect(350, 120, 111, 20));

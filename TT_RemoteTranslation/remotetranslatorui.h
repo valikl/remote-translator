@@ -112,6 +112,7 @@ private slots:
     void on_NickName_editingFinished();
     void on_HapList_currentIndexChanged(const QString &arg1);
     void on_MicGainSld_valueChanged(int val);
+    void on_MicMuteBut_clicked(bool checked);
     void on_Timeout();
 
 private:
