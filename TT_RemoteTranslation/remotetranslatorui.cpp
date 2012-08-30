@@ -1,31 +1,10 @@
 #include "remotetranslatorui.h"
+#include "sounddevices.h"
 #include "ui_remotetranslatorui.h"
 #include <QTimer>
 #include <time.h>
 
-static ClientConfig ConfigUI;
-
-/*
-bool SrcChannelList(int *Nchannels, ChannelData *ChList)
-{
-    if (ChList == NULL)
-    {
-        *Nchannels = 3;
-        return true;
-    }
-    else
-    {
-        ChList[0].ChannelID = 10;
-        ChList[1].ChannelID = 20;
-        ChList[2].ChannelID = 30;
-        wcscpy(ChList[0].ChannelName, L"IntelKozel");
-        wcscpy(ChList[1].ChannelName, L"2xIntelKozel");
-        wcscpy(ChList[2].ChannelName, L"4xIntelKozel");
-
-        return true;
-    }
-}
-*/
+ClientConfig ConfigUI;
 
 // Configuration Manager functions
 
@@ -122,25 +101,106 @@ RemoteTranslatorUI::RemoteTranslatorUI(QWidget *parent) :
     ui->MicGainSld->setMaximum(SOUND_GAIN_MAX);
     ui->MicGainSld->setValue(ConfigUI.m_MicGainLevel);
 
+
+    ui->TrgLvlSld->setMinimum(0);
+    ui->TrgLvlSld->setMaximum(SOUND_VOLUME_MAX);
+    ui->TrgLvlSld->setValue(ConfigUI.m_trgVolumeLevel);
+
+    ui->SrcLevelSld->setMinimum(0);
+    ui->SrcLevelSld->setMaximum(SOUND_VOLUME_MAX);
+    ui->SrcLevelSld->setValue(ConfigUI.m_SrcVolumeLevel);
+
+    ConfigUI.m_VideoQuality = 100;
+    ui->VideoLvlSld->setMinimum(0);
+    ui->VideoLvlSld->setMaximum(100);
+    ui->VideoLvlSld->setValue(ConfigUI.m_VideoQuality);
+
+
     ui->MicMuteBut->setCheckable(true);
     ui->MicLevelInd->setMinimum(0);
-//    ui->MicLevelInd->setMaximum(100);
+    ui->MicLevelInd->setMaximum(20);
+    ui->MicLevelInd->setTextVisible(false);
+
+    ui->TrgMuteBut->setCheckable(true);
 
     //Timer for progress bar
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(on_Timeout()));
     timer->start(100);
 
+    // Timer for user detection
+    user_timer = new QTimer(this);
+    connect(user_timer, SIGNAL(timeout()), this, SLOT(on_UserTimeout()));
+    user_timer->start(1000);
+
     //Initialize ComboBoxes
     InitHapsMenu(haps_from_mgr, ui);
 
     ui->MicLevelInd->setValue(GetMicLevel());
+
+    connect(ui->actionConfigure_Audio, SIGNAL(triggered()), this, SLOT(ActivateSoundDevices()));
+}
+
+void RemoteTranslatorUI::ActivateSoundDevices()
+{
+    SoundDevices sound_devices(this);
+    sound_devices.exec();
 }
 
 void RemoteTranslatorUI::on_Timeout()
 {
 //    ui->MicLevelInd->setValue(0);
     ui->MicLevelInd->setValue(GetMicLevel());
+}
+
+void getSrcUsers(vector<string>& users, string& active_user)
+{
+    users.clear();
+    users.push_back("Valik");
+    users.push_back("Valik1");
+
+    active_user = "Valik1";
+}
+
+void getTrgUsers(vector<string>& users, string& active_user)
+{
+    users.clear();
+    users.push_back("Huyalik");
+    users.push_back("Huyalik1");
+
+    active_user = "Huyalik1";
+}
+
+static void setUserItems(QListWidget* users_list, vector<string>& users, string& active_user)
+{
+    users_list->clear();
+    for (unsigned int i = 0; i < users.size(); ++i)
+    {
+        string user = users[i];
+        if (users[i] != active_user)
+            users_list->addItem(user.c_str());
+        else
+        {
+            QListWidgetItem* active_item = new QListWidgetItem(user.c_str());
+            active_item->setBackgroundColor("green");
+            QFont font;
+            font.setBold(true);
+            active_item->setFont(font);
+            users_list->addItem(active_item);
+        }
+    }
+}
+
+void RemoteTranslatorUI::on_UserTimeout()
+{
+    vector<string> users;
+    string active_user;
+
+    getSrcUsers(users, active_user);
+    setUserItems(ui->SrcUsersList, users, active_user);
+
+    getTrgUsers(users, active_user);
+    setUserItems(ui->TrgUsersList, users, active_user);
 }
 
 RemoteTranslatorUI::~RemoteTranslatorUI()
@@ -168,20 +228,61 @@ void RemoteTranslatorUI::on_MicGainSld_valueChanged(int val)
     ConfigUI.m_MicGainLevel = ui->MicGainSld->value();
 }
 
+void RemoteTranslatorUI::on_TrgLvlSld_valueChanged(int val)
+{
+    ConfigUI.m_trgVolumeLevel = ui->TrgLvlSld->value();
+
+}
+
+void RemoteTranslatorUI::on_SrcLevelSld_valueChanged(int val)
+{
+    ConfigUI.m_SrcVolumeLevel = ui->SrcLevelSld->value();
+
+}
 void RemoteTranslatorUI::on_MicMuteBut_clicked(bool checked)
 {
     if (checked)
+    {
         ui->MicStatusLbl->setText(QApplication::translate("RemoteTranslatorUI", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
                                                           "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
                                                           "p, li { white-space: pre-wrap;  background-color:red;}\n"
                                                           "</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
                                                           "<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:12pt; font-weight:600; color:#5500ff;\">Microphone</span></p>\n"
                                                           "<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:12pt; font-weight:600; color:#5500ff;\"> muted</span></p></body></html>", 0, QApplication::UnicodeUTF8));
+        ConfigUI.m_MicMute = true;
+    }
     else
+    {
         ui->MicStatusLbl->setText(QApplication::translate("RemoteTranslatorUI", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
                                                           "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
                                                           "p, li { white-space: pre-wrap;  background-color:green;}\n"
                                                           "</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
                                                           "<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:12pt; font-weight:600; color:white;\">Microphone</span></p>\n"
                                                           "<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:12pt; font-weight:600; color:white;\"> active</span></p></body></html>", 0, QApplication::UnicodeUTF8));
+        ConfigUI.m_MicMute = false;
+    }
+}
+
+void RemoteTranslatorUI::on_TrgMuteBut_clicked(bool checked)
+{
+    if (checked)
+    {
+        ui->TrgStatusLbl->setText(QApplication::translate("RemoteTranslatorUI", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+                                                          "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+                                                          "p, li { white-space: pre-wrap;  background-color:red;}\n"
+                                                          "</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
+                                                          "<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:12pt; font-weight:600; color:#5500ff;\">Target</span></p>\n"
+                                                          "<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:12pt; font-weight:600; color:#5500ff;\"> muted</span></p></body></html>", 0, QApplication::UnicodeUTF8));
+        ConfigUI.m_TrgMute = true;
+    }
+    else
+    {
+        ui->TrgStatusLbl->setText(QApplication::translate("RemoteTranslatorUI", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+                                                          "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+                                                          "p, li { white-space: pre-wrap;  background-color:green;}\n"
+                                                          "</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
+                                                          "<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:12pt; font-weight:600; color:white;\">Target</span></p>\n"
+                                                          "<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:12pt; font-weight:600; color:white;\"> active</span></p></body></html>", 0, QApplication::UnicodeUTF8));
+        ConfigUI.m_TrgMute = false;
+    }
 }

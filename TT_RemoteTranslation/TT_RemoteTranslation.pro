@@ -19,7 +19,8 @@ SOURCES += main.cpp\
     Ticpp/tinyxml.cpp \
     Ticpp/tinystr.cpp \
     Ticpp/ticpp.cpp \
-    Ticpp/tinyxmlparser.cpp
+    Ticpp/tinyxmlparser.cpp \
+    sounddevices.cpp
 
 HEADERS  += \
     common.h \
@@ -33,9 +34,11 @@ HEADERS  += \
     Ticpp/tinyxml.h \
     Ticpp/tinystr.h \
     Ticpp/ticpprc.h \
-    Ticpp/ticpp.h
+    Ticpp/ticpp.h \
+    sounddevices.h
 
-FORMS    += remotetranslatorui.ui
+FORMS    += remotetranslatorui.ui \
+    sounddevices.ui
 
 OTHER_FILES += \
     images/webcam_stop.png \

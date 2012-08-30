@@ -58,6 +58,12 @@ struct ClientConfig
     QString m_SrcChannel;
     QString m_TrgChannel;
     int m_MicGainLevel;
+    int m_SrcVolumeLevel;
+    int m_trgVolumeLevel;
+    int m_VideoQuality;
+
+    bool m_MicMute;
+    bool m_TrgMute;
  };
 
 /* It was decided with Dima that GUI need not channel IDs, it need only names,
@@ -113,12 +119,21 @@ private slots:
     void on_HapList_currentIndexChanged(const QString &arg1);
     void on_MicGainSld_valueChanged(int val);
     void on_MicMuteBut_clicked(bool checked);
+    void on_TrgMuteBut_clicked(bool checked);
+    void on_TrgLvlSld_valueChanged(int val);
+    void on_SrcLevelSld_valueChanged(int val);
+
+
     void on_Timeout();
+    void on_UserTimeout();
+
+    void ActivateSoundDevices();
 
 private:
 
     Ui::RemoteTranslatorUI *ui;
     QTimer *timer;
+    QTimer *user_timer;
 };
 
 #endif // REMOTETRANSLATORUI_H
