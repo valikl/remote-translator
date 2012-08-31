@@ -1,7 +1,11 @@
 #ifndef SOUNDDEVICES_H
 #define SOUNDDEVICES_H
 
+#include "BBTT/BB_Translator.h"
 #include <QDialog>
+#include <vector>
+
+using namespace std;
 
 namespace Ui {
 class SoundDevices;
@@ -17,6 +21,9 @@ public:
     
 private:
     Ui::SoundDevices *ui;
+    vector<BB_SoundDevice> m_soundDevList;
+    void setSystemDevice();
+    void drawDevices();
 };
 
 #endif // SOUNDDEVICES_H

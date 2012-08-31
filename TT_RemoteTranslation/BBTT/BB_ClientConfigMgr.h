@@ -3,9 +3,10 @@
     #define TIXML_USE_TICPP
 #endif
 
+#include "Ticpp/ticpp.h"
 
 #include <string>
-#include "Ticpp/ticpp.h"
+#include <vector>
 
 const std::string NODE_BBCONFIG("BBconfig"); 
 const std::string NODE_SERVER_CONNECT("ServerConnect");
@@ -34,7 +35,6 @@ const std::string ATTR_MAX_INC("maxIncrement");
 const std::string ATTR_MAX_DEC("maxDecrement");
 const std::string ATTR_MAX_GAIN("maxGain");
 
-
 // template for happening structure:
 // hap_<happening name>/source_<source language channel>
 // hap_<happening name>/destination_<destination language channel>
@@ -45,6 +45,14 @@ struct HapTemplate
 	std::string m_srcRegexp;
 	std::string m_dstRegexp;
 	std::string m_videoRegexp;
+};
+
+struct HapData
+{
+    std::string m_Happening;
+    std::vector<std::string> m_srcList;
+    std::vector<std::string> m_trgList;
+    std::string m_Video;
 };
 
 struct AGC
@@ -59,25 +67,42 @@ struct AGC
 // Client configuration
 struct ClientConfig
 {
-	std::string m_IP;
-	int         m_TCP;
-	int         m_UDP;
-	std::string m_srvUser;
-	std::string m_srvUserPsw;
-	std::string m_srvPsw;
-	
-	// Regexp for happening
-	HapTemplate m_hapTemplate;   
-	
-	// Struct AGC
-	AGC m_AGC;	
-	// Struct De-noise
-	int m_noiseCancel;	
-	// Boolean echo cancelation function
-	bool m_echoCancel;		
-	// Percentage of frames to show 100% - All frames shown, 0% - No frames shown
-	int m_framesPerSec;	
-};
+    std::string m_IP;
+    int    m_TCP;
+    int    m_UDP;
+    std::string m_srvUser;
+    std::string m_srvUserPsw;
+    std::string m_srvPsw;
+
+    // Regexp for happening
+    HapTemplate m_hapTemplate;
+
+    // Struct AGC
+    AGC m_AGC;
+    // Struct De-noise
+    int m_noiseCancel;
+    // Boolean echo cancelation function
+    bool m_echoCancel;
+    // Percentage of frames to show 100% - All frames shown, 0% - No frames shown
+    int m_framesPerSec;
+
+    //Structure fields for GUI intitialization
+    std::string m_NickName;
+    std::string m_Happening;
+    std::string m_SrcChannel;
+    std::string m_TrgChannel;
+    int m_MicGainLevel;
+    int m_SrcVolumeLevel;
+    int m_trgVolumeLevel;
+    int m_VideoQuality;
+
+    bool m_MicMute;
+    bool m_TrgMute;
+
+    bool m_isSoundSystemWin;
+    int m_InputSoundDevId;
+    int m_OutputSoundDevId;
+ };
 
 // Client configuration manager
 class BB_ClientConfigMgr

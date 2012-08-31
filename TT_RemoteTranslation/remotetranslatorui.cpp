@@ -1,5 +1,6 @@
 #include "remotetranslatorui.h"
 #include "sounddevices.h"
+#include "BBTT/BB_ClientConfigMgr.h"
 #include "ui_remotetranslatorui.h"
 #include <QTimer>
 #include <time.h>
@@ -8,13 +9,13 @@ ClientConfig ConfigUI;
 
 // Configuration Manager functions
 
-static void ChangeChannelMenu(vector<QString>& channels, QComboBox* combo, QString def_val)
+static void ChangeChannelMenu(vector<string>& channels, QComboBox* combo, string def_val)
 {
     combo->clear();
     for (unsigned int i = 0; i < channels.size(); ++i)
     {
-        QString channel = channels[i];
-        combo->addItem(channel, i);
+        string channel = channels[i];
+        combo->addItem(QString::fromStdString(channel), i);
         if (channel == def_val)
             combo->setCurrentIndex(i);
     }
@@ -25,7 +26,7 @@ static void InitHapsMenu(vector<HapData>& haps, Ui::RemoteTranslatorUI* ui)
     for (unsigned int i = 0; i < haps.size(); ++i)
     {
         HapData hap = haps[i];
-        ui->HapList->addItem(hap.m_Happening, i);
+        ui->HapList->addItem(QString::fromStdString(hap.m_Happening), i);
         if (hap.m_Happening == ConfigUI.m_Happening)
             ui->HapList->setCurrentIndex(i);
     }
@@ -92,10 +93,14 @@ RemoteTranslatorUI::RemoteTranslatorUI(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    BB_ClientConfigMgr::Instance().init("C:\\Projects\\work\\config.xml");
+    ClientConfig config = BB_ClientConfigMgr::Instance().getConfig();
+
+
     // simulation of config manager
     GetHapsData(haps_from_mgr);
 
-    ui->NickName->setText(ConfigUI.m_NickName);
+    ui->NickName->setText(QString::fromStdString(ConfigUI.m_NickName));
 
     ui->MicGainSld->setMinimum(0);
     ui->MicGainSld->setMaximum(SOUND_GAIN_MAX);
@@ -211,7 +216,7 @@ RemoteTranslatorUI::~RemoteTranslatorUI()
 
 void RemoteTranslatorUI::on_NickName_editingFinished()
 {
-    ConfigUI.m_NickName = ui->NickName->text();
+    ConfigUI.m_NickName = ui->NickName->text().toStdString();
 }
 
 

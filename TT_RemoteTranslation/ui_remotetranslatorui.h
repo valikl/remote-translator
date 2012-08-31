@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'remotetranslatorui.ui'
 **
-** Created: Mon Aug 27 05:21:50 2012
+** Created: Fri Aug 31 03:52:06 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
