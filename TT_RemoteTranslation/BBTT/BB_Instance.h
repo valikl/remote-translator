@@ -33,15 +33,26 @@ struct BB_InstanceContext
 	std::wstring m_audioDir;
 
 	std::wstring m_channelName;
+
+	INT32 channelId;
 };
 
 const INT32 ROOT_PARENT_ID(1);
+const std::wstring DEFAULT_AUDIO_STORAGE(L"");
 
 struct BB_Channel
 {
 	std::wstring name;
 	INT32 id;
 	INT32 parentId;
+};
+
+struct BB_SoundDevice
+{
+	std::wstring m_deviceName;
+	bool m_isOutputDevice;
+	bool m_isSoundSystemWin;
+	INT32 m_id;
 };
 
 class BB_Instance
@@ -54,19 +65,19 @@ public:
 	// Use init and finalize instead
 	int init();
 	void finalize();
+	int getInstance();
 
-	int getChannelId();
 	int initDevice();
 	int SetAudioLevels();
 	int EnableTransmition();
 	int getVideoDevice();
 	
 	int getChannels(std::vector<BB_Channel> &channels);
+	int getSoundDevices(std::vector<BB_SoundDevice> &soundDevs);
 
 private:
 		
 	int joinChannel();
-	int getInstance();
 	int setInstProp();
 
 	void processTTMessage(const TTMessage& msg);

@@ -10,6 +10,8 @@ BB_Instance::BB_Instance(const BB_InstanceContext &context) : m_context(context)
 {
 	// We don't want to call TT functions in Ctor
 	// Caller must call init()
+
+	m_channelId = context.channelId;
 }
 
 BB_Instance::~BB_Instance(void)
@@ -22,7 +24,6 @@ int BB_Instance::init()
 {
 	int ret;
 	CHECK_ret(getInstance());
-	CHECK_ret(getChannelId());
 	CHECK_ret(joinChannel());
 	CHECK_ret(setInstProp());
 
@@ -57,7 +58,7 @@ int BB_Instance::getInstance()
     cout << "Now Connected..." << endl;
 
     //now that we're connected log on
-    cmd_id = TT_DoLogin(m_ttInst, _T(""), m_context.m_srvPsw.c_str(), m_context.m_srvUser.c_str(), m_context.m_srvUserPsw.c_str());
+	cmd_id = TT_DoLogin(m_ttInst, _T(""), m_context.m_srvPsw.c_str(), m_context.m_srvUser.c_str(), m_context.m_srvUserPsw.c_str());
     if(cmd_id < 0)
         goto error_login;
 
@@ -128,46 +129,6 @@ int BB_Instance::initDevice()
 	return EXIT_SUCCESS;
 }
 
-int BB_Instance::getChannelId()
-{
-	INT32 ret = EXIT_SUCCESS;
-	INT32* channelIDs = NULL;
-	INT32 lpnHowMany = 0;
-
-	CHECK_ret_bool(TT_GetServerChannels(m_ttInst, channelIDs, &lpnHowMany));
-
-	if (lpnHowMany == 0)
-	{
-		cout << "No channels!" << endl;
-		return EXIT_FAILURE;
-	}
-
-	channelIDs = new INT32[lpnHowMany];
-	CHECK_ret_bool(TT_GetServerChannels(m_ttInst, channelIDs, &lpnHowMany));
-
-	Channel channel;
-	bool isFound = false;
-	for (int i = 0; i < lpnHowMany; ++i)
-	{
-		CHECK_ret_bool(TT_GetChannel(m_ttInst, channelIDs[i], &channel));
-		if (_tcscmp(channel.szName, m_context.m_channelName.c_str()) == 0)
-		{
-			isFound = true;
-			m_channelId = channelIDs[i];
-			break;
-		}
-	}
-
-	delete[] channelIDs;
-
-	if (!isFound)
-	{
-		cout << "Channel not found!" << endl;
-		ret = EXIT_FAILURE;
-	}
-
-	return ret;
-}
 
 int BB_Instance::joinChannel()
 {
@@ -423,28 +384,28 @@ int BB_Instance::getChannels(std::vector<BB_Channel> &channels)
 {
 	INT32 ret = EXIT_FAILURE;
 	INT32* channelIDs = NULL;
-	INT32 lpnHowMany = 0;
+	INT32 size = 0;
     bool isFound = false;
 
-	if (!TT_GetServerChannels(m_ttInst, channelIDs, &lpnHowMany))
+	if (!TT_GetServerChannels(m_ttInst, channelIDs, &size) || size == 0)
 	{
 		goto __err_exit1;
 	}
 
-	if (lpnHowMany == 0)
+	if (size == 0)
 	{
 		cout << "No channels!" << endl;
 		goto __err_exit1;
 	}
 
-	channelIDs = new INT32[lpnHowMany];
-	if (!TT_GetServerChannels(m_ttInst, channelIDs, &lpnHowMany))
+	channelIDs = new INT32[size];
+	if (!TT_GetServerChannels(m_ttInst, channelIDs, &size))
 	{
 		goto __err_exit2;
 	}
 
 	Channel channel;
-	for (int i = 0; i < lpnHowMany; ++i)
+	for (int i = 0; i < size; ++i)
 	{
 		BB_Channel channelToList;
 		channelToList.id = channelIDs[i];
@@ -461,6 +422,70 @@ int BB_Instance::getChannels(std::vector<BB_Channel> &channels)
 
 __err_exit2:
 	delete[] channelIDs;
+__err_exit1:
+	return ret;
+}
+
+int BB_Instance::getSoundDevices(vector<BB_SoundDevice> &soundDevs)
+{
+	INT32 ret = EXIT_FAILURE;
+	SoundDevice* soundDevices = NULL;
+	INT32 size = 0;
+
+	if (!TT_GetSoundInputDevices(m_ttInst, soundDevices, &size) || size == 0)
+	{
+		goto __err_exit1;
+	}
+
+	soundDevices = new SoundDevice[size];
+	if (!TT_GetSoundInputDevices(m_ttInst, soundDevices, &size))
+	{
+		goto __err_exit2;
+	}
+
+	// Create Input Devices List
+	for (int i = 0; i < size; ++i)
+	{
+		BB_SoundDevice soundDev;
+		soundDev.m_id = soundDevices[i].nDeviceID;
+		soundDev.m_isOutputDevice = false;
+		soundDev.m_isSoundSystemWin = (soundDevices[i].nSoundSystem == SOUNDSYSTEM_WINMM);
+		soundDev.m_deviceName = soundDevices[i].szDeviceName;
+
+		soundDevs.push_back(soundDev);
+	}
+
+	delete[] soundDevices;
+
+	size = 0;
+	soundDevices = NULL;
+	if (!TT_GetSoundOutputDevices(m_ttInst, soundDevices, &size) || size == 0)
+	{
+		goto __err_exit1;
+	}
+
+	soundDevices = new SoundDevice[size];
+	if (!TT_GetSoundOutputDevices(m_ttInst, soundDevices, &size))
+	{
+		goto __err_exit2;
+	}
+
+	// Create Output Devices List
+	for (int i = 0; i < size; ++i)
+	{
+		BB_SoundDevice soundDev;
+		soundDev.m_id = soundDevices[i].nDeviceID;
+		soundDev.m_isOutputDevice = true;
+		soundDev.m_isSoundSystemWin = (soundDevices[i].nSoundSystem == SOUNDSYSTEM_WINMM);
+		soundDev.m_deviceName = soundDevices[i].szDeviceName;
+
+		soundDevs.push_back(soundDev);
+	}
+
+	ret = EXIT_SUCCESS;
+
+__err_exit2:
+	delete[] soundDevices;
 __err_exit1:
 	return ret;
 }
