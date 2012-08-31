@@ -4,8 +4,6 @@
 #include "sounddevices.h"
 #include "ui_sounddevices.h"
 
-extern ClientConfig ConfigUI;
-
 static void getSoundDevices(vector<BB_SoundDevice>& soundDevList)
 {
     BB_SoundDevice device1, device2, device3, device4;

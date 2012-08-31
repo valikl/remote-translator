@@ -2,6 +2,7 @@
 #define REMOTETRANSLATORUI_H
 
 #include "common.h"
+#include "BBTT/BB_Translator.h"
 
 #include <windows.h>
 #include <stdio.h>
@@ -44,6 +45,7 @@ private slots:
 
 private:
 
+    BB_Translator translator;
     Ui::RemoteTranslatorUI *ui;
     QTimer *timer;
     QTimer *user_timer;

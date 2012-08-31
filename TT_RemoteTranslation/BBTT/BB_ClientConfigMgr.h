@@ -8,6 +8,8 @@
 #include <string>
 #include <vector>
 
+#define ConfigUI (BB_ClientConfigMgr::Instance().getConfig())
+
 const std::string NODE_BBCONFIG("BBconfig"); 
 const std::string NODE_SERVER_CONNECT("ServerConnect");
 const std::string ATTR_IP("ip");

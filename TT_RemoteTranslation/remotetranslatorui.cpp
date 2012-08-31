@@ -5,8 +5,6 @@
 #include <QTimer>
 #include <time.h>
 
-ClientConfig ConfigUI;
-
 // Configuration Manager functions
 
 static void ChangeChannelMenu(vector<string>& channels, QComboBox* combo, string def_val)
@@ -94,8 +92,9 @@ RemoteTranslatorUI::RemoteTranslatorUI(QWidget *parent) :
     ui->setupUi(this);
 
     BB_ClientConfigMgr::Instance().init("C:\\Projects\\work\\config.xml");
-    ClientConfig config = BB_ClientConfigMgr::Instance().getConfig();
+    ConfigUI = BB_ClientConfigMgr::Instance().getConfig();
 
+    translator.init();
 
     // simulation of config manager
     GetHapsData(haps_from_mgr);
