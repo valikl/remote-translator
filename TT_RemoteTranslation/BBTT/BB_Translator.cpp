@@ -1,9 +1,10 @@
 #include "BB_Translator.h"
+#include "BB_ClientConfigMgr.h"
 #include "Utils.h"
 
 using namespace std;
 
-BB_Translator::BB_Translator(const BB_TranslatorContext &context) : m_context(context)
+BB_Translator::BB_Translator()
 {
 }
 
@@ -19,18 +20,20 @@ BB_Translator::~BB_Translator(void)
 
 int BB_Translator::connectHap(wstring hapName, wstring nickName, wstring srcName, wstring dstName)
 {
-	BB_InstanceContext context;
-	context.m_TCP = m_context.m_TCP;
-	context.m_IP = m_context.m_IP;
-	context.m_UDP = m_context.m_UDP;
-	context.m_srvPsw = m_context.m_srvPsw;
-	context.m_srvUser = m_context.m_srvUser;
-	context.m_srvUserPsw = m_context.m_srvUserPsw;
+    BB_InstanceContext context;
+
+    ClientConfig config = BB_ClientConfigMgr::Instance().getConfig();
+    context.m_TCP = config.m_TCP;
+    context.m_IP.assign(config.m_IP.begin(), config.m_IP.end());
+    context.m_UDP = config.m_UDP;
+    context.m_srvPsw.assign(config.m_srvPsw.begin(), config.m_srvPsw.end());
+    context.m_srvUser.assign(config.m_srvUser.begin(), config.m_srvUser.end());
+    context.m_srvUserPsw.assign(config.m_srvUserPsw.begin(), config.m_srvUserPsw.end());
 	context.m_audioDir = DEFAULT_AUDIO_STORAGE;
 	
 	// Find Happening
 	HappeningEx hap;
-	if (!findHap(hap, hapName))
+    if (!findHap(hap, hapName))
 	{
 		return EXIT_FAILURE;
 	}
@@ -67,12 +70,14 @@ int BB_Translator::init()
 {
 	// Get Dummy Instance
 	BB_InstanceContext context;
-	context.m_TCP = m_context.m_TCP;
-	context.m_IP = m_context.m_IP;
-	context.m_UDP = m_context.m_UDP;
-	context.m_srvPsw = m_context.m_srvPsw;
-	context.m_srvUser = m_context.m_srvUser;
-	context.m_srvUserPsw = m_context.m_srvUserPsw;
+
+    ClientConfig config = BB_ClientConfigMgr::Instance().getConfig();
+    context.m_TCP = config.m_TCP;
+    context.m_IP.assign(config.m_IP.begin(), config.m_IP.end());
+    context.m_UDP = config.m_UDP;
+    context.m_srvPsw.assign(config.m_srvPsw.begin(), config.m_srvPsw.end());
+    context.m_srvUser.assign(config.m_srvUser.begin(), config.m_srvUser.end());
+    context.m_srvUserPsw.assign(config.m_srvUserPsw.begin(), config.m_srvUserPsw.end());
 
 	BB_Instance inst(context);
 	inst.getInstance();

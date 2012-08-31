@@ -40,22 +40,11 @@ struct HappeningEx
 	ChannelInfo m_videoChannel;
 };
 
-struct BB_TranslatorContext
-{
-	std::wstring m_IP;
-	int m_TCP;
-	int m_UDP;
-	std::wstring m_srvPsw;
-	std::wstring m_srvUser;
-	std::wstring m_srvUserPsw;
-	std::wstring m_audioDir;
-};
-
 
 class BB_Translator
 {
 public:
-	BB_Translator(const BB_TranslatorContext &context);
+    BB_Translator();
 	~BB_Translator(void);
 
 	// connect to the server and get happenings
@@ -86,7 +75,6 @@ private:
 
 	// Happening list with channel IDs for class internal usage
 	std::vector<HappeningEx> m_hapListEx;
-	BB_TranslatorContext m_context;
 
 	// Sound Devices List
 	std::vector<BB_SoundDevice> m_soundDevList;
