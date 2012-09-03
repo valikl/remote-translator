@@ -1,6 +1,5 @@
 #include "BB_Instance.h"
 #include "Utils.h"
-#include "common.h"
 #include <stdio.h>
 #include <tchar.h>
 

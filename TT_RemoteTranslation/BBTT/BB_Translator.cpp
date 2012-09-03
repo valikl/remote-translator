@@ -24,11 +24,11 @@ int BB_Translator::connectHap(wstring hapName, wstring nickName, wstring srcName
 
     ClientConfig config = BB_ClientConfigMgr::Instance().getConfig();
     context.m_TCP = config.m_TCP;
-    context.m_IP.assign(config.m_IP.begin(), config.m_IP.end());
+    context.m_IP = config.m_IP;
     context.m_UDP = config.m_UDP;
-    context.m_srvPsw.assign(config.m_srvPsw.begin(), config.m_srvPsw.end());
-    context.m_srvUser.assign(config.m_srvUser.begin(), config.m_srvUser.end());
-    context.m_srvUserPsw.assign(config.m_srvUserPsw.begin(), config.m_srvUserPsw.end());
+    context.m_srvPsw = config.m_srvPsw;
+    context.m_srvUser = config.m_srvUser;
+    context.m_srvUserPsw = config.m_srvUserPsw;
 	context.m_audioDir = DEFAULT_AUDIO_STORAGE;
 	
 	// Find Happening
@@ -73,11 +73,11 @@ int BB_Translator::init()
 
     ClientConfig config = BB_ClientConfigMgr::Instance().getConfig();
     context.m_TCP = config.m_TCP;
-    context.m_IP.assign(config.m_IP.begin(), config.m_IP.end());
+    context.m_IP = config.m_IP;
     context.m_UDP = config.m_UDP;
-    context.m_srvPsw.assign(config.m_srvPsw.begin(), config.m_srvPsw.end());
-    context.m_srvUser.assign(config.m_srvUser.begin(), config.m_srvUser.end());
-    context.m_srvUserPsw.assign(config.m_srvUserPsw.begin(), config.m_srvUserPsw.end());
+    context.m_srvPsw = config.m_srvPsw;
+    context.m_srvUser = config.m_srvUser;
+    context.m_srvUserPsw = config.m_srvUserPsw;
 
 	BB_Instance inst(context);
 	inst.getInstance();

@@ -8,8 +8,6 @@
 #include <string>
 #include <vector>
 
-#define ConfigUI (BB_ClientConfigMgr::Instance().getConfig())
-
 const std::string NODE_BBCONFIG("BBconfig"); 
 const std::string NODE_SERVER_CONNECT("ServerConnect");
 const std::string ATTR_IP("ip");
@@ -18,6 +16,10 @@ const std::string ATTR_UDP("udp");
 const std::string ATTR_SRV_PASSWORD("srvPassword");
 const std::string ATTR_SRV_USER("srvUser");
 const std::string ATTR_SRV_USER_PASSWORD("srvUserPassword");
+const std::string ATTR_NICK_NAME("nickName");
+const std::string ATTR_HAP_NAME("hapName");
+const std::string ATTR_SRC_NAME("srcName");
+const std::string ATTR_TRG_NAME("trgName");
 
 const std::string NODE_TEMPLATES("Templates");
 const std::string ATTR_HAP_PREFIX("hapPrefix");
@@ -29,6 +31,14 @@ const std::string NODE_AUDIO_SETTINGS("AudioSettings");
 const std::string ATTR_DENOISE_LEVEL("denoiseLevel");
 const std::string ATTR_ECHO_CANCEL("echoCancel");
 const std::string ATTR_FRAMES_PER_SEC("framesPerSec");
+const std::string ATTR_MIC_GAIN_LEVEL("micGainLevel");
+const std::string ATTR_SRC_VOLUME_LEVEL("srcVolumeLevel");
+const std::string ATTR_TRG_VOLUME_LEVEL("trgVolumeLevel");
+const std::string ATTR_MIC_MUTE("micMute");
+const std::string ATTR_TRG_MUTE("trgMute");
+const std::string ATTR_SOUND_SYS_WIN("soundSystemWin");
+const std::string ATTR_INPUT_SOUND_DEV_ID("inputSoundDevId");
+const std::string ATTR_OUTPUT_SOUND_DEV_ID("outputSoundDevId");
 
 const std::string NODE_AGC("AGC");
 const std::string ATTR_ENABLE("enable");
@@ -37,24 +47,27 @@ const std::string ATTR_MAX_INC("maxIncrement");
 const std::string ATTR_MAX_DEC("maxDecrement");
 const std::string ATTR_MAX_GAIN("maxGain");
 
+const std::string NODE_VIDEO_SETTINGS("VideoSettings");
+const std::string ATTR_VIDEO_QUALITY("videoQuality");
+
 // template for happening structure:
 // hap_<happening name>/source_<source language channel>
 // hap_<happening name>/destination_<destination language channel>
 // hap_<happening name>/video_<video channel>
 struct HapTemplate
 {
-	std::string m_hapRegexp;
-	std::string m_srcRegexp;
-	std::string m_dstRegexp;
-	std::string m_videoRegexp;
+    std::wstring m_hapRegexp;
+    std::wstring m_srcRegexp;
+    std::wstring m_dstRegexp;
+    std::wstring m_videoRegexp;
 };
 
 struct HapData
 {
-    std::string m_Happening;
-    std::vector<std::string> m_srcList;
-    std::vector<std::string> m_trgList;
-    std::string m_Video;
+    std::wstring m_Happening;
+    std::vector<std::wstring> m_srcList;
+    std::vector<std::wstring> m_trgList;
+    std::wstring m_Video;
 };
 
 struct AGC
@@ -69,12 +82,12 @@ struct AGC
 // Client configuration
 struct ClientConfig
 {
-    std::string m_IP;
+    std::wstring m_IP;
     int    m_TCP;
     int    m_UDP;
-    std::string m_srvUser;
-    std::string m_srvUserPsw;
-    std::string m_srvPsw;
+    std::wstring m_srvUser;
+    std::wstring m_srvUserPsw;
+    std::wstring m_srvPsw;
 
     // Regexp for happening
     HapTemplate m_hapTemplate;
@@ -89,10 +102,10 @@ struct ClientConfig
     int m_framesPerSec;
 
     //Structure fields for GUI intitialization
-    std::string m_NickName;
-    std::string m_Happening;
-    std::string m_SrcChannel;
-    std::string m_TrgChannel;
+    std::wstring m_NickName;
+    std::wstring m_Happening;
+    std::wstring m_SrcChannel;
+    std::wstring m_TrgChannel;
     int m_MicGainLevel;
     int m_SrcVolumeLevel;
     int m_trgVolumeLevel;
@@ -115,10 +128,39 @@ public:
 	// Returns the instance of the singleton
 	static BB_ClientConfigMgr &Instance();
 
-	int init(std::string fileName = "config.xml");
+    int init(std::string fileName = "config.xml");
 	int saveConfig();
 	
 	ClientConfig getConfig();
+
+    void SetIP(std::wstring ip) {m_config.m_IP = ip;}
+    void SetTCP(int tcp) {m_config.m_TCP = tcp;}
+    void SetUDP(int udp) {m_config.m_UDP = udp;}
+    void SetSrvUser(std::wstring srvUser) {m_config.m_srvUser = srvUser;}
+    void SetSrvUserPsw(std::wstring srvUserPsw) {m_config.m_srvUserPsw = srvUserPsw;}
+    void SetSrvPsw(std::wstring srvPsw) {m_config.m_srvPsw = srvPsw;}
+    void SetHapTemplate(HapTemplate hapTemplate) {m_config.m_hapTemplate.m_dstRegexp = hapTemplate.m_dstRegexp;
+        m_config.m_hapTemplate.m_srcRegexp = hapTemplate.m_srcRegexp; m_config.m_hapTemplate.m_dstRegexp = hapTemplate.m_dstRegexp;
+        m_config.m_hapTemplate.m_videoRegexp = hapTemplate.m_videoRegexp;}
+    void SetAGC(AGC agc) {m_config.m_AGC.m_enable = agc.m_enable; m_config.m_AGC.m_gainLevel = agc.m_gainLevel;
+        m_config.m_AGC.m_maxIncrement = agc.m_maxIncrement; m_config.m_AGC.m_maxDecrement = agc.m_maxDecrement;
+        m_config.m_AGC.m_maxGain = agc.m_maxGain;}
+    void SetNoiseCancel(int noiseCancel) {m_config.m_noiseCancel = noiseCancel;}
+    void SetEchoCancel(bool echoCancel) {m_config.m_echoCancel = echoCancel;}
+    void SetFramesPerSec(int framesPerSec) {m_config.m_framesPerSec = framesPerSec;}
+    void SetNickName(std::wstring nickName) {m_config.m_NickName = nickName;}
+    void SetHappening(std::wstring happening) {m_config.m_Happening = happening;}
+    void SetSrcChannel(std::wstring srcChannel) {m_config.m_SrcChannel = srcChannel;}
+    void SetTrgChannel(std::wstring trgChannel) {m_config.m_TrgChannel = trgChannel;}
+    void SetMicGainLevel(int micGainLevel) {m_config.m_MicGainLevel = micGainLevel;}
+    void SetSrcVolumeLevel(int srcVolumeLevel) {m_config.m_SrcVolumeLevel = srcVolumeLevel;}
+    void SetTrgVolumeLevel(int trgVolumeLevel) {m_config.m_trgVolumeLevel = trgVolumeLevel;}
+    void SetVideoQuality(int videoQuality) {m_config.m_VideoQuality = videoQuality;}
+    void SetMicMute(bool micMute) {m_config.m_MicMute = micMute;}
+    void SetTrgMute(bool trgMute) {m_config.m_TrgMute = trgMute;}
+    void SetSoundSystemWin(bool isSoundSystemWin) {m_config.m_isSoundSystemWin = isSoundSystemWin;}
+    void SetInputSoundDevId(int inputSoundDevId) {m_config.m_InputSoundDevId = inputSoundDevId;}
+    void SetOutputSoundDevId(int outputSoundDevId) {m_config.m_OutputSoundDevId = outputSoundDevId;}
 
 private:
 
@@ -138,6 +180,7 @@ private:
 	void loadServerConnectConfig(const ticpp::Document &doc);
 	void loadTemplateConfig(const ticpp::Document &doc);
 	void loadAudioSettingsConfig(const ticpp::Document &doc);
+	void loadVideoSettings(const ticpp::Document &doc);
 
 	ClientConfig m_config;
 	std::string m_fileName;

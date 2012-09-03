@@ -1,8 +1,6 @@
 #include "BB_ClientConfigMgr.h"
 #include "Ticpp/tinyxml.h"
 
-
-
 using namespace std;
 using namespace ticpp;
 
@@ -55,6 +53,36 @@ void BB_ClientConfigMgr::loadConfigFromFile()
 	loadServerConnectConfig(doc);
 	loadTemplateConfig(doc);
 	loadAudioSettingsConfig(doc);
+	loadVideoSettings(doc);
+}
+
+void BB_ClientConfigMgr::loadVideoSettings(const ticpp::Document &doc)
+{
+		// parse through all BBconfig Elements
+    ticpp::Iterator<ticpp::Element> child;
+    for(child = child.begin(doc.FirstChildElement()); child != child.end(); child++)
+    {
+		string strName;
+        child->GetValue(&strName);
+		if (strName == NODE_VIDEO_SETTINGS)
+		{
+			 // now parse through all the attributes of this element
+            ticpp::Iterator< ticpp::Attribute > attribute;
+            for(attribute = attribute.begin(child.Get()); attribute != attribute.end(); attribute++)
+            {
+				string strValue;
+                attribute->GetName(&strName);
+                attribute->GetValue(&strValue);
+
+				if (strName == ATTR_VIDEO_QUALITY)
+				{
+					m_config.m_VideoQuality = atoi(strValue.c_str());
+					continue;
+				}
+		    }
+			break;
+		}
+	}
 }
 
 void BB_ClientConfigMgr::loadServerConnectConfig(const ticpp::Document &doc)
@@ -74,10 +102,13 @@ void BB_ClientConfigMgr::loadServerConnectConfig(const ticpp::Document &doc)
 				string strValue;
                 attribute->GetName(&strName);
                 attribute->GetValue(&strValue);
-                    
+                   
+				wstring wstrValue;
+				wstrValue.assign(strValue.begin(), strValue.end());
+
 				if (strName == ATTR_IP)
 				{
-					m_config.m_IP = strValue;
+					m_config.m_IP = wstrValue;
 					continue;
 				}
 
@@ -95,19 +126,43 @@ void BB_ClientConfigMgr::loadServerConnectConfig(const ticpp::Document &doc)
 
 				if (strName == ATTR_SRV_PASSWORD)
 				{
-					m_config.m_srvPsw = strValue;
+					m_config.m_srvPsw = wstrValue;
 					continue;
 				}
 
 				if (strName == ATTR_SRV_USER)
 				{
-					m_config.m_srvUser = strValue;
+					m_config.m_srvUser = wstrValue;
 					continue;
 				}
 
 				if (strName == ATTR_SRV_USER_PASSWORD)
 				{
-					m_config.m_srvUserPsw = strValue;
+					m_config.m_srvUserPsw = wstrValue;
+					continue;
+				}
+
+				if (strName == ATTR_NICK_NAME)
+				{
+					m_config.m_NickName = wstrValue;
+					continue;
+				}
+
+				if (strName == ATTR_HAP_NAME)
+				{
+					m_config.m_Happening = wstrValue;
+					continue;
+				}
+
+				if (strName == ATTR_SRC_NAME)
+				{
+					m_config.m_SrcChannel = wstrValue;
+					continue;
+				}
+
+				if (strName == ATTR_TRG_NAME)
+				{
+					m_config.m_TrgChannel = wstrValue;
 					continue;
 				}
 		    }
@@ -134,27 +189,30 @@ void BB_ClientConfigMgr::loadTemplateConfig(const ticpp::Document &doc)
                 attribute->GetName(&strName);
                 attribute->GetValue(&strValue);
                     
+				wstring wstrValue;
+				wstrValue.assign(strValue.begin(), strValue.end());
+
 				if (strName == ATTR_HAP_PREFIX)
 				{
-					m_config.m_hapTemplate.m_hapRegexp = strValue;
+					m_config.m_hapTemplate.m_hapRegexp = wstrValue;
 					continue;
 				}
 
 				if (strName == ATTR_SRC_PREFIX)
 				{
-					m_config.m_hapTemplate.m_srcRegexp = strValue;
+					m_config.m_hapTemplate.m_srcRegexp = wstrValue;
 					continue;
 				}
 
 				if (strName == ATTR_DST_PREFIX)
 				{
-					m_config.m_hapTemplate.m_dstRegexp = strValue;
+					m_config.m_hapTemplate.m_dstRegexp = wstrValue;
 					continue;
 				}
 
 				if (strName == ATTR_VIDEO_PREFIX)
 				{
-					m_config.m_hapTemplate.m_videoRegexp = strValue;
+					m_config.m_hapTemplate.m_videoRegexp = wstrValue;
 					continue;
 				}
 		    }
@@ -199,6 +257,54 @@ void BB_ClientConfigMgr::loadAudioSettingsConfig(const ticpp::Document &doc)
 			if (strName == ATTR_FRAMES_PER_SEC)
 			{
 				m_config.m_framesPerSec = atoi(strValue.c_str());
+				continue;
+			}
+
+			if (strName == ATTR_MIC_GAIN_LEVEL)
+			{
+				m_config.m_MicGainLevel = atoi(strValue.c_str());
+				continue;
+			}
+
+			if (strName == ATTR_SRC_VOLUME_LEVEL)
+			{
+				m_config.m_SrcVolumeLevel = atoi(strValue.c_str());
+				continue;
+			}
+
+			if (strName == ATTR_TRG_VOLUME_LEVEL)
+			{
+				m_config.m_trgVolumeLevel = atoi(strValue.c_str());
+				continue;
+			}
+
+			if (strName == ATTR_MIC_MUTE)
+			{
+				m_config.m_MicMute = atoi(strValue.c_str());
+				continue;
+			}
+
+			if (strName == ATTR_TRG_MUTE)
+			{
+				m_config.m_TrgMute = atoi(strValue.c_str());
+				continue;
+			}
+
+			if (strName == ATTR_SOUND_SYS_WIN)
+			{
+				m_config.m_isSoundSystemWin = atoi(strValue.c_str());
+				continue;
+			}
+
+			if (strName == ATTR_INPUT_SOUND_DEV_ID)
+			{
+				m_config.m_InputSoundDevId = atoi(strValue.c_str());
+				continue;
+			}
+
+			if (strName == ATTR_OUTPUT_SOUND_DEV_ID)
+			{
+				m_config.m_OutputSoundDevId = atoi(strValue.c_str());
 				continue;
 			}
 		}
@@ -262,24 +368,37 @@ int BB_ClientConfigMgr::saveConfig()
 	string xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n";
 	xml += "<" + NODE_BBCONFIG + ">\n";
 	
+
 	xml += "<" + NODE_SERVER_CONNECT + " " +
-		ATTR_IP + "=\"" + m_config.m_IP + "\" " + 
+		ATTR_IP + "=\"" + string(m_config.m_IP.begin(), m_config.m_IP.end()) + "\" " + 
 		ATTR_TCP + "=\"" + string(itoa(m_config.m_TCP, buffer, 10)) + "\" " +
 		ATTR_UDP + "=\"" + string(itoa(m_config.m_UDP, buffer, 10)) + "\" " +
-		ATTR_SRV_PASSWORD + "=\"" + m_config.m_srvPsw + "\" " +
-		ATTR_SRV_USER + "=\"" + m_config.m_srvUser + "\" " +
-		ATTR_SRV_USER_PASSWORD + "=\"" + m_config.m_srvUserPsw + "\" " + "/>\n";
+		ATTR_SRV_PASSWORD + "=\"" + string(m_config.m_srvPsw.begin(), m_config.m_srvPsw.end()) + "\" " +
+		ATTR_SRV_USER + "=\"" + string(m_config.m_srvUser.begin(), m_config.m_srvUser.end()) + "\" " +
+		ATTR_SRV_USER_PASSWORD + "=\"" + string(m_config.m_srvUserPsw.begin(), m_config.m_srvUserPsw.end()) + "\" " + 
+		ATTR_NICK_NAME + "=\"" + string(m_config.m_NickName.begin(), m_config.m_NickName.end()) + "\" " + 
+		ATTR_HAP_NAME + "=\"" + string(m_config.m_Happening.begin(), m_config.m_Happening.end()) + "\" " + 
+		ATTR_SRC_NAME + "=\"" + string(m_config.m_SrcChannel.begin(), m_config.m_SrcChannel.end()) + "\" " + 
+		ATTR_TRG_NAME + "=\"" + string(m_config.m_TrgChannel.begin(), m_config.m_TrgChannel.end()) + "\" " + "/>\n";
 
 	xml += "<" + NODE_TEMPLATES + " " +
-		ATTR_HAP_PREFIX + "=\"" + m_config.m_hapTemplate.m_hapRegexp + "\" " + 
-		ATTR_SRC_PREFIX + "=\"" + m_config.m_hapTemplate.m_srcRegexp + "\" " +
-		ATTR_DST_PREFIX + "=\"" + m_config.m_hapTemplate.m_dstRegexp + "\" " +
-		ATTR_VIDEO_PREFIX + "=\"" + m_config.m_hapTemplate.m_videoRegexp + "\" " + "/>\n";
+		ATTR_HAP_PREFIX + "=\"" + string(m_config.m_hapTemplate.m_hapRegexp.begin(), m_config.m_hapTemplate.m_hapRegexp.end()) + "\" " + 
+		ATTR_SRC_PREFIX + "=\"" + string(m_config.m_hapTemplate.m_srcRegexp.begin(), m_config.m_hapTemplate.m_srcRegexp.end()) + "\" " +
+		ATTR_DST_PREFIX + "=\"" + string(m_config.m_hapTemplate.m_dstRegexp.begin(), m_config.m_hapTemplate.m_dstRegexp.end()) + "\" " +
+		ATTR_VIDEO_PREFIX + "=\"" + string(m_config.m_hapTemplate.m_videoRegexp.begin(), m_config.m_hapTemplate.m_videoRegexp.end()) + "\" " + "/>\n";
 
 	xml += "<" + NODE_AUDIO_SETTINGS + " " +
 		ATTR_DENOISE_LEVEL + "=\"" + string(itoa(m_config.m_noiseCancel, buffer, 10)) + "\" " + 
 		ATTR_ECHO_CANCEL + "=\"" + string(itoa(m_config.m_echoCancel, buffer, 10)) + "\" " +
-		ATTR_FRAMES_PER_SEC + "=\"" + string(itoa(m_config.m_framesPerSec, buffer, 10)) + "\" " + ">\n";
+		ATTR_FRAMES_PER_SEC + "=\"" + string(itoa(m_config.m_framesPerSec, buffer, 10)) + "\" " + 
+		ATTR_MIC_GAIN_LEVEL + "=\"" + string(itoa(m_config.m_MicGainLevel, buffer, 10)) + "\" " + 
+		ATTR_SRC_VOLUME_LEVEL + "=\"" + string(itoa(m_config.m_SrcVolumeLevel, buffer, 10)) + "\" " + 
+		ATTR_TRG_VOLUME_LEVEL + "=\"" + string(itoa(m_config.m_trgVolumeLevel, buffer, 10)) + "\" " + 
+		ATTR_MIC_MUTE + "=\"" + string(itoa(m_config.m_MicMute, buffer, 10)) + "\" " + 
+		ATTR_TRG_MUTE + "=\"" + string(itoa(m_config.m_TrgMute, buffer, 10)) + "\" " + 
+		ATTR_SOUND_SYS_WIN + "=\"" + string(itoa(m_config.m_isSoundSystemWin, buffer, 10)) + "\" " + 
+		ATTR_INPUT_SOUND_DEV_ID + "=\"" + string(itoa(m_config.m_InputSoundDevId, buffer, 10)) + "\" " + 
+		ATTR_OUTPUT_SOUND_DEV_ID + "=\"" + string(itoa(m_config.m_OutputSoundDevId, buffer, 10)) + "\" " + ">\n";
 
 	xml += "<" + NODE_AGC + " " +
 		ATTR_ENABLE + "=\"" + string(itoa(m_config.m_AGC.m_enable, buffer, 10)) + "\" " + 
@@ -289,6 +408,10 @@ int BB_ClientConfigMgr::saveConfig()
 		ATTR_MAX_GAIN + "=\"" + string(itoa(m_config.m_AGC.m_maxGain, buffer, 10)) + "\" " + "/>\n";
 
 	xml += "</" + NODE_AUDIO_SETTINGS + ">\n";
+
+	xml += "<" + NODE_VIDEO_SETTINGS + " " +
+		ATTR_VIDEO_QUALITY + "=\"" + string(itoa(m_config.m_VideoQuality, buffer, 10)) + "\" " + "/>\n";
+
 	xml += "</" + NODE_BBCONFIG + ">\n";
 
 	FILE *pFile = fopen(m_fileName.c_str(), "wb");
