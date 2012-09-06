@@ -12,6 +12,8 @@
 
 #include <QMainWindow>
 
+#define ConfigUI (BB_ClientConfigMgr::Instance().getConfig())
+
 using namespace std;
 
 namespace Ui {
@@ -46,6 +48,8 @@ private slots:
 private:
 
     BB_Translator translator;
+    std::vector<Happening> haps_from_mgr;
+
     Ui::RemoteTranslatorUI *ui;
     QTimer *timer;
     QTimer *user_timer;
