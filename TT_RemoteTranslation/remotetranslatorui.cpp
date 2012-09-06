@@ -7,29 +7,30 @@
 
 // Configuration Manager functions
 
-static void ChangeChannelMenu(vector<string>& channels, QComboBox* combo, string def_val)
+static void ChangeChannelMenu(vector<wstring>& channels, QComboBox* combo, wstring def_val)
 {
     combo->clear();
     for (unsigned int i = 0; i < channels.size(); ++i)
     {
-        string channel = channels[i];
-        combo->addItem(QString::fromStdString(channel), i);
+        wstring channel = channels[i];
+        combo->addItem(QString::fromStdWString(channel), i);
         if (channel == def_val)
             combo->setCurrentIndex(i);
     }
 }
 
-static void InitHapsMenu(vector<HapData>& haps, Ui::RemoteTranslatorUI* ui)
+static void InitHapsMenu(vector<Happening>& haps, Ui::RemoteTranslatorUI* ui)
 {
     for (unsigned int i = 0; i < haps.size(); ++i)
     {
-        HapData hap = haps[i];
-        ui->HapList->addItem(QString::fromStdString(hap.m_Happening), i);
-        if (hap.m_Happening == ConfigUI.m_Happening)
+        Happening hap = haps[i];
+        ui->HapList->addItem(QString::fromStdWString(hap.m_hapName), i);
+        if (hap.m_hapName == ConfigUI.m_Happening)
             ui->HapList->setCurrentIndex(i);
     }
  }
 
+/*
 // simulation of config manager
 static vector<HapData> haps_from_mgr;
 static void GetHapsData(vector<HapData>& haps)
@@ -65,6 +66,7 @@ static void GetHapsData(vector<HapData>& haps)
     ConfigUI.m_TrgChannel = "Hungarian";
     ConfigUI.m_MicGainLevel = SOUND_GAIN_DEFAULT;
 }
+*/
 
 //Dummy function for Mic level return
 
@@ -95,11 +97,9 @@ RemoteTranslatorUI::RemoteTranslatorUI(QWidget *parent) :
     ConfigUI = BB_ClientConfigMgr::Instance().getConfig();
 
     translator.init();
+    haps_from_mgr = translator.getHappenings();
 
-    // simulation of config manager
-    GetHapsData(haps_from_mgr);
-
-    ui->NickName->setText(QString::fromStdString(ConfigUI.m_NickName));
+    ui->NickName->setText(QString::fromStdWString(ConfigUI.m_NickName));
 
     ui->MicGainSld->setMinimum(0);
     ui->MicGainSld->setMaximum(SOUND_GAIN_MAX);
@@ -215,16 +215,16 @@ RemoteTranslatorUI::~RemoteTranslatorUI()
 
 void RemoteTranslatorUI::on_NickName_editingFinished()
 {
-    ConfigUI.m_NickName = ui->NickName->text().toStdString();
+    ConfigUI.m_NickName = ui->NickName->text().toStdWString();
 }
 
 
 void RemoteTranslatorUI::on_HapList_currentIndexChanged(const QString &arg1)
 {
     int hap_id = ui->HapList->itemData(ui->HapList->currentIndex()).toInt();
-    HapData hap = haps_from_mgr[hap_id];
-    ChangeChannelMenu(hap.m_srcList, ui->SrcLangList, ConfigUI.m_SrcChannel);
-    ChangeChannelMenu(hap.m_trgList, ui->TrgLangList, ConfigUI.m_TrgChannel);
+    Happening hap = haps_from_mgr[hap_id];
+    ChangeChannelMenu(hap.m_srcChannels, ui->SrcLangList, ConfigUI.m_SrcChannel);
+    ChangeChannelMenu(hap.m_dstChannels, ui->TrgLangList, ConfigUI.m_TrgChannel);
 }
 
 void RemoteTranslatorUI::on_MicGainSld_valueChanged(int val)
