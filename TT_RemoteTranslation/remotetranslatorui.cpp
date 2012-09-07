@@ -246,7 +246,7 @@ void RemoteTranslatorUI::on_SrcLangList_currentIndexChanged(const QString &arg1)
     int hap_id = ui->HapList->itemData(ui->HapList->currentIndex()).toInt();
     Happening hap = haps_from_mgr[hap_id];
 
-    int lang_id = ui->SrcLangList->itemData(ui->HapList->currentIndex()).toInt();
+    int lang_id = ui->SrcLangList->itemData(ui->SrcLangList->currentIndex()).toInt();
     BB_ClientConfigMgr::Instance().SetSrcChannel(hap.m_srcChannels[lang_id]);
 }
 
@@ -256,7 +256,7 @@ void RemoteTranslatorUI::on_TrgLangList_currentIndexChanged(const QString &arg1)
     int hap_id = ui->HapList->itemData(ui->HapList->currentIndex()).toInt();
     Happening hap = haps_from_mgr[hap_id];
 
-    int lang_id = ui->TrgLangList->itemData(ui->HapList->currentIndex()).toInt();
+    int lang_id = ui->TrgLangList->itemData(ui->TrgLangList->currentIndex()).toInt();
     BB_ClientConfigMgr::Instance().SetTrgChannel(hap.m_dstChannels[lang_id]);
 }
 
