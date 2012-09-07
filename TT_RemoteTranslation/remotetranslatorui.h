@@ -28,11 +28,20 @@ public:
 
     explicit RemoteTranslatorUI(QWidget *parent = 0);
     ~RemoteTranslatorUI();
+    int init();
     
 private slots:
 
     void on_NickName_editingFinished();
+
+    // happa\ening slots
     void on_HapList_currentIndexChanged(const QString &arg1);
+
+    // source/target language slots
+    void on_SrcLangList_currentIndexChanged(const QString &arg1);
+    void on_TrgLangList_currentIndexChanged(const QString &arg1);
+    void on_LangConnect_toggled(bool checked);
+
     void on_MicGainSld_valueChanged(int val);
     void on_MicMuteBut_clicked(bool checked);
     void on_TrgMuteBut_clicked(bool checked);

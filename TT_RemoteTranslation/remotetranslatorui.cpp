@@ -1,23 +1,12 @@
 #include "remotetranslatorui.h"
 #include "sounddevices.h"
 #include "BBTT/BB_ClientConfigMgr.h"
+#include "BBTT/Utils.h"
 #include "ui_remotetranslatorui.h"
 #include <QTimer>
 #include <time.h>
 
 // Configuration Manager functions
-
-static void ChangeChannelMenu(vector<wstring>& channels, QComboBox* combo, wstring def_val)
-{
-    combo->clear();
-    for (unsigned int i = 0; i < channels.size(); ++i)
-    {
-        wstring channel = channels[i];
-        combo->addItem(QString::fromStdWString(channel), i);
-        if (channel == def_val)
-            combo->setCurrentIndex(i);
-    }
-}
 
 static void InitHapsMenu(vector<Happening>& haps, Ui::RemoteTranslatorUI* ui)
 {
@@ -92,13 +81,19 @@ RemoteTranslatorUI::RemoteTranslatorUI(QWidget *parent) :
     ui(new Ui::RemoteTranslatorUI)
 {
     ui->setupUi(this);
+}
 
-    BB_ClientConfigMgr::Instance().init("C:\\Projects\\work\\config.xml");
+int RemoteTranslatorUI::init()
+{
+    int ret = 0;
 
-    translator.init();
+    CHECK_ret(BB_ClientConfigMgr::Instance().init("C:\\Projects\\work\\config.xml"));
+    CHECK_ret(translator.init());
+
     haps_from_mgr = translator.getHappenings();
 
     ui->NickName->setText(QString::fromStdWString(ConfigUI.m_NickName));
+    ui->LangConnect->setCheckable(true);
 
     ui->MicGainSld->setMinimum(0);
     ui->MicGainSld->setMaximum(SOUND_GAIN_MAX);
@@ -113,7 +108,6 @@ RemoteTranslatorUI::RemoteTranslatorUI(QWidget *parent) :
     ui->SrcLevelSld->setMaximum(SOUND_VOLUME_MAX);
     ui->SrcLevelSld->setValue(ConfigUI.m_SrcVolumeLevel);
 
-    BB_ClientConfigMgr::Instance().SetVideoQuality(100);
     ui->VideoLvlSld->setMinimum(0);
     ui->VideoLvlSld->setMaximum(100);
     ui->VideoLvlSld->setValue(ConfigUI.m_VideoQuality);
@@ -142,8 +136,11 @@ RemoteTranslatorUI::RemoteTranslatorUI(QWidget *parent) :
     ui->MicLevelInd->setValue(GetMicLevel());
 
     connect(ui->actionConfigure_Audio, SIGNAL(triggered()), this, SLOT(ActivateSoundDevices()));
+
+    return ret;
 }
 
+// Activate sound devices
 void RemoteTranslatorUI::ActivateSoundDevices()
 {
     vector<BB_SoundDevice> soundDevList = translator.getSoundDevices();
@@ -218,7 +215,23 @@ void RemoteTranslatorUI::on_NickName_editingFinished()
     BB_ClientConfigMgr::Instance().SetNickName(ui->NickName->text().toStdWString());
 }
 
+//////////////////////////////
+// Happenings and languages //
+//////////////////////////////
 
+static void ChangeChannelMenu(vector<wstring>& channels, QComboBox* combo, wstring def_val)
+{
+    combo->clear();
+    for (unsigned int i = 0; i < channels.size(); ++i)
+    {
+        wstring channel = channels[i];
+        combo->addItem(QString::fromStdWString(channel), i);
+        if (channel == def_val)
+            combo->setCurrentIndex(i);
+    }
+}
+
+// Change happening
 void RemoteTranslatorUI::on_HapList_currentIndexChanged(const QString &arg1)
 {
     int hap_id = ui->HapList->itemData(ui->HapList->currentIndex()).toInt();
@@ -226,6 +239,37 @@ void RemoteTranslatorUI::on_HapList_currentIndexChanged(const QString &arg1)
     ChangeChannelMenu(hap.m_srcChannels, ui->SrcLangList, ConfigUI.m_SrcChannel);
     ChangeChannelMenu(hap.m_dstChannels, ui->TrgLangList, ConfigUI.m_TrgChannel);
 }
+
+// Change source language
+void RemoteTranslatorUI::on_SrcLangList_currentIndexChanged(const QString &arg1)
+{
+    int hap_id = ui->HapList->itemData(ui->HapList->currentIndex()).toInt();
+    Happening hap = haps_from_mgr[hap_id];
+
+    int lang_id = ui->SrcLangList->itemData(ui->HapList->currentIndex()).toInt();
+    BB_ClientConfigMgr::Instance().SetSrcChannel(hap.m_srcChannels[lang_id]);
+}
+
+// Change target language
+void RemoteTranslatorUI::on_TrgLangList_currentIndexChanged(const QString &arg1)
+{
+    int hap_id = ui->HapList->itemData(ui->HapList->currentIndex()).toInt();
+    Happening hap = haps_from_mgr[hap_id];
+
+    int lang_id = ui->TrgLangList->itemData(ui->HapList->currentIndex()).toInt();
+    BB_ClientConfigMgr::Instance().SetTrgChannel(hap.m_dstChannels[lang_id]);
+}
+
+// Connect to choosen languages
+void RemoteTranslatorUI::on_LangConnect_toggled(bool checked)
+{
+    translator.connectHap(HAPPENING_CHANNEL_DEFAULT_NAME, ConfigUI.m_NickName, ConfigUI.m_SrcChannel, ConfigUI.m_TrgChannel);
+
+    if (checked)
+        ui->LangConnect->setChecked(false);
+}
+
+/////////////////////////////////
 
 void RemoteTranslatorUI::on_MicGainSld_valueChanged(int val)
 {
