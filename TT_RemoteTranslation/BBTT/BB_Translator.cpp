@@ -6,6 +6,9 @@ using namespace std;
 
 BB_Translator::BB_Translator()
 {
+    m_channelVideo = NULL;
+    m_channelSrc = NULL;
+    m_channelDst = NULL;
 }
 
 BB_Translator::~BB_Translator(void)
@@ -74,8 +77,8 @@ int BB_Translator::connectHap(wstring hapName, wstring nickName, wstring srcName
 	context.channelId = hap.m_videoChannel.m_id;
 	context.m_nickName = VIDEO_CHANNEL_PREFIX + nickName;
 	context.m_channelName = VIDEO_CHANNEL_NAME;
-	m_channelDst = new BB_Instance(context);
-	m_channelDst->init();
+    m_channelVideo = new BB_Instance(context);
+    m_channelVideo->init();
 
 	return EXIT_SUCCESS;
 }
