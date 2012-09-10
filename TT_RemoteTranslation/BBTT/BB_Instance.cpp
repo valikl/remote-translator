@@ -384,7 +384,6 @@ int BB_Instance::getChannels(std::vector<BB_Channel> &channels)
 	INT32 ret = EXIT_FAILURE;
 	INT32* channelIDs = NULL;
 	INT32 size = 0;
-    bool isFound = false;
 
 	if (!TT_GetServerChannels(m_ttInst, channelIDs, &size) || size == 0)
 	{
@@ -487,4 +486,56 @@ __err_exit2:
 	delete[] soundDevices;
 __err_exit1:
 	return ret;
+}
+
+
+int BB_Instance::getUsers(std::vector<BB_ChannelUser> &userList)
+{
+    INT32 ret = EXIT_FAILURE;
+    INT32* userIDs = NULL;
+    INT32 size = 0;
+
+    // Always rebuild list
+    m_UserList.empty();
+
+    if (!TT_GetChannelUsers(m_ttInst, m_channelId, userIDs, &size) || size == 0)
+    {
+        goto __err_exit1;
+    }
+
+    if (size == 0)
+    {
+        cout << "No users!" << endl;
+        goto __err_exit1;
+    }
+
+    userIDs = new INT32[size];
+    if (!TT_GetChannelUsers(m_ttInst, m_channelId, userIDs, &size))
+    {
+        goto __err_exit2;
+    }
+
+    for (int i = 0; i < size; ++i)
+    {
+        User ttUser;
+        if (!TT_GetUser(m_ttInst, userIDs[i], &ttUser))
+        {
+            continue;
+        }
+
+        BB_ChannelUser user;
+        // TODO ask Valik, do we need szNickname or szUsername
+        // What happen if name is changed or new user connected/disconnected
+        user.m_userName = ttUser.szUsername;
+        user.m_id = userIDs[i];
+        m_UserList.push_back(user);
+    }
+
+    userList = m_UserList;
+    ret = EXIT_SUCCESS;
+
+__err_exit2:
+    delete[] userIDs;
+__err_exit1:
+    return ret;
 }

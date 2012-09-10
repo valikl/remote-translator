@@ -55,6 +55,12 @@ struct BB_SoundDevice
 	INT32 m_id;
 };
 
+struct BB_ChannelUser
+{
+    std::wstring m_userName;
+    INT32 m_id;
+};
+
 class BB_Instance
 {
 public:
@@ -74,11 +80,13 @@ public:
 	
 	int getChannels(std::vector<BB_Channel> &channels);
 	int getSoundDevices(std::vector<BB_SoundDevice> &soundDevs);
+    int getUsers(std::vector<BB_ChannelUser> &userList);
 
 private:
 		
 	int joinChannel();
 	int setInstProp();
+    int createUserList();
 
 	void processTTMessage(const TTMessage& msg);
 
@@ -87,6 +95,8 @@ private:
 	BB_InstanceContext m_context;
 
 	INT32 m_channelId;
+
+    std::vector<BB_ChannelUser> m_UserList;
 };
 
 #endif

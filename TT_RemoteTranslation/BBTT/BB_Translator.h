@@ -40,6 +40,15 @@ struct HappeningEx
 	ChannelInfo m_videoChannel;
 };
 
+enum TranslatorOpCode
+{
+    OP_CODE_UPDATE_MICROPHONE_GAIN,
+    OP_CODE_UPDATE_SOURCE_LEVEL,
+    OP_CODE_UPDATE_TARGET_LEVEL,
+    OP_CODE_UPDATE_VIDEO_QUALITY,
+    OP_CODE_MUTE_MICROPHONE,
+    OP_CODE_MUTE_TARGET
+};
 
 class BB_Translator
 {
@@ -56,6 +65,9 @@ public:
 	std::vector<BB_SoundDevice> getSoundDevices() { return m_soundDevList; }
 
 	int connectHap(std::wstring hapName, std::wstring nickName, std::wstring srcName, std::wstring dstName);
+    int getUsers(std::vector<BB_ChannelUser> &userList, bool isSource);
+
+    int handleOperation(TranslatorOpCode eOpCode);
 
 private:
 

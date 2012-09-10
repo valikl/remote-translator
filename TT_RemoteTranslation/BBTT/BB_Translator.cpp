@@ -10,12 +10,18 @@ BB_Translator::BB_Translator()
 
 BB_Translator::~BB_Translator(void)
 {
-	/*
-	delete m_channelOrigIn;
-	delete m_channelOrigOut;
-	delete m_channelLangFrom;
-	delete m_channelLangTo;
-	*/
+    if (m_channelVideo)
+    {
+        delete m_channelVideo;
+    }
+    if (m_channelSrc)
+    {
+        delete m_channelSrc;
+    }
+    if (m_channelDst)
+    {
+        delete m_channelDst;
+    }
 }
 
 int BB_Translator::connectHap(wstring hapName, wstring nickName, wstring srcName, wstring dstName)
@@ -97,7 +103,7 @@ int BB_Translator::init()
 
 	ret = inst.getSoundDevices(m_soundDevList);
 
-	return EXIT_SUCCESS;
+    return ret;
 }
 
 int BB_Translator::initHapsList(const std::vector<BB_Channel> &channels)
@@ -218,4 +224,54 @@ bool BB_Translator::findDstChannelId(const HappeningEx hap, wstring name, INT32 
 		}
 	}
 	return false;
+}
+
+int BB_Translator::getUsers(std::vector<BB_ChannelUser> &userList, bool isSource)
+{
+    int ret;
+    if (isSource)
+    {
+        ret = m_channelSrc->getUsers(userList);
+    }
+    else
+    {
+        ret = m_channelDst->getUsers(userList);
+    }
+
+    return ret;
+}
+
+int handleOperation(TranslatorOpCode eOpCode)
+{
+    int ret = EXIT_SUCCESS;
+    switch (eOpCode)
+    {
+    case OP_CODE_UPDATE_MICROPHONE_GAIN:
+    {
+
+    }
+    case OP_CODE_UPDATE_SOURCE_LEVEL:
+    {
+    }
+    case OP_CODE_UPDATE_TARGET_LEVEL:
+    {
+    }
+    case OP_CODE_UPDATE_VIDEO_QUALITY:
+    {
+    }
+    case OP_CODE_MUTE_MICROPHONE:
+    {
+        //TT_SetUserMute (IN TTInstance *lpTTInstance, IN INT32 nUserID, IN BOOL bMute)
+    }
+    case OP_CODE_MUTE_TARGET:
+    {
+        //TT_SetUserMute (IN TTInstance *lpTTInstance, IN INT32 nUserID, IN BOOL bMute)
+    }
+    default:
+    {
+        ret = EXIT_FAILURE;
+    }
+    }
+
+    return ret;
 }
