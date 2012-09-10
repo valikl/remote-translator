@@ -32,6 +32,9 @@ RemoteTranslatorUI::RemoteTranslatorUI(QWidget *parent) :
 
 void RemoteTranslatorUI::initHapsMenu()
 {
+    // get list of happenings
+    happenings = translator.getHappenings();
+
     for (unsigned int i = 0; i < happenings.size(); ++i)
     {
         Happening hap = happenings[i];
@@ -73,8 +76,8 @@ int RemoteTranslatorUI::init()
     CHECK_ret(BB_ClientConfigMgr::Instance().init("C:\\Projects\\work\\config.xml"));
     CHECK_ret(translator.init());
 
-    // get list of happenings
-    happenings = translator.getHappenings();
+    //Initialize ComboBoxes
+    initHapsMenu();
 
     // set nick name
     ui->NickName->setText(QString::fromStdWString(ConfigUI.m_NickName));
@@ -96,9 +99,6 @@ int RemoteTranslatorUI::init()
     user_timer = new QTimer(this);
     connect(user_timer, SIGNAL(timeout()), this, SLOT(on_UserTimeout()));
     user_timer->start(1000);
-
-    //Initialize ComboBoxes
-    initHapsMenu();
 
     // activate sound devices
     connect(ui->actionConfigure_Audio, SIGNAL(triggered()), this, SLOT(ActivateSoundDevices()));
@@ -154,6 +154,7 @@ void RemoteTranslatorUI::on_UserTimeout()
 
 RemoteTranslatorUI::~RemoteTranslatorUI()
 {
+    translator.finalize();
     delete ui;
 }
 
@@ -210,6 +211,7 @@ void RemoteTranslatorUI::on_TrgLangList_currentIndexChanged(const QString &arg1)
 // Connect to choosen languages
 void RemoteTranslatorUI::on_LangConnect_toggled(bool checked)
 {
+    translator.disconnectHap();
     translator.connectHap(HAPPENING_CHANNEL_DEFAULT_NAME, ConfigUI.m_NickName, ConfigUI.m_SrcChannel, ConfigUI.m_TrgChannel);
 
     if (checked)
