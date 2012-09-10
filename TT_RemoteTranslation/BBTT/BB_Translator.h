@@ -59,12 +59,16 @@ public:
 	// connect to the server and get happenings
 	int init();
 
+    // disconnect etc.
+    int finalize();
+
 	std::vector<Happening> getHappenings() { return m_hapList; }
 	//int setActiveHappening(std::string hapName);
 
 	std::vector<BB_SoundDevice> getSoundDevices() { return m_soundDevList; }
 
 	int connectHap(std::wstring hapName, std::wstring nickName, std::wstring srcName, std::wstring dstName);
+    int disconnectHap();
     int getUsers(std::vector<BB_ChannelUser> &userList, bool isSource);
 
     int handleOperation(TranslatorOpCode eOpCode);

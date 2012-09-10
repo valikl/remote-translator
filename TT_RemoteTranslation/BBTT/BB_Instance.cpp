@@ -96,7 +96,6 @@ error_login:
 
 int BB_Instance::initDevice()
 {
-    int wait_ms = 10000;
 	ClientFlags flags;
 	INT32 inSoundId, outSoundId;
 	string err_str;
@@ -164,7 +163,6 @@ int BB_Instance::setInstProp()
 
 void BB_Instance::processTTMessage(const TTMessage& msg)
 {
-    Channel chan = {0};
     User user = {0};
     ServerProperties srvprop = {0};
     FileInfo file = {0};
@@ -342,7 +340,6 @@ int BB_Instance::SetAudioLevels()
 int BB_Instance::EnableTransmition()
 {
 	TT_EnableTransmission(m_ttInst, (TRANSMIT_AUDIO), TRUE);
-	ClientFlags  flags = TT_GetFlags(m_ttInst);
 	if (!(TT_GetFlags(m_ttInst) & CLIENT_TX_AUDIO))
 	{
 		cout <<"Video or audio transmission is not enabled" <<endl;
@@ -496,7 +493,7 @@ int BB_Instance::getUsers(std::vector<BB_ChannelUser> &userList)
     INT32 size = 0;
 
     // Always rebuild list
-    m_UserList.empty();
+    m_UserList.clear();
 
     if (!TT_GetChannelUsers(m_ttInst, m_channelId, userIDs, &size) || size == 0)
     {

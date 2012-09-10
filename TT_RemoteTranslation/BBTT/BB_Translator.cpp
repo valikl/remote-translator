@@ -10,18 +10,27 @@ BB_Translator::BB_Translator()
 
 BB_Translator::~BB_Translator(void)
 {
+}
+
+int BB_Translator::disconnectHap()
+{
     if (m_channelVideo)
     {
+        m_channelVideo->finalize();
         delete m_channelVideo;
     }
     if (m_channelSrc)
     {
+        m_channelSrc->finalize();
         delete m_channelSrc;
     }
     if (m_channelDst)
     {
+        m_channelDst->finalize();
         delete m_channelDst;
     }
+
+    return EXIT_SUCCESS;
 }
 
 int BB_Translator::connectHap(wstring hapName, wstring nickName, wstring srcName, wstring dstName)
@@ -71,6 +80,10 @@ int BB_Translator::connectHap(wstring hapName, wstring nickName, wstring srcName
 	return EXIT_SUCCESS;
 }
 
+int BB_Translator::finalize()
+{
+    return disconnectHap();
+}
 
 int BB_Translator::init()
 {
@@ -110,7 +123,7 @@ int BB_Translator::initHapsList(const std::vector<BB_Channel> &channels)
 {
 		// Find Source Channel Id
 	INT32 sourceChannelId = ROOT_PARENT_ID;
-	for (int i=0; i < channels.size(); i++)
+    for (int i=0; i < channels.size(); i++)
 	{
 		if (channels[i].name == SOURCE_CHANNEL_NAME)
 		{
@@ -129,7 +142,7 @@ int BB_Translator::initHapsList(const std::vector<BB_Channel> &channels)
 	// NOTE: We currently support only 1 Happening under root.
 	Happening hap;
 	HappeningEx hapEx;
-	for (int i=0; i < channels.size(); i++)
+    for (int i=0; i < channels.size(); i++)
 	{
 		if (channels[i].name == VIDEO_CHANNEL_NAME)
 		{
@@ -189,7 +202,7 @@ int BB_Translator::initHapsList(const std::vector<BB_Channel> &channels)
 
 bool BB_Translator::findHap(HappeningEx &hap, wstring name)
 {
-	for (int i=0; i < m_hapListEx.size(); i++)
+    for (int i=0; i < m_hapListEx.size(); i++)
 	{
 		if (m_hapListEx[i].m_hapChannel.m_name == name)
 		{
@@ -202,7 +215,7 @@ bool BB_Translator::findHap(HappeningEx &hap, wstring name)
 
 bool BB_Translator::findSrcChannelId(const HappeningEx hap, wstring name, INT32 &channelId)
 {
-	for (int i=0; i < hap.m_srcChannels.size(); i++)
+    for (int i=0; i < hap.m_srcChannels.size(); i++)
 	{
 		if (hap.m_srcChannels[i].m_name == name)
 		{
@@ -215,7 +228,7 @@ bool BB_Translator::findSrcChannelId(const HappeningEx hap, wstring name, INT32 
 
 bool BB_Translator::findDstChannelId(const HappeningEx hap, wstring name, INT32 &channelId)
 {
-	for (int i=0; i < hap.m_dstChannels.size(); i++)
+    for (int i=0; i < hap.m_dstChannels.size(); i++)
 	{
 		if (hap.m_dstChannels[i].m_name == name)
 		{
