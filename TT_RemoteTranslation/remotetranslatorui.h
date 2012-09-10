@@ -56,8 +56,12 @@ private slots:
 
 private:
 
+    void initHapsMenu();
+    void setSliders();
+    void setUserItems(bool is_source);
+
     BB_Translator translator;
-    std::vector<Happening> haps_from_mgr;
+    std::vector<Happening> happenings;
 
     Ui::RemoteTranslatorUI *ui;
     QTimer *timer;
