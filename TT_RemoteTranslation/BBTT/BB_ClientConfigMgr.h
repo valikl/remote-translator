@@ -115,8 +115,8 @@ struct ClientConfig
     bool m_TrgMute;
 
     bool m_isSoundSystemWin;
-    int m_InputSoundDevId;
-    int m_OutputSoundDevId;
+    std::wstring m_InputSoundDevId;
+    std::wstring m_OutputSoundDevId;
  };
 
 // Client configuration manager
@@ -159,8 +159,8 @@ public:
     void SetMicMute(bool micMute) {m_config.m_MicMute = micMute;}
     void SetTrgMute(bool trgMute) {m_config.m_TrgMute = trgMute;}
     void SetSoundSystemWin(bool isSoundSystemWin) {m_config.m_isSoundSystemWin = isSoundSystemWin;}
-    void SetInputSoundDevId(int inputSoundDevId) {m_config.m_InputSoundDevId = inputSoundDevId;}
-    void SetOutputSoundDevId(int outputSoundDevId) {m_config.m_OutputSoundDevId = outputSoundDevId;}
+    void SetInputSoundDevId(std::wstring inputSoundDevId) {m_config.m_InputSoundDevId = inputSoundDevId;}
+    void SetOutputSoundDevId(std::wstring outputSoundDevId) {m_config.m_OutputSoundDevId = outputSoundDevId;}
 
 private:
 

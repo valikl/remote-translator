@@ -67,7 +67,8 @@ public:
 
 	std::vector<BB_SoundDevice> getSoundDevices() { return m_soundDevList; }
 
-	int connectHap(std::wstring hapName, std::wstring nickName, std::wstring srcName, std::wstring dstName);
+    int connectHap(std::wstring hapName, std::wstring nickName, std::wstring srcName, std::wstring dstName,
+                  std::wstring inputSoundDevId, std::wstring outputSoundDevId);
     int disconnectHap();
     int getUsers(std::vector<BB_ChannelUser> &userList, bool isSource);
 
@@ -81,6 +82,7 @@ private:
 	bool findHap(HappeningEx &hap, std::wstring name);
 	bool findSrcChannelId(const HappeningEx hap, std::wstring name, INT32 &channelId);
 	bool findDstChannelId(const HappeningEx hap, std::wstring name, INT32 &channelId);
+    bool findSoundDev(std::wstring deviceId, BB_SoundDevice &soundDevice);
 	
 	BB_Instance *m_channelVideo;
 	BB_Instance *m_channelSrc;

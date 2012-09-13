@@ -446,7 +446,7 @@ int BB_Instance::getSoundDevices(vector<BB_SoundDevice> &soundDevs)
 		soundDev.m_isOutputDevice = false;
 		soundDev.m_isSoundSystemWin = (soundDevices[i].nSoundSystem == SOUNDSYSTEM_WINMM);
 		soundDev.m_deviceName = soundDevices[i].szDeviceName;
-
+        soundDev.m_deviceId = soundDevices[i].szDeviceID;
 		soundDevs.push_back(soundDev);
 	}
 
@@ -473,6 +473,7 @@ int BB_Instance::getSoundDevices(vector<BB_SoundDevice> &soundDevs)
 		soundDev.m_isOutputDevice = true;
 		soundDev.m_isSoundSystemWin = (soundDevices[i].nSoundSystem == SOUNDSYSTEM_WINMM);
 		soundDev.m_deviceName = soundDevices[i].szDeviceName;
+        soundDevices[i].szDeviceID;
 
 		soundDevs.push_back(soundDev);
 	}

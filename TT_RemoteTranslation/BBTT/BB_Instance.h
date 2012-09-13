@@ -32,8 +32,10 @@ struct BB_InstanceContext
 	std::wstring m_nickName;
 	std::wstring m_audioDir;
 
-	std::wstring m_channelName;
+    INT32 m_inputSoundDevId;
+    INT32 m_outputSoundDevId;
 
+	std::wstring m_channelName;
 	INT32 channelId;
 };
 
@@ -50,6 +52,7 @@ struct BB_Channel
 struct BB_SoundDevice
 {
 	std::wstring m_deviceName;
+    std::wstring m_deviceId;
 	bool m_isOutputDevice;
 	bool m_isSoundSystemWin;
 	INT32 m_id;

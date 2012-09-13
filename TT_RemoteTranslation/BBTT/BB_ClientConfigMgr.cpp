@@ -298,13 +298,17 @@ void BB_ClientConfigMgr::loadAudioSettingsConfig(const ticpp::Document &doc)
 
 			if (strName == ATTR_INPUT_SOUND_DEV_ID)
 			{
-				m_config.m_InputSoundDevId = atoi(strValue.c_str());
+                wstring wstrValue;
+                wstrValue.assign(strValue.begin(), strValue.end());
+                m_config.m_InputSoundDevId = wstrValue;
 				continue;
 			}
 
 			if (strName == ATTR_OUTPUT_SOUND_DEV_ID)
 			{
-				m_config.m_OutputSoundDevId = atoi(strValue.c_str());
+                wstring wstrValue;
+                wstrValue.assign(strValue.begin(), strValue.end());
+                m_config.m_OutputSoundDevId = wstrValue;
 				continue;
 			}
 		}
@@ -397,8 +401,8 @@ int BB_ClientConfigMgr::saveConfig()
 		ATTR_MIC_MUTE + "=\"" + string(itoa(m_config.m_MicMute, buffer, 10)) + "\" " + 
 		ATTR_TRG_MUTE + "=\"" + string(itoa(m_config.m_TrgMute, buffer, 10)) + "\" " + 
 		ATTR_SOUND_SYS_WIN + "=\"" + string(itoa(m_config.m_isSoundSystemWin, buffer, 10)) + "\" " + 
-		ATTR_INPUT_SOUND_DEV_ID + "=\"" + string(itoa(m_config.m_InputSoundDevId, buffer, 10)) + "\" " + 
-		ATTR_OUTPUT_SOUND_DEV_ID + "=\"" + string(itoa(m_config.m_OutputSoundDevId, buffer, 10)) + "\" " + ">\n";
+        ATTR_INPUT_SOUND_DEV_ID + "=\"" + string(m_config.m_InputSoundDevId.begin(), m_config.m_InputSoundDevId.end()) + "\" " +
+        ATTR_OUTPUT_SOUND_DEV_ID + "=\"" + string(m_config.m_OutputSoundDevId.begin(), m_config.m_OutputSoundDevId.end()) + "\" " + ">\n";
 
 	xml += "<" + NODE_AGC + " " +
 		ATTR_ENABLE + "=\"" + string(itoa(m_config.m_AGC.m_enable, buffer, 10)) + "\" " + 

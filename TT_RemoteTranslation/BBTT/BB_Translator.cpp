@@ -36,7 +36,8 @@ int BB_Translator::disconnectHap()
     return EXIT_SUCCESS;
 }
 
-int BB_Translator::connectHap(wstring hapName, wstring nickName, wstring srcName, wstring dstName)
+int BB_Translator::connectHap(wstring hapName, wstring nickName, wstring srcName, wstring dstName,
+    wstring inputSoundDevId, wstring outputSoundDevId)
 {
     BB_InstanceContext context;
 
@@ -48,6 +49,19 @@ int BB_Translator::connectHap(wstring hapName, wstring nickName, wstring srcName
     context.m_srvUser = config.m_srvUser;
     context.m_srvUserPsw = config.m_srvUserPsw;
 	context.m_audioDir = DEFAULT_AUDIO_STORAGE;
+
+    BB_SoundDevice soundDevice;
+    if (!findSoundDev(inputSoundDevId, soundDevice))
+    {
+        return EXIT_FAILURE;
+    }
+    context.m_inputSoundDevId = soundDevice.m_id;
+
+    if (!findSoundDev(outputSoundDevId, soundDevice))
+    {
+        return EXIT_FAILURE;
+    }
+    context.m_outputSoundDevId = soundDevice.m_id;
 	
 	// Find Happening
 	HappeningEx hap;
@@ -126,7 +140,7 @@ int BB_Translator::initHapsList(const std::vector<BB_Channel> &channels)
 {
 		// Find Source Channel Id
 	INT32 sourceChannelId = ROOT_PARENT_ID;
-    for (int i=0; i < channels.size(); i++)
+    for (unsigned int i=0; i < channels.size(); i++)
 	{
 		if (channels[i].name == SOURCE_CHANNEL_NAME)
 		{
@@ -145,7 +159,7 @@ int BB_Translator::initHapsList(const std::vector<BB_Channel> &channels)
 	// NOTE: We currently support only 1 Happening under root.
 	Happening hap;
 	HappeningEx hapEx;
-    for (int i=0; i < channels.size(); i++)
+    for (unsigned int i=0; i < channels.size(); i++)
 	{
 		if (channels[i].name == VIDEO_CHANNEL_NAME)
 		{
@@ -205,7 +219,7 @@ int BB_Translator::initHapsList(const std::vector<BB_Channel> &channels)
 
 bool BB_Translator::findHap(HappeningEx &hap, wstring name)
 {
-    for (int i=0; i < m_hapListEx.size(); i++)
+    for (unsigned int i=0; i < m_hapListEx.size(); i++)
 	{
 		if (m_hapListEx[i].m_hapChannel.m_name == name)
 		{
@@ -218,7 +232,7 @@ bool BB_Translator::findHap(HappeningEx &hap, wstring name)
 
 bool BB_Translator::findSrcChannelId(const HappeningEx hap, wstring name, INT32 &channelId)
 {
-    for (int i=0; i < hap.m_srcChannels.size(); i++)
+    for (unsigned int i=0; i < hap.m_srcChannels.size(); i++)
 	{
 		if (hap.m_srcChannels[i].m_name == name)
 		{
@@ -240,6 +254,19 @@ bool BB_Translator::findDstChannelId(const HappeningEx hap, wstring name, INT32 
 		}
 	}
 	return false;
+}
+
+bool BB_Translator::findSoundDev(wstring deviceId, BB_SoundDevice &soundDevice)
+{
+    for (int i=0; i < m_soundDevList.size(); i++)
+    {
+        if (m_soundDevList[i].m_deviceId == deviceId)
+        {
+            soundDevice = m_soundDevList[i];
+            return true;
+        }
+    }
+    return false;
 }
 
 int BB_Translator::getUsers(std::vector<BB_ChannelUser> &userList, bool isSource)
