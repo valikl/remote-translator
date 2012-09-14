@@ -77,7 +77,8 @@ public:
 	void finalize();
 	int getInstance();
 
-	int initDevice();
+    int initSoundDevices();
+    int closeSoundDevices();
 	int SetAudioLevels();
 	int EnableTransmition();
 	int getVideoDevice();

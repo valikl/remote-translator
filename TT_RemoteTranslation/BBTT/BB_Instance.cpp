@@ -25,13 +25,14 @@ int BB_Instance::init()
 	CHECK_ret(getInstance());
 	CHECK_ret(joinChannel());
 	CHECK_ret(setInstProp());
+    CHECK_ret(initSoundDevices());
 
 	return EXIT_SUCCESS;
 }
 
 void BB_Instance::finalize()
 {
-	TT_CloseSoundDuplexDevices(m_ttInst);
+    closeSoundDevices();
 	TT_DoLogout(m_ttInst);
 	TT_DoQuit(m_ttInst);
 }
@@ -94,35 +95,34 @@ error_login:
     return EXIT_FAILURE;
 }
 
-int BB_Instance::initDevice()
+int BB_Instance::closeSoundDevices()
 {
-	ClientFlags flags;
-	INT32 inSoundId, outSoundId;
-	string err_str;
-	
-	CHECK_ret_bool(TT_GetDefaultSoundDevices(m_ttInst, &inSoundId, &outSoundId));
+    TT_CloseSoundDuplexDevices(m_ttInst);
+    TT_CloseSoundOutputDevice(m_ttInst);
+    TT_CloseSoundInputDevice(m_ttInst);
 
-/*	switch(type)
-	{
-	case BB_IN_SOUND_DEVICE:
-		CHECK_ret_bool(TT_InitSoundInputDevice(m_ttInst, inSoundId));
-		TT_EnableTransmission(m_ttInst, (TRANSMIT_AUDIO), false);
-		err_str = "input sound";
-		break;
-	case BB_OUT_SOUND_DEVICE:
-		CHECK_ret_bool(TT_InitSoundOutputDevice(m_ttInst, outSoundId));
-		TT_EnableTransmission(m_ttInst, (TRANSMIT_AUDIO), TRUE);
-		err_str = "input sound";
-		break;
+    return EXIT_SUCCESS;
+}
 
-	}
-*/	
-	TT_InitSoundDuplexDevices(m_ttInst, inSoundId, outSoundId);	 
+int BB_Instance::initSoundDevices()
+{
+    // Init input sound device
+    CHECK_ret_bool(TT_InitSoundInputDevice(m_ttInst, m_context.m_inputSoundDevId));
+    CHECK_ret_bool(TT_EnableTransmission(m_ttInst, (TRANSMIT_AUDIO), false));
 
-	flags = TT_GetFlags(m_ttInst);
+    // Init output sound device
+    CHECK_ret_bool(TT_InitSoundOutputDevice(m_ttInst, m_context.m_outputSoundDevId));
+    CHECK_ret_bool(TT_EnableTransmission(m_ttInst, (TRANSMIT_AUDIO), true));
+
+    CHECK_ret_bool(TT_InitSoundDuplexDevices(m_ttInst, m_context.m_inputSoundDevId,
+        m_context.m_outputSoundDevId));
+
+    ClientFlags flags = TT_GetFlags(m_ttInst);
 	if (!(flags & CLIENT_SNDINOUTPUT_DUPLEX) && (flags & CLIENT_SNDOUTPUT_READY) &&(flags & CLIENT_SNDINPUT_READY))
+    {
+        return EXIT_FAILURE;
 		cout << "Cannot initialize Duplex mode"<<endl;
-
+    }
 
 	return EXIT_SUCCESS;
 }

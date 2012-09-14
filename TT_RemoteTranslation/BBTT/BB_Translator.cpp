@@ -9,6 +9,7 @@ BB_Translator::BB_Translator()
     m_channelVideo = NULL;
     m_channelSrc = NULL;
     m_channelDst = NULL;
+    m_isConnected = NULL;
 }
 
 BB_Translator::~BB_Translator(void)
@@ -94,6 +95,7 @@ int BB_Translator::connectHap(wstring hapName, wstring nickName, wstring srcName
     m_channelVideo = new BB_Instance(context);
     m_channelVideo->init();
 
+    m_isConnected = true;
 	return EXIT_SUCCESS;
 }
 
@@ -271,6 +273,11 @@ bool BB_Translator::findSoundDev(wstring deviceId, BB_SoundDevice &soundDevice)
 
 int BB_Translator::getUsers(std::vector<BB_ChannelUser> &userList, bool isSource)
 {
+    if (!m_isConnected)
+    {
+        return EXIT_FAILURE;
+    }
+
     int ret;
     if (isSource)
     {

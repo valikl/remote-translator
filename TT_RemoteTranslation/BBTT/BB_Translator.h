@@ -74,6 +74,8 @@ public:
 
     int handleOperation(TranslatorOpCode eOpCode);
 
+    bool isConnected() {return m_isConnected; }
+
 private:
 
 	int initHapsList(const std::vector<BB_Channel> &channels);
@@ -96,6 +98,8 @@ private:
 
 	// Sound Devices List
 	std::vector<BB_SoundDevice> m_soundDevList;
+
+    bool m_isConnected;
 };
 
 #endif
