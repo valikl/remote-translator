@@ -213,7 +213,8 @@ void RemoteTranslatorUI::on_TrgLangList_currentIndexChanged(const QString &arg1)
 // Connect to choosen languages
 void RemoteTranslatorUI::on_LangConnect_toggled(bool checked)
 {
-    translator.disconnectHap();
+    if (translator.isConnected())
+        translator.disconnectHap();
     translator.connectHap(HAPPENING_CHANNEL_DEFAULT_NAME, ConfigUI.m_NickName,
                           ConfigUI.m_SrcChannel, ConfigUI.m_TrgChannel,
                           ConfigUI.m_InputSoundDevId, ConfigUI.m_OutputSoundDevId);

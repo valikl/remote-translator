@@ -93,6 +93,7 @@ void SoundDevices::on_ActSDButton_accepted()
     id = ui->OutputDevicesBox->itemData(ui->OutputDevicesBox->currentIndex()).toInt();
     device = m_soundDevList[id];
     BB_ClientConfigMgr::Instance().SetOutputSoundDevId(device.m_deviceId);
+    BB_ClientConfigMgr::Instance().SetSoundSystemWin(!(ui->DirectSoundButton->isChecked()));
 }
 
 void SoundDevices::on_SelfTestButton_clicked(bool checked)

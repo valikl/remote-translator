@@ -21,10 +21,7 @@ BB_Translator::~BB_Translator(void)
 
 int BB_Translator::disconnectHap()
 {
-    if (m_channelDummy)
-    {
-        delete m_channelDummy;
-    }
+
     if (m_channelVideo)
     {
         m_channelVideo->finalize();
@@ -101,6 +98,10 @@ int BB_Translator::connectHap(wstring hapName, wstring nickName, wstring srcName
 int BB_Translator::finalize()
 {
     return disconnectHap();
+    if (m_channelDummy)
+    {
+        delete m_channelDummy;
+    }
 }
 
 int BB_Translator::init()
