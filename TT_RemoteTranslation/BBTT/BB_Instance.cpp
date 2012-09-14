@@ -583,7 +583,7 @@ int BB_Instance::StopSoundLoopbackTest()
 int BB_Instance::MuteMicrophone(bool bMute)
 {
     int ret;
-    CHECK_ret(TT_EnableTransmission(m_ttInst, TRANSMIT_AUDIO, bMute));
+    CHECK_ret(TT_EnableTransmission(m_ttInst, TRANSMIT_AUDIO, !(bMute)));
     return EXIT_SUCCESS;
 }
 
