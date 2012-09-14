@@ -15,12 +15,6 @@
 #include <stdlib.h>
 #include <vector>
 
-enum DeviceType
-{
-	BB_IN_SOUND_DEVICE,
-	BB_OUT_SOUND_DEVICE
-};
-
 struct BB_InstanceContext
 {
 	std::wstring m_IP;
@@ -86,6 +80,10 @@ public:
 	int getChannels(std::vector<BB_Channel> &channels);
 	int getSoundDevices(std::vector<BB_SoundDevice> &soundDevs);
     int getUsers(std::vector<BB_ChannelUser> &userList);
+
+    // Operations
+    int StartSoundLoopbackTest(INT32 inputSoundDevId, INT32 outputSoundDevId);
+    int StopSoundLoopbackTest();
 
 private:
 		

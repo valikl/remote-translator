@@ -10,6 +10,9 @@ BB_Translator::BB_Translator()
     m_channelSrc = NULL;
     m_channelDst = NULL;
     m_isConnected = NULL;
+    m_channelDummy = NULL;
+    m_isLoopbackStarted = false;
+    m_isConnected = false;
 }
 
 BB_Translator::~BB_Translator(void)
@@ -18,6 +21,10 @@ BB_Translator::~BB_Translator(void)
 
 int BB_Translator::disconnectHap()
 {
+    if (m_channelDummy)
+    {
+        delete m_channelDummy;
+    }
     if (m_channelVideo)
     {
         m_channelVideo->finalize();
@@ -41,24 +48,16 @@ int BB_Translator::connectHap(wstring hapName, wstring nickName, wstring srcName
     wstring inputSoundDevId, wstring outputSoundDevId)
 {
     BB_InstanceContext context;
-
-    ClientConfig config = BB_ClientConfigMgr::Instance().getConfig();
-    context.m_TCP = config.m_TCP;
-    context.m_IP = config.m_IP;
-    context.m_UDP = config.m_UDP;
-    context.m_srvPsw = config.m_srvPsw;
-    context.m_srvUser = config.m_srvUser;
-    context.m_srvUserPsw = config.m_srvUserPsw;
-	context.m_audioDir = DEFAULT_AUDIO_STORAGE;
+    initInstanceContext(context);
 
     BB_SoundDevice soundDevice;
-    if (!findSoundDev(inputSoundDevId, soundDevice))
+    if (!findSoundDev(inputSoundDevId, BB_ClientConfigMgr::Instance().getConfig().m_isSoundSystemWin, soundDevice))
     {
         return EXIT_FAILURE;
     }
     context.m_inputSoundDevId = soundDevice.m_id;
 
-    if (!findSoundDev(outputSoundDevId, soundDevice))
+    if (!findSoundDev(outputSoundDevId, BB_ClientConfigMgr::Instance().getConfig().m_isSoundSystemWin, soundDevice))
     {
         return EXIT_FAILURE;
     }
@@ -107,21 +106,14 @@ int BB_Translator::finalize()
 int BB_Translator::init()
 {
 	// Get Dummy Instance
-	BB_InstanceContext context;
+    BB_InstanceContext context;
+    initInstanceContext(context);
 
-    ClientConfig config = BB_ClientConfigMgr::Instance().getConfig();
-    context.m_TCP = config.m_TCP;
-    context.m_IP = config.m_IP;
-    context.m_UDP = config.m_UDP;
-    context.m_srvPsw = config.m_srvPsw;
-    context.m_srvUser = config.m_srvUser;
-    context.m_srvUserPsw = config.m_srvUserPsw;
-
-	BB_Instance inst(context);
-	inst.getInstance();
+    m_channelDummy = new BB_Instance(context);
+    m_channelDummy->getInstance();
 
 	std::vector<BB_Channel> channels;
-	int ret = inst.getChannels(channels);
+    int ret = m_channelDummy->getChannels(channels);
 	if (ret != EXIT_SUCCESS)
 	{
 		return ret;
@@ -133,7 +125,7 @@ int BB_Translator::init()
 		return ret;
 	}
 
-	ret = inst.getSoundDevices(m_soundDevList);
+    ret = m_channelDummy->getSoundDevices(m_soundDevList);
 
     return ret;
 }
@@ -258,11 +250,12 @@ bool BB_Translator::findDstChannelId(const HappeningEx hap, wstring name, INT32 
 	return false;
 }
 
-bool BB_Translator::findSoundDev(wstring deviceId, BB_SoundDevice &soundDevice)
+bool BB_Translator::findSoundDev(wstring deviceId, bool isSoundSystemWin, BB_SoundDevice &soundDevice)
 {
     for (int i=0; i < m_soundDevList.size(); i++)
     {
-        if (m_soundDevList[i].m_deviceId == deviceId)
+        if (m_soundDevList[i].m_deviceId == deviceId &&
+            m_soundDevList[i].m_isSoundSystemWin == isSoundSystemWin)
         {
             soundDevice = m_soundDevList[i];
             return true;
@@ -291,6 +284,56 @@ int BB_Translator::getUsers(std::vector<BB_ChannelUser> &userList, bool isSource
     return ret;
 }
 
+int BB_Translator::StartSoundLoopbackTest(wstring inputSoundDevId, wstring outputSoundDevId, bool isSoundSystemWin)
+{
+    if (m_isLoopbackStarted)
+    {
+        return EXIT_FAILURE;
+    }
+
+    BB_SoundDevice inputSoundDev;
+    if (!findSoundDev(inputSoundDevId, isSoundSystemWin, inputSoundDev))
+    {
+        return EXIT_FAILURE;
+    }
+
+    BB_SoundDevice outputSoundDev;
+    if (!findSoundDev(outputSoundDevId, isSoundSystemWin, outputSoundDev))
+    {
+        return EXIT_FAILURE;
+    }
+
+    int ret = m_channelDummy->StartSoundLoopbackTest(inputSoundDev.m_id, outputSoundDev.m_id);
+    if (EXIT_SUCCESS == ret)
+    {
+        m_isLoopbackStarted = true;
+    }
+    return ret;
+}
+
+int BB_Translator::StopSoundLoopbackTest()
+{
+    if (!m_isLoopbackStarted)
+    {
+        return EXIT_FAILURE;
+    }
+    m_isLoopbackStarted = false;
+    return m_channelDummy->StopSoundLoopbackTest();
+}
+
+void BB_Translator::initInstanceContext(BB_InstanceContext &context)
+{
+    ClientConfig config = BB_ClientConfigMgr::Instance().getConfig();
+    context.m_TCP = config.m_TCP;
+    context.m_IP = config.m_IP;
+    context.m_UDP = config.m_UDP;
+    context.m_srvPsw = config.m_srvPsw;
+    context.m_srvUser = config.m_srvUser;
+    context.m_srvUserPsw = config.m_srvUserPsw;
+    context.m_audioDir = DEFAULT_AUDIO_STORAGE;
+}
+
+#if 0
 int handleOperation(TranslatorOpCode eOpCode)
 {
     int ret = EXIT_SUCCESS;
@@ -298,7 +341,6 @@ int handleOperation(TranslatorOpCode eOpCode)
     {
     case OP_CODE_UPDATE_MICROPHONE_GAIN:
     {
-
     }
     case OP_CODE_UPDATE_SOURCE_LEVEL:
     {
@@ -311,11 +353,24 @@ int handleOperation(TranslatorOpCode eOpCode)
     }
     case OP_CODE_MUTE_MICROPHONE:
     {
-        //TT_SetUserMute (IN TTInstance *lpTTInstance, IN INT32 nUserID, IN BOOL bMute)
+        // Disable my microphone
+       // TT_EnableTransmission 	( 	IN TTInstance *  	lpTTInstance,
+        //        IN TransmitTypes  	uTxType,
+         //       IN BOOL  	bEnable	 )
     }
     case OP_CODE_MUTE_TARGET:
     {
-        //TT_SetUserMute (IN TTInstance *lpTTInstance, IN INT32 nUserID, IN BOOL bMute)
+        // Mute other users in my channel
+        //TT_SetSoundOutputMute (IN TTInstance *lpTTInstance, IN BOOL bMuteAll);
+    }
+    case OP_START_SOUND_LOOPBACK_TEST:
+    {
+        TT_StartSoundLoopbackTest( 	IN TTInstance *  	lpTTInstance,
+                IN INT32  	nInputDeviceID,
+                IN INT32  	nOutputDeviceID,
+                IN INT32  	nSampleRate,
+                IN INT32  	nChannels
+            )
     }
     default:
     {
@@ -325,3 +380,4 @@ int handleOperation(TranslatorOpCode eOpCode)
 
     return ret;
 }
+#endif

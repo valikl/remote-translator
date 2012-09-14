@@ -546,3 +546,34 @@ __err_exit2:
 __err_exit1:
     return ret;
 }
+
+int BB_Instance::StartSoundLoopbackTest(INT32 inputSoundDevId, INT32 outputSoundDevId)
+{
+    if (!TT_InitSoundInputDevice(m_ttInst, inputSoundDevId))
+    {
+        return EXIT_FAILURE;
+    }
+
+    if (!TT_InitSoundOutputDevice(m_ttInst, outputSoundDevId))
+    {
+        TT_CloseSoundInputDevice(m_ttInst);
+        return EXIT_FAILURE;
+    }
+
+    if (!TT_StartSoundLoopbackTest(m_ttInst, inputSoundDevId, outputSoundDevId, 16000, 2))
+    {
+        TT_CloseSoundOutputDevice(m_ttInst);
+        TT_CloseSoundInputDevice(m_ttInst);
+        return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
+}
+
+int BB_Instance::StopSoundLoopbackTest()
+{
+    TT_StopSoundLoopbackTest(m_ttInst);
+    TT_CloseSoundOutputDevice(m_ttInst);
+    TT_CloseSoundInputDevice(m_ttInst);
+    return EXIT_SUCCESS;
+}

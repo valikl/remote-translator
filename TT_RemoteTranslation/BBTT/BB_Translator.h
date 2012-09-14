@@ -40,16 +40,6 @@ struct HappeningEx
 	ChannelInfo m_videoChannel;
 };
 
-enum TranslatorOpCode
-{
-    OP_CODE_UPDATE_MICROPHONE_GAIN,
-    OP_CODE_UPDATE_SOURCE_LEVEL,
-    OP_CODE_UPDATE_TARGET_LEVEL,
-    OP_CODE_UPDATE_VIDEO_QUALITY,
-    OP_CODE_MUTE_MICROPHONE,
-    OP_CODE_MUTE_TARGET
-};
-
 class BB_Translator
 {
 public:
@@ -72,9 +62,11 @@ public:
     int disconnectHap();
     int getUsers(std::vector<BB_ChannelUser> &userList, bool isSource);
 
-    int handleOperation(TranslatorOpCode eOpCode);
-
     bool isConnected() {return m_isConnected; }
+
+    // Operations
+    int StartSoundLoopbackTest(std::wstring inputSoundDevId, std::wstring outputSoundDevId, bool m_isSoundSystemWin);
+    int StopSoundLoopbackTest();
 
 private:
 
@@ -84,11 +76,14 @@ private:
 	bool findHap(HappeningEx &hap, std::wstring name);
 	bool findSrcChannelId(const HappeningEx hap, std::wstring name, INT32 &channelId);
 	bool findDstChannelId(const HappeningEx hap, std::wstring name, INT32 &channelId);
-    bool findSoundDev(std::wstring deviceId, BB_SoundDevice &soundDevice);
+    bool findSoundDev(std::wstring deviceId, bool isSoundSystemWin, BB_SoundDevice &soundDevice);
+
+    void initInstanceContext(BB_InstanceContext &context);
 	
 	BB_Instance *m_channelVideo;
 	BB_Instance *m_channelSrc;
 	BB_Instance *m_channelDst;
+    BB_Instance *m_channelDummy;
 
 	// Happening list for GUI
 	std::vector<Happening> m_hapList;
@@ -100,6 +95,7 @@ private:
 	std::vector<BB_SoundDevice> m_soundDevList;
 
     bool m_isConnected;
+    bool m_isLoopbackStarted;
 };
 
 #endif
