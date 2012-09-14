@@ -55,6 +55,7 @@ struct BB_SoundDevice
     std::wstring m_deviceId;
 	bool m_isOutputDevice;
 	bool m_isSoundSystemWin;
+    bool m_isDefault;
 	INT32 m_id;
 };
 
