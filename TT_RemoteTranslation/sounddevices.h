@@ -19,6 +19,11 @@ public:
     explicit SoundDevices(QWidget *parent, std::vector<BB_SoundDevice>& soundDevList);
     ~SoundDevices();
     
+private slots:
+    void on_DirectSoundButton_toggled(bool checked);
+
+    void on_ActSDButton_accepted();
+
 private:
     Ui::SoundDevices *ui;
     vector<BB_SoundDevice> m_soundDevList;

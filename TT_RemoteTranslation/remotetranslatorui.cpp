@@ -42,7 +42,6 @@ void RemoteTranslatorUI::initHapsMenu()
         if (hap.m_hapName == ConfigUI.m_Happening)
             ui->HapList->setCurrentIndex(i);
     }
-    translator.connectHap(HAPPENING_CHANNEL_DEFAULT_NAME, ConfigUI.m_NickName, ConfigUI.m_SrcChannel, ConfigUI.m_TrgChannel);
 }
 
 void RemoteTranslatorUI::setSliders()
@@ -79,6 +78,9 @@ int RemoteTranslatorUI::init()
     //Initialize ComboBoxes
     initHapsMenu();
 
+    // activate sound devices
+    connect(ui->actionConfigure_Audio, SIGNAL(triggered()), this, SLOT(ActivateSoundDevices()));
+
     // set nick name
     ui->NickName->setText(QString::fromStdWString(ConfigUI.m_NickName));
 
@@ -100,9 +102,6 @@ int RemoteTranslatorUI::init()
     connect(user_timer, SIGNAL(timeout()), this, SLOT(on_UserTimeout()));
     user_timer->start(1000);
 
-    // activate sound devices
-    connect(ui->actionConfigure_Audio, SIGNAL(triggered()), this, SLOT(ActivateSoundDevices()));
-
     return ret;
 }
 
@@ -122,6 +121,9 @@ void RemoteTranslatorUI::on_Timeout()
 
 void RemoteTranslatorUI::setUserItems(bool is_source)
 {
+    if (!translator.isConnected())
+        return;
+
     vector<BB_ChannelUser> users;
     translator.getUsers(users, is_source);
 
@@ -212,7 +214,9 @@ void RemoteTranslatorUI::on_TrgLangList_currentIndexChanged(const QString &arg1)
 void RemoteTranslatorUI::on_LangConnect_toggled(bool checked)
 {
     translator.disconnectHap();
-    translator.connectHap(HAPPENING_CHANNEL_DEFAULT_NAME, ConfigUI.m_NickName, ConfigUI.m_SrcChannel, ConfigUI.m_TrgChannel);
+    translator.connectHap(HAPPENING_CHANNEL_DEFAULT_NAME, ConfigUI.m_NickName,
+                          ConfigUI.m_SrcChannel, ConfigUI.m_TrgChannel,
+                          ConfigUI.m_InputSoundDevId, ConfigUI.m_OutputSoundDevId);
 
     if (checked)
         ui->LangConnect->setChecked(false);
