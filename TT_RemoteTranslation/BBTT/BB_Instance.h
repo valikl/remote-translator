@@ -84,6 +84,8 @@ public:
     // Operations
     int StartSoundLoopbackTest(INT32 inputSoundDevId, INT32 outputSoundDevId);
     int StopSoundLoopbackTest();
+    int MuteMicrophone(bool bMute);
+    int MuteTarget(bool bMute);
 
 private:
 		

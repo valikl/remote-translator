@@ -279,6 +279,8 @@ void BB_Instance::processTTMessage(const TTMessage& msg)
                 cout << user.szNickname << " to entire server ";
                 cout << "content: " << textmsg.szMessage << endl;
                 break;
+            default:
+                break;
             }
         }
         break;
@@ -482,7 +484,6 @@ int BB_Instance::getSoundDevices(vector<BB_SoundDevice> &soundDevs)
 		soundDev.m_isSoundSystemWin = (soundDevices[i].nSoundSystem == SOUNDSYSTEM_WINMM);
 		soundDev.m_deviceName = soundDevices[i].szDeviceName;
         soundDev.m_isDefault = (soundDevices[i].nDeviceID == outputDeviceId);
-        soundDevices[i].szDeviceID;
 
 		soundDevs.push_back(soundDev);
 	}
@@ -575,5 +576,19 @@ int BB_Instance::StopSoundLoopbackTest()
     TT_StopSoundLoopbackTest(m_ttInst);
     TT_CloseSoundOutputDevice(m_ttInst);
     TT_CloseSoundInputDevice(m_ttInst);
+    return EXIT_SUCCESS;
+}
+
+int BB_Instance::MuteMicrophone(bool bMute)
+{
+    int ret;
+    CHECK_ret(TT_EnableTransmission(m_ttInst, TRANSMIT_AUDIO, bMute));
+    return EXIT_SUCCESS;
+}
+
+int BB_Instance::MuteTarget(bool bMute)
+{
+    int ret;
+    CHECK_ret(TT_SetSoundOutputMute(m_ttInst, bMute));
     return EXIT_SUCCESS;
 }

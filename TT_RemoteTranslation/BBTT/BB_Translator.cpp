@@ -239,7 +239,7 @@ bool BB_Translator::findSrcChannelId(const HappeningEx hap, wstring name, INT32 
 
 bool BB_Translator::findDstChannelId(const HappeningEx hap, wstring name, INT32 &channelId)
 {
-    for (int i=0; i < hap.m_dstChannels.size(); i++)
+    for (unsigned int i=0; i < hap.m_dstChannels.size(); i++)
 	{
 		if (hap.m_dstChannels[i].m_name == name)
 		{
@@ -252,7 +252,7 @@ bool BB_Translator::findDstChannelId(const HappeningEx hap, wstring name, INT32 
 
 bool BB_Translator::findSoundDev(wstring deviceId, bool isSoundSystemWin, BB_SoundDevice &soundDevice)
 {
-    for (int i=0; i < m_soundDevList.size(); i++)
+    for (unsigned int i=0; i < m_soundDevList.size(); i++)
     {
         if (m_soundDevList[i].m_deviceId == deviceId &&
             m_soundDevList[i].m_isSoundSystemWin == isSoundSystemWin)
@@ -331,6 +331,16 @@ void BB_Translator::initInstanceContext(BB_InstanceContext &context)
     context.m_srvUser = config.m_srvUser;
     context.m_srvUserPsw = config.m_srvUserPsw;
     context.m_audioDir = DEFAULT_AUDIO_STORAGE;
+}
+
+int BB_Translator::MuteMicrophone(bool bMute)
+{
+    return m_channelDst->MuteMicrophone(bMute);
+}
+
+int BB_Translator::MuteTarget(bool bMute)
+{
+   return m_channelDst->MuteTarget(bMute);
 }
 
 #if 0

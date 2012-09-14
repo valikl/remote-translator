@@ -67,6 +67,8 @@ public:
     // Operations
     int StartSoundLoopbackTest(std::wstring inputSoundDevId, std::wstring outputSoundDevId, bool m_isSoundSystemWin);
     int StopSoundLoopbackTest();
+    int MuteMicrophone(bool bMute);
+    int MuteTarget(bool bMute);
 
 private:
 
