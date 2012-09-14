@@ -447,15 +447,15 @@ int BB_Instance::getSoundDevices(vector<BB_SoundDevice> &soundDevs)
 		goto __err_exit2;
 	}
 
-	// Create Input Devices List
+    // Create Input Devices List
 	for (int i = 0; i < size; ++i)
 	{
 		BB_SoundDevice soundDev;
-		soundDev.m_id = soundDevices[i].nDeviceID;
-		soundDev.m_isOutputDevice = false;
+        soundDev.m_id = soundDevices[i].nDeviceID;
+        soundDev.m_isOutputDevice = false;
 		soundDev.m_isSoundSystemWin = (soundDevices[i].nSoundSystem == SOUNDSYSTEM_WINMM);
-		soundDev.m_deviceName = soundDevices[i].szDeviceName;
-        soundDev.m_deviceId = soundDevices[i].szDeviceID;
+        soundDev.m_deviceName = soundDevices[i].szDeviceName;
+        soundDev.m_deviceId = soundDevices[i].szDeviceName;
         soundDev.m_isDefault = (soundDevices[i].nDeviceID == inputDeviceId);
 		soundDevs.push_back(soundDev);
 	}
@@ -482,7 +482,8 @@ int BB_Instance::getSoundDevices(vector<BB_SoundDevice> &soundDevs)
 		soundDev.m_id = soundDevices[i].nDeviceID;
 		soundDev.m_isOutputDevice = true;
 		soundDev.m_isSoundSystemWin = (soundDevices[i].nSoundSystem == SOUNDSYSTEM_WINMM);
-		soundDev.m_deviceName = soundDevices[i].szDeviceName;
+        soundDev.m_deviceName = soundDevices[i].szDeviceName;
+        soundDev.m_deviceId = soundDevices[i].szDeviceName;
         soundDev.m_isDefault = (soundDevices[i].nDeviceID == outputDeviceId);
 
 		soundDevs.push_back(soundDev);

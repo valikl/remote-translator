@@ -16,7 +16,7 @@ class SoundDevices : public QDialog
     Q_OBJECT
     
 public:
-    explicit SoundDevices(QWidget *parent, std::vector<BB_SoundDevice>& soundDevList);
+    explicit SoundDevices(QWidget *parent, std::vector<BB_SoundDevice>& soundDevList, BB_Translator* trans);
     ~SoundDevices();
     
 private slots:
@@ -24,9 +24,13 @@ private slots:
 
     void on_ActSDButton_accepted();
 
+    void on_SelfTestButton_clicked(bool checked);
+
 private:
     Ui::SoundDevices *ui;
     vector<BB_SoundDevice> m_soundDevList;
+    BB_Translator* translator;
+
     void setSystemDevice();
     void drawDevices();
 };

@@ -109,7 +109,7 @@ int RemoteTranslatorUI::init()
 void RemoteTranslatorUI::ActivateSoundDevices()
 {
     vector<BB_SoundDevice> soundDevList = translator.getSoundDevices();
-    SoundDevices sound_devices(this, soundDevList);
+    SoundDevices sound_devices(this, soundDevList, &translator);
     sound_devices.exec();
 }
 

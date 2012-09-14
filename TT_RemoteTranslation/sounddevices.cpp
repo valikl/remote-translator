@@ -4,15 +4,18 @@
 #include "sounddevices.h"
 #include "ui_sounddevices.h"
 
-SoundDevices::SoundDevices(QWidget *parent, vector<BB_SoundDevice>& soundDevList) :
+SoundDevices::SoundDevices(QWidget *parent, vector<BB_SoundDevice>& soundDevList, BB_Translator* trans) :
     QDialog(parent),
     ui(new Ui::SoundDevices),
-    m_soundDevList(soundDevList)
+    m_soundDevList(soundDevList),
+    translator(trans)
 {
     ui->setupUi(this);
     setSystemDevice();
 
     drawDevices();
+
+    ui->SelfTestButton->setCheckable(true);
 }
 
 SoundDevices::~SoundDevices()
@@ -90,4 +93,23 @@ void SoundDevices::on_ActSDButton_accepted()
     id = ui->OutputDevicesBox->itemData(ui->OutputDevicesBox->currentIndex()).toInt();
     device = m_soundDevList[id];
     BB_ClientConfigMgr::Instance().SetOutputSoundDevId(device.m_deviceId);
+}
+
+void SoundDevices::on_SelfTestButton_clicked(bool checked)
+{
+    if (checked)
+    {
+        int in_id = ui->InputDevicesBox->itemData(ui->InputDevicesBox->currentIndex()).toInt();
+        BB_SoundDevice in_device = m_soundDevList[in_id];
+        int out_id = ui->OutputDevicesBox->itemData(ui->OutputDevicesBox->currentIndex()).toInt();
+        BB_SoundDevice out_device = m_soundDevList[out_id];
+
+        bool sound_system = !(ui->DirectSoundButton->isChecked());
+
+        translator->StartSoundLoopbackTest(in_device.m_deviceId, out_device.m_deviceId, sound_system);
+    }
+    else
+    {
+        translator->StopSoundLoopbackTest();
+    }
 }
