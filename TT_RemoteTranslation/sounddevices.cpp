@@ -12,9 +12,6 @@ SoundDevices::SoundDevices(QWidget *parent, vector<BB_SoundDevice>& soundDevList
 {
     ui->setupUi(this);
     setSystemDevice();
-
-    drawDevices();
-
     ui->SelfTestButton->setCheckable(true);
 }
 
@@ -25,11 +22,6 @@ SoundDevices::~SoundDevices()
 
 void SoundDevices::setSystemDevice()
 {
-    if (ConfigUI.m_isSoundSystemWin)
-        ui->WindowsStandardButton->setChecked(true);
-    else
-        ui->DirectSoundButton->setChecked(true);
-
     for (unsigned int i = 0; i < m_soundDevList.size(); ++i)
     {
         BB_SoundDevice& device = m_soundDevList[i];
@@ -42,6 +34,11 @@ void SoundDevices::setSystemDevice()
         if (!device.m_isOutputDevice && ConfigUI.m_InputSoundDevId.empty())
             BB_ClientConfigMgr::Instance().SetInputSoundDevId(device.m_deviceId);
     }
+
+    if (ConfigUI.m_isSoundSystemWin)
+        ui->WindowsStandardButton->setChecked(true);
+    else
+        ui->DirectSoundButton->setChecked(true);
 }
 
 void SoundDevices::drawDevices()
@@ -60,13 +57,13 @@ void SoundDevices::drawDevices()
         {
             ui->OutputDevicesBox->addItem(device_name, i);
             if (device.m_deviceId == ConfigUI.m_OutputSoundDevId)
-                ui->OutputDevicesBox->setCurrentIndex(i);
+                ui->OutputDevicesBox->setCurrentIndex(ui->OutputDevicesBox->count()-1);
         }
         else
         {
             ui->InputDevicesBox->addItem(device_name, i);
             if (device.m_deviceId == ConfigUI.m_InputSoundDevId)
-                ui->InputDevicesBox->setCurrentIndex(i);
+                ui->InputDevicesBox->setCurrentIndex(ui->InputDevicesBox->count()-1);
         }
     }
 }

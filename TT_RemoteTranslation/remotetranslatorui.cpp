@@ -3,6 +3,7 @@
 #include "BBTT/BB_ClientConfigMgr.h"
 #include "BBTT/Utils.h"
 #include "ui_remotetranslatorui.h"
+#include <QMessageBox>
 #include <QTimer>
 #include <time.h>
 
@@ -210,13 +211,21 @@ void RemoteTranslatorUI::on_TrgLangList_currentIndexChanged(const QString &arg1)
 }
 
 // Connect to choosen languages
-void RemoteTranslatorUI::on_LangConnect_toggled(bool checked)
+void RemoteTranslatorUI::on_LangConnect_clicked(bool checked)
 {
     if (translator.isConnected())
         translator.disconnectHap();
-    translator.connectHap(HAPPENING_CHANNEL_DEFAULT_NAME, ConfigUI.m_NickName,
-                          ConfigUI.m_SrcChannel, ConfigUI.m_TrgChannel,
-                          ConfigUI.m_InputSoundDevId, ConfigUI.m_OutputSoundDevId);
+
+    if (ConfigUI.m_InputSoundDevId.empty() || ConfigUI.m_OutputSoundDevId.empty())
+        QMessageBox::critical(this,"Connecting error","Sound devices are not defined");
+    else
+    {
+        int ret = translator.connectHap(HAPPENING_CHANNEL_DEFAULT_NAME, ConfigUI.m_NickName,
+                              ConfigUI.m_SrcChannel, ConfigUI.m_TrgChannel,
+                              ConfigUI.m_InputSoundDevId, ConfigUI.m_OutputSoundDevId);
+        if (ret == EXIT_FAILURE)
+            QMessageBox::critical(this,"Connecting error","Check properties");
+    }
 
     if (checked)
         ui->LangConnect->setChecked(false);
