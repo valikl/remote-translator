@@ -86,6 +86,10 @@ public:
     int StopSoundLoopbackTest();
     int MuteMicrophone(bool bMute);
     int MuteTarget(bool bMute);
+    int UpdateSourceVolumeLevel(int volumeLevel);
+    int UpdateTargetVolumeLevel(int volumeLevel);
+    int UpdateMicrophoneGainLevel(int gainLevel);
+    int UpdateVideoQuality(int videoQuality);
 
 private:
 		

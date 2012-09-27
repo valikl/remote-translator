@@ -67,8 +67,14 @@ public:
     // Operations
     int StartSoundLoopbackTest(std::wstring inputSoundDevId, std::wstring outputSoundDevId, bool m_isSoundSystemWin);
     int StopSoundLoopbackTest();
+    // Disable/Enable my microphone
     int MuteMicrophone(bool bMute);
+    // Mute other users in my channel
     int MuteTarget(bool bMute);
+    int UpdateSourceVolumeLevel(int volumeLevel);
+    int UpdateTargetVolumeLevel(int volumeLevel);
+    int UpdateMicrophoneGainLevel(int gainLevel);
+    int UpdateVideoQuality(int videoQuality);
 
 private:
 
