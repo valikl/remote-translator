@@ -67,12 +67,11 @@ void RemoteTranslatorUI::setSliders()
     ui->MicLevelInd->setTextVisible(false);
     ui->MicLevelInd->setValue(GetMicLevel());
 }
-
 int RemoteTranslatorUI::init()
 {
     int ret = 0;
 
-    CHECK_ret(BB_ClientConfigMgr::Instance().init("C:\\Projects\\work\\config.xml"));
+    CHECK_ret(BB_ClientConfigMgr::Instance().init("config.xml"));
     CHECK_ret(translator.init());
 
     //Initialize ComboBoxes
