@@ -593,3 +593,23 @@ int BB_Instance::MuteTarget(bool bMute)
     CHECK_ret(TT_SetSoundOutputMute(m_ttInst, bMute));
     return EXIT_SUCCESS;
 }
+
+int BB_Instance::UpdateSourceVolumeLevel(int volumeLevel)
+{
+    return EXIT_SUCCESS;
+}
+
+int BB_Instance::UpdateTargetVolumeLevel(int volumeLevel)
+{
+    return EXIT_SUCCESS;
+}
+
+int BB_Instance::UpdateMicrophoneGainLevel(int gainLevel)
+{
+    return EXIT_SUCCESS;
+}
+
+int BB_Instance::UpdateVideoQuality(int videoQuality)
+{
+    return EXIT_SUCCESS;
+}

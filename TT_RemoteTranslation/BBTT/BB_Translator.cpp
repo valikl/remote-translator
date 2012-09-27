@@ -97,11 +97,11 @@ int BB_Translator::connectHap(wstring hapName, wstring nickName, wstring srcName
 
 int BB_Translator::finalize()
 {
-    return disconnectHap();
     if (m_channelDummy)
     {
         delete m_channelDummy;
     }
+    return disconnectHap();
 }
 
 int BB_Translator::init()
@@ -336,59 +336,56 @@ void BB_Translator::initInstanceContext(BB_InstanceContext &context)
 
 int BB_Translator::MuteMicrophone(bool bMute)
 {
+    if (!m_isConnected)
+    {
+        return EXIT_FAILURE;
+    }
     return m_channelDst->MuteMicrophone(bMute);
 }
 
 int BB_Translator::MuteTarget(bool bMute)
 {
+    if (!m_isConnected)
+    {
+        return EXIT_FAILURE;
+    }
    return m_channelDst->MuteTarget(bMute);
 }
 
-#if 0
-int handleOperation(TranslatorOpCode eOpCode)
+int BB_Translator::UpdateVideoQuality(int videoQuality)
 {
-    int ret = EXIT_SUCCESS;
-    switch (eOpCode)
+    if (!m_isConnected)
     {
-    case OP_CODE_UPDATE_MICROPHONE_GAIN:
-    {
+        return EXIT_FAILURE;
     }
-    case OP_CODE_UPDATE_SOURCE_LEVEL:
-    {
-    }
-    case OP_CODE_UPDATE_TARGET_LEVEL:
-    {
-    }
-    case OP_CODE_UPDATE_VIDEO_QUALITY:
-    {
-    }
-    case OP_CODE_MUTE_MICROPHONE:
-    {
-        // Disable my microphone
-       // TT_EnableTransmission 	( 	IN TTInstance *  	lpTTInstance,
-        //        IN TransmitTypes  	uTxType,
-         //       IN BOOL  	bEnable	 )
-    }
-    case OP_CODE_MUTE_TARGET:
-    {
-        // Mute other users in my channel
-        //TT_SetSoundOutputMute (IN TTInstance *lpTTInstance, IN BOOL bMuteAll);
-    }
-    case OP_START_SOUND_LOOPBACK_TEST:
-    {
-        TT_StartSoundLoopbackTest( 	IN TTInstance *  	lpTTInstance,
-                IN INT32  	nInputDeviceID,
-                IN INT32  	nOutputDeviceID,
-                IN INT32  	nSampleRate,
-                IN INT32  	nChannels
-            )
-    }
-    default:
-    {
-        ret = EXIT_FAILURE;
-    }
-    }
-
-    return ret;
+    return m_channelVideo->UpdateVideoQuality(videoQuality);
 }
-#endif
+
+int BB_Translator::UpdateSourceVolumeLevel(int volumeLevel)
+{
+    if (!m_isConnected)
+    {
+        return EXIT_FAILURE;
+    }
+    return m_channelSrc->UpdateSourceVolumeLevel(volumeLevel);
+}
+
+int BB_Translator::UpdateTargetVolumeLevel(int volumeLevel)
+{
+    if (!m_isConnected)
+    {
+        return EXIT_FAILURE;
+    }
+    return m_channelDst->UpdateTargetVolumeLevel(volumeLevel);
+}
+
+int BB_Translator::UpdateMicrophoneGainLevel(int gainLevel)
+{
+    if (!m_isConnected)
+    {
+        return EXIT_FAILURE;
+    }
+    return m_channelDst->UpdateMicrophoneGainLevel(gainLevel);
+}
+
+
