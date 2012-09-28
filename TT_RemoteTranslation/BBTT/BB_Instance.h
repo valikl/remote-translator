@@ -14,6 +14,8 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <vector>
+#include "BB_ClientConfigMgr.h"
+#include "BB_Thread.h"
 
 struct BB_InstanceContext
 {
@@ -59,6 +61,15 @@ struct BB_ChannelUser
     INT32 m_id;
 };
 
+#if 0
+class VideoJob : IRunnable
+{
+public:
+    // the thread procedure
+    virtual void run();
+};
+#endif
+
 class BB_Instance
 {
 public:
@@ -86,10 +97,14 @@ public:
     int StopSoundLoopbackTest();
     int MuteMicrophone(bool bMute);
     int MuteTarget(bool bMute);
-    int UpdateSourceVolumeLevel(int volumeLevel);
-    int UpdateTargetVolumeLevel(int volumeLevel);
+    int UpdateVolumeLevel(int volumeLevel);
     int UpdateMicrophoneGainLevel(int gainLevel);
     int UpdateVideoQuality(int videoQuality);
+    int EnableDenoising(bool bEnable);
+    int EnableEchoCancellation(bool bEnable);
+    int SetAGCEnable(bool bEnable, const AGC *agc = NULL);
+    void OpenVideoWindow();
+    void CloseVideoWindow();
 
 private:
 		
@@ -106,7 +121,14 @@ private:
 	INT32 m_channelId;
 
     std::vector<BB_ChannelUser> m_UserList;
+#if 0
+    // Used for video channel
+    Thread m_thread;
+    VideoJob m_videoJob;
+    bool m_stopThread;
+#endif
 };
+
 
 #endif
 
