@@ -71,10 +71,15 @@ public:
     int MuteMicrophone(bool bMute);
     // Mute other users in my channel
     int MuteTarget(bool bMute);
-    int UpdateSourceVolumeLevel(int volumeLevel);
-    int UpdateTargetVolumeLevel(int volumeLevel);
+    int UpdateVolumeLevel(int volumeLevel, bool isSource);
     int UpdateMicrophoneGainLevel(int gainLevel);
     int UpdateVideoQuality(int videoQuality);
+    int EnableDenoising(bool bEnable);
+    int EnableEchoCancellation(bool bEnable);
+    // Target
+    int VoiceActivation();
+    // Microphone(target)
+    int SetAGCEnable(bool bEnable, const AGC *agc = NULL);
 
 private:
 
