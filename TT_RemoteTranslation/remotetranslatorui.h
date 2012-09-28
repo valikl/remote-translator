@@ -53,6 +53,7 @@ private slots:
     void on_UserTimeout();
 
     void ActivateSoundDevices();
+    void ActivateAudioFilters();
 
 private:
 

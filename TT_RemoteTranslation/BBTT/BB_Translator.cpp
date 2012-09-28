@@ -361,22 +361,20 @@ int BB_Translator::UpdateVideoQuality(int videoQuality)
     return m_channelVideo->UpdateVideoQuality(videoQuality);
 }
 
-int BB_Translator::UpdateSourceVolumeLevel(int volumeLevel)
+int BB_Translator::UpdateVolumeLevel(int volumeLevel, bool isSource)
 {
     if (!m_isConnected)
     {
         return EXIT_FAILURE;
     }
-    return m_channelSrc->UpdateSourceVolumeLevel(volumeLevel);
-}
-
-int BB_Translator::UpdateTargetVolumeLevel(int volumeLevel)
-{
-    if (!m_isConnected)
+    if (isSource)
     {
-        return EXIT_FAILURE;
+        return m_channelSrc->UpdateVolumeLevel(volumeLevel);
     }
-    return m_channelDst->UpdateTargetVolumeLevel(volumeLevel);
+    else
+    {
+        return m_channelDst->UpdateVolumeLevel(volumeLevel);
+    }
 }
 
 int BB_Translator::UpdateMicrophoneGainLevel(int gainLevel)
@@ -388,4 +386,35 @@ int BB_Translator::UpdateMicrophoneGainLevel(int gainLevel)
     return m_channelDst->UpdateMicrophoneGainLevel(gainLevel);
 }
 
+int BB_Translator::EnableDenoising(bool bEnable)
+{
+    if (!m_isConnected)
+    {
+        return EXIT_FAILURE;
+    }
+    int ret;
+    CHECK_ret(m_channelSrc->EnableDenoising(bEnable));
+    CHECK_ret(m_channelDst->EnableDenoising(bEnable));
+    return EXIT_SUCCESS;
+}
 
+int BB_Translator::EnableEchoCancellation(bool bEnable)
+{
+    if (!m_isConnected)
+    {
+        return EXIT_FAILURE;
+    }
+    int ret;
+    CHECK_ret(m_channelSrc->EnableEchoCancellation(bEnable));
+    CHECK_ret(m_channelDst->EnableEchoCancellation(bEnable));
+    return EXIT_SUCCESS;
+}
+
+int BB_Translator::SetAGCEnable(bool bEnable, const AGC *agc)
+{
+    if (!m_isConnected)
+    {
+        return EXIT_FAILURE;
+    }
+    return m_channelDst->SetAGCEnable(bEnable, agc);
+}

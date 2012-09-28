@@ -632,6 +632,7 @@ p, li { white-space: pre-wrap; }
      <string>Sound Settings</string>
     </property>
     <addaction name="actionConfigure_Audio"/>
+    <addaction name="actionAudio_Filters"/>
    </widget>
    <widget class="QMenu" name="menuPersonal">
     <property name="title">
@@ -684,6 +685,11 @@ p, li { white-space: pre-wrap; }
   <action name="actionControl_server_connection">
    <property name="text">
     <string>Control server connection</string>
+   </property>
+  </action>
+  <action name="actionAudio_Filters">
+   <property name="text">
+    <string>Audio Filters</string>
    </property>
   </action>
  </widget>

@@ -15,6 +15,9 @@ public:
     explicit SoundFilters(QWidget *parent = 0);
     ~SoundFilters();
     
+private slots:
+    void on_FiltersOK_accepted();
+
 private:
     Ui::SoundFilters *ui;
 };

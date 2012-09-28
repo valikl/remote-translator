@@ -1,5 +1,6 @@
 #include "remotetranslatorui.h"
 #include "sounddevices.h"
+#include "soundfilters.h"
 #include "BBTT/BB_ClientConfigMgr.h"
 #include "BBTT/Utils.h"
 #include "ui_remotetranslatorui.h"
@@ -80,6 +81,7 @@ int RemoteTranslatorUI::init()
 
     // activate sound devices
     connect(ui->actionConfigure_Audio, SIGNAL(triggered()), this, SLOT(ActivateSoundDevices()));
+    connect(ui->actionAudio_Filters, SIGNAL(triggered()), this, SLOT(ActivateAudioFilters()));
 
     // set nick name
     ui->NickName->setText(QString::fromStdWString(ConfigUI.m_NickName));
@@ -118,6 +120,14 @@ void RemoteTranslatorUI::on_Timeout()
 //    ui->MicLevelInd->setValue(0);
     ui->MicLevelInd->setValue(GetMicLevel());
 }
+
+void RemoteTranslatorUI::ActivateAudioFilters()
+{
+    SoundFilters sound_filters(this);
+    sound_filters.exec();
+}
+
+
 
 void RemoteTranslatorUI::setUserItems(bool is_source)
 {

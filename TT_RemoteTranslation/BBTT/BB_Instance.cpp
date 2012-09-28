@@ -6,6 +6,9 @@
 using namespace std;
 
 BB_Instance::BB_Instance(const BB_InstanceContext &context) : m_context(context)
+#if 0
+    , m_thread(NULL), m_videoJob(NULL), m_stopThread(false)
+#endif
 {
 	// We don't want to call TT functions in Ctor
 	// Caller must call init()
@@ -594,18 +597,17 @@ int BB_Instance::MuteTarget(bool bMute)
     return EXIT_SUCCESS;
 }
 
-int BB_Instance::UpdateSourceVolumeLevel(int volumeLevel)
+int BB_Instance::UpdateVolumeLevel(int volumeLevel)
 {
-    return EXIT_SUCCESS;
-}
-
-int BB_Instance::UpdateTargetVolumeLevel(int volumeLevel)
-{
+    int ret;
+    CHECK_ret(TT_SetSoundOutputVolume(m_ttInst, volumeLevel));
     return EXIT_SUCCESS;
 }
 
 int BB_Instance::UpdateMicrophoneGainLevel(int gainLevel)
 {
+    int ret;
+    CHECK_ret(TT_SetSoundInputGainLevel(m_ttInst, gainLevel));
     return EXIT_SUCCESS;
 }
 
@@ -613,3 +615,113 @@ int BB_Instance::UpdateVideoQuality(int videoQuality)
 {
     return EXIT_SUCCESS;
 }
+
+int BB_Instance::EnableDenoising(bool bEnable)
+{
+    int ret;
+    CHECK_ret(TT_EnableDenoising(m_ttInst, bEnable));
+    return EXIT_SUCCESS;
+}
+
+int BB_Instance::EnableEchoCancellation(bool bEnable)
+{
+    int ret;
+    CHECK_ret(TT_EnableEchoCancellation(m_ttInst, bEnable));
+    return EXIT_SUCCESS;
+}
+
+int BB_Instance::SetAGCEnable(bool bEnable, const AGC *agc)
+{
+    int ret;
+    if (bEnable)
+    {
+        CHECK_ret(TT_SetAGCSettings(m_ttInst, agc->m_gainLevel, agc->m_maxIncrement, agc->m_maxDecrement, agc->m_maxGain));
+    }
+
+    CHECK_ret(TT_EnableAGC(m_ttInst, bEnable));
+    return EXIT_SUCCESS;
+}
+
+#if 0
+void BB_Instance::OpenVideoWindow()
+{
+    if (m_thread)
+    {
+        // Video window is already opened
+        return;
+    }
+    m_stopThread = false;
+    m_videoJob = new VideoJob();
+    m_thread = new Thread(m_videoJob);
+}
+
+int BB_Instance::CloseVideoWindow()
+{
+    if (m_thread == NULL)
+    {
+        // Video window is not opened
+        return;
+    }
+    m_stopThread = true;
+    m_thread.Join();
+
+    delete m_videoJob;
+    delete m_thread;
+    m_videoJob = NULL;
+    m_thread = NULL;
+}
+
+void VideoJob::run()
+{
+    std::vector<BB_ChannelUser> userList;
+    if (getUsers(userList) != EXIT_SUCCESS)
+    {
+        return;
+    }
+
+    //CHECK_ret(m_channelOrigIn->getVideoDevice());
+    int userId = -1;
+    for (int i = 0; i < userList.size(); i++)
+    {
+        if (userList[i].m_userName == m_nickName)
+        {
+            userId = user.nUserID;
+            break;
+        }
+    }
+
+    if (userId == -1)
+    {
+        return;
+    }
+
+    int cmdId = TT_DoSubscribe(m_ttInst, userId, (SUBSCRIBE_VIDEO | SUBSCRIBE_INTERCEPT_VIDEO));
+    if(cmdId > 0)
+    {
+         cout << "Subscribing to video events from #" << userId << endl;
+    }
+    else
+    {
+         cout << "Failed to issue subscribe command" << endl;
+    }
+
+    HDC hDC = CreateDC(TEXT("DISPLAY"),NULL,NULL,NULL);
+
+    TTMessage msg;
+    int wait_ms = 10000;
+    while(TT_GetMessage(m_ttInst, &msg, &wait_ms))
+    {
+        if (msg.wmMsg == WM_TEAMTALK_USER_VIDEOFRAME)
+        {
+            m_channelOrigOut->processTTMessage(msg);
+            VideoFrame video_frame;
+            res = TT_AcquireUserVideoFrame(m_ttInst, userId, &video_frame);
+            res = TT_PaintVideoFrame(m_ttInst, userId, hDC, 0, 0, 100, 100);
+            TT_ReleaseUserVideoFrame(m_ttInst, userId);
+        }
+    }
+
+    DeleteDC(hDC);
+}
+
+#endif
