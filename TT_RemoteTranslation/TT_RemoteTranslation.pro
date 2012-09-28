@@ -20,7 +20,8 @@ SOURCES += main.cpp\
     Ticpp/tinystr.cpp \
     Ticpp/ticpp.cpp \
     Ticpp/tinyxmlparser.cpp \
-    sounddevices.cpp
+    sounddevices.cpp \
+    soundfilters.cpp
 
 HEADERS  += \
     common.h \
@@ -35,10 +36,12 @@ HEADERS  += \
     Ticpp/tinystr.h \
     Ticpp/ticpprc.h \
     Ticpp/ticpp.h \
-    sounddevices.h
+    sounddevices.h \
+    soundfilters.h
 
 FORMS    += remotetranslatorui.ui \
-    sounddevices.ui
+    sounddevices.ui \
+    soundfilters.ui
 
 OTHER_FILES += \
     images/webcam_stop.png \
@@ -91,3 +94,5 @@ win32:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/lib/TeamTalk4.lib
 else:win32:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/lib/TeamTalk4.lib
 
 win32:DEFINES += TIXML_USE_TICPP
+
+CONFIG += static
