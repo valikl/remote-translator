@@ -20,7 +20,8 @@ SOURCES += main.cpp\
     Ticpp/tinystr.cpp \
     Ticpp/ticpp.cpp \
     Ticpp/tinyxmlparser.cpp \
-    sounddevices.cpp
+    sounddevices.cpp \
+    BBTT/BB_Thread.cpp
 
 HEADERS  += \
     common.h \
@@ -35,7 +36,9 @@ HEADERS  += \
     Ticpp/tinystr.h \
     Ticpp/ticpprc.h \
     Ticpp/ticpp.h \
-    sounddevices.h
+    sounddevices.h \
+    BBTT/BB_Thread.h \
+    BBTT/IRunnable.h
 
 FORMS    += remotetranslatorui.ui \
     sounddevices.ui
