@@ -418,3 +418,12 @@ int BB_Translator::SetAGCEnable(bool bEnable, const AGC *agc)
     }
     return m_channelDst->SetAGCEnable(bEnable, agc);
 }
+
+int BB_Translator::EnableVoiceActivation(bool bEnable, int voiceactSlider)
+{
+    if (!m_isConnected)
+    {
+        return EXIT_FAILURE;
+    }
+    return m_channelDst->EnableVoiceActivation(bEnable, voiceactSlider);
+}

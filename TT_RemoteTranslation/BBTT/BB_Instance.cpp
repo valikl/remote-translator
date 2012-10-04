@@ -642,7 +642,19 @@ int BB_Instance::SetAGCEnable(bool bEnable, const AGC *agc)
     return EXIT_SUCCESS;
 }
 
+int BB_Instance::EnableVoiceActivation(bool bEnable, int voiceactSlider)
+{
+    int ret;
+    CHECK_ret(TT_EnableVoiceActivation(m_ttInst, bEnable));
+    if (bEnable)
+    {
+        CHECK_ret(TT_SetVoiceActivationLevel(m_ttInst, voiceactSlider));
+    }
+    return EXIT_SUCCESS;
+}
+
 #if 0
+
 void BB_Instance::OpenVideoWindow()
 {
     if (m_thread)

@@ -77,7 +77,7 @@ public:
     int EnableDenoising(bool bEnable);
     int EnableEchoCancellation(bool bEnable);
     // Target
-    int VoiceActivation();
+    int EnableVoiceActivation(bool bEnable, int voiceactSlider = 0);
     // Microphone(target)
     int SetAGCEnable(bool bEnable, const AGC *agc = NULL);
 
