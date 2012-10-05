@@ -40,7 +40,7 @@ DWORD WINAPI Thread::ThreadProc(LPVOID lpParameter)
 
     try
     {
-        pJob->Run();
+        pJob->run();
     }
     catch (const exception& e)
     {

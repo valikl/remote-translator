@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include <vector>
 #include "BB_ClientConfigMgr.h"
+#include "IRunnable.h"
 #include "BB_Thread.h"
 
 struct BB_InstanceContext
@@ -61,20 +62,14 @@ struct BB_ChannelUser
     INT32 m_id;
 };
 
-#if 0
-class VideoJob : IRunnable
-{
-public:
-    // the thread procedure
-    virtual void run();
-};
-#endif
-
-class BB_Instance
+class BB_Instance : public IRunnable
 {
 public:
 	BB_Instance(const BB_InstanceContext &context);
 	~BB_Instance(void);
+
+    // the thread procedure
+    virtual void run();
 
 	// We don't want to call TT functions in Ctor & Dtor
 	// Use init and finalize instead
@@ -122,12 +117,10 @@ private:
 	INT32 m_channelId;
 
     std::vector<BB_ChannelUser> m_UserList;
-#if 0
+
     // Used for video channel
-    Thread m_thread;
-    VideoJob m_videoJob;
+    Thread *m_thread;
     bool m_stopThread;
-#endif
 };
 
 

@@ -3,7 +3,7 @@
 #include "IRunnable.h"
 
 // Usage
-// VideoWindow *obj = new VideoWindow();
+// VideoJob *obj = new VideoJob();
 // Thread thread = new Thread(obj);
 
 class Thread

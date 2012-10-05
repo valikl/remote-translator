@@ -93,6 +93,9 @@ private:
 
     void initInstanceContext(BB_InstanceContext &context);
 	
+    void OpenVideoWindow();
+    void CloseVideoWindow();
+
 	BB_Instance *m_channelVideo;
 	BB_Instance *m_channelSrc;
 	BB_Instance *m_channelDst;
