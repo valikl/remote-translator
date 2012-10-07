@@ -77,7 +77,7 @@ public:
     int EnableDenoising(bool bEnable);
     int EnableEchoCancellation(bool bEnable);
     // Target
-    int VoiceActivation();
+    int EnableVoiceActivation(bool bEnable, int voiceactSlider = 0);
     // Microphone(target)
     int SetAGCEnable(bool bEnable, const AGC *agc = NULL);
 
@@ -93,6 +93,9 @@ private:
 
     void initInstanceContext(BB_InstanceContext &context);
 	
+    void OpenVideoWindow();
+    void CloseVideoWindow();
+
 	BB_Instance *m_channelVideo;
 	BB_Instance *m_channelSrc;
 	BB_Instance *m_channelDst;

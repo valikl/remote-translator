@@ -5,10 +5,7 @@
 
 using namespace std;
 
-BB_Instance::BB_Instance(const BB_InstanceContext &context) : m_context(context)
-#if 0
-    , m_thread(NULL), m_videoJob(NULL), m_stopThread(false)
-#endif
+BB_Instance::BB_Instance(const BB_InstanceContext &context) : m_context(context), m_thread(NULL), m_stopThread(false)
 {
 	// We don't want to call TT functions in Ctor
 	// Caller must call init()
@@ -642,7 +639,17 @@ int BB_Instance::SetAGCEnable(bool bEnable, const AGC *agc)
     return EXIT_SUCCESS;
 }
 
-#if 0
+int BB_Instance::EnableVoiceActivation(bool bEnable, int voiceactSlider)
+{
+    int ret;
+    CHECK_ret(TT_EnableVoiceActivation(m_ttInst, bEnable));
+    if (bEnable)
+    {
+        CHECK_ret(TT_SetVoiceActivationLevel(m_ttInst, voiceactSlider));
+    }
+    return EXIT_SUCCESS;
+}
+
 void BB_Instance::OpenVideoWindow()
 {
     if (m_thread)
@@ -651,11 +658,10 @@ void BB_Instance::OpenVideoWindow()
         return;
     }
     m_stopThread = false;
-    m_videoJob = new VideoJob();
-    m_thread = new Thread(m_videoJob);
+    m_thread = new Thread(this);
 }
 
-int BB_Instance::CloseVideoWindow()
+void BB_Instance::CloseVideoWindow()
 {
     if (m_thread == NULL)
     {
@@ -663,15 +669,13 @@ int BB_Instance::CloseVideoWindow()
         return;
     }
     m_stopThread = true;
-    m_thread.Join();
+    m_thread->Join();
 
-    delete m_videoJob;
     delete m_thread;
-    m_videoJob = NULL;
     m_thread = NULL;
 }
 
-void VideoJob::run()
+void BB_Instance::run()
 {
     std::vector<BB_ChannelUser> userList;
     if (getUsers(userList) != EXIT_SUCCESS)
@@ -681,11 +685,11 @@ void VideoJob::run()
 
     //CHECK_ret(m_channelOrigIn->getVideoDevice());
     int userId = -1;
-    for (int i = 0; i < userList.size(); i++)
+    for (unsigned int i = 0; i < userList.size(); i++)
     {
-        if (userList[i].m_userName == m_nickName)
+        if (userList[i].m_userName == m_context.m_nickName)
         {
-            userId = user.nUserID;
+            userId = userList[i].m_id;
             break;
         }
     }
@@ -705,23 +709,26 @@ void VideoJob::run()
          cout << "Failed to issue subscribe command" << endl;
     }
 
-    HDC hDC = CreateDC(TEXT("DISPLAY"),NULL,NULL,NULL);
+    //http://qt-project.org/forums/viewthread/497
+    //WId QWidget::effectiveWinId () const
+    //WId QWidget::winId () const
+    HWND hWnd = NULL;
+    HDC hDC = GetDC(hWnd);
 
     TTMessage msg;
     int wait_ms = 10000;
     while(TT_GetMessage(m_ttInst, &msg, &wait_ms))
     {
         if (msg.wmMsg == WM_TEAMTALK_USER_VIDEOFRAME)
-        {
-            m_channelOrigOut->processTTMessage(msg);
+        {         
+            processTTMessage(msg);
             VideoFrame video_frame;
-            res = TT_AcquireUserVideoFrame(m_ttInst, userId, &video_frame);
+            int res = TT_AcquireUserVideoFrame(m_ttInst, userId, &video_frame);
             res = TT_PaintVideoFrame(m_ttInst, userId, hDC, 0, 0, 100, 100);
             TT_ReleaseUserVideoFrame(m_ttInst, userId);
         }
     }
 
-    DeleteDC(hDC);
+    ReleaseDC(hWnd, hDC);
 }
 
-#endif
