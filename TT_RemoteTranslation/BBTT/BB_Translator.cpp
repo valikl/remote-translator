@@ -19,6 +19,12 @@ BB_Translator::~BB_Translator(void)
 {
 }
 
+BB_Translator& BB_Translator::Instance()
+{
+    static BB_Translator instance;
+    return instance;
+}
+
 int BB_Translator::disconnectHap()
 {
 

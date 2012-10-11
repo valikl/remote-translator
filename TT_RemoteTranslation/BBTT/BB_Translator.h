@@ -43,8 +43,10 @@ struct HappeningEx
 class BB_Translator
 {
 public:
-    BB_Translator();
 	~BB_Translator(void);
+
+    // Returns the instance of the singleton
+    static BB_Translator &Instance();
 
 	// connect to the server and get happenings
 	int init();
@@ -82,6 +84,9 @@ public:
     int SetAGCEnable(bool bEnable, const AGC *agc = NULL);
 
 private:
+    BB_Translator();
+    BB_Translator(const BB_Translator &);
+    const BB_Translator &operator=(const BB_Translator &);
 
 	int initHapsList(const std::vector<BB_Channel> &channels);
 	void initSoundDevicesList();
