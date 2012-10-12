@@ -22,7 +22,8 @@ SOURCES += main.cpp\
     Ticpp/tinyxmlparser.cpp \
     sounddevices.cpp \
     soundfilters.cpp \
-    BBTT/BB_Thread.cpp
+    BBTT/BB_Thread.cpp \
+    manconnect.cpp
 
 HEADERS  += \
     common.h \
@@ -40,11 +41,13 @@ HEADERS  += \
     sounddevices.h \
     soundfilters.h \
     BBTT/IRunnable.h \
-    BBTT/BB_Thread.h
+    BBTT/BB_Thread.h \
+    manconnect.h
 
 FORMS    += remotetranslatorui.ui \
     sounddevices.ui \
-    soundfilters.ui
+    soundfilters.ui \
+    manconnect.ui
 
 OTHER_FILES += \
     images/webcam_stop.png \
