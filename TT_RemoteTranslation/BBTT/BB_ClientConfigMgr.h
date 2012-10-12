@@ -116,7 +116,7 @@ struct ClientConfig
     std::wstring m_TrgChannel;
     int m_MicGainLevel;
     int m_SrcVolumeLevel;
-    int m_trgVolumeLevel;
+    int m_TrgVolumeLevel;
     int m_VideoQuality;
 
     bool m_MicMute;
@@ -164,7 +164,7 @@ public:
     void SetTrgChannel(std::wstring trgChannel) {m_config.m_TrgChannel = trgChannel;}
     void SetMicGainLevel(int micGainLevel) {m_config.m_MicGainLevel = micGainLevel;}
     void SetSrcVolumeLevel(int srcVolumeLevel) {m_config.m_SrcVolumeLevel = srcVolumeLevel;}
-    void SetTrgVolumeLevel(int trgVolumeLevel) {m_config.m_trgVolumeLevel = trgVolumeLevel;}
+    void SetTrgVolumeLevel(int trgVolumeLevel) {m_config.m_TrgVolumeLevel = trgVolumeLevel;}
     void SetVideoQuality(int videoQuality) {m_config.m_VideoQuality = videoQuality;}
     void SetMicMute(bool micMute) {m_config.m_MicMute = micMute;}
     void SetTrgMute(bool trgMute) {m_config.m_TrgMute = trgMute;}

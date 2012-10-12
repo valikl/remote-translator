@@ -274,7 +274,7 @@ void BB_ClientConfigMgr::loadAudioSettingsConfig(const ticpp::Document &doc)
 
 			if (strName == ATTR_TRG_VOLUME_LEVEL)
 			{
-				m_config.m_trgVolumeLevel = atoi(strValue.c_str());
+                m_config.m_TrgVolumeLevel = atoi(strValue.c_str());
 				continue;
 			}
 
@@ -440,7 +440,7 @@ int BB_ClientConfigMgr::saveConfig()
 		ATTR_FRAMES_PER_SEC + "=\"" + string(itoa(m_config.m_framesPerSec, buffer, 10)) + "\" " + 
 		ATTR_MIC_GAIN_LEVEL + "=\"" + string(itoa(m_config.m_MicGainLevel, buffer, 10)) + "\" " + 
 		ATTR_SRC_VOLUME_LEVEL + "=\"" + string(itoa(m_config.m_SrcVolumeLevel, buffer, 10)) + "\" " + 
-		ATTR_TRG_VOLUME_LEVEL + "=\"" + string(itoa(m_config.m_trgVolumeLevel, buffer, 10)) + "\" " + 
+        ATTR_TRG_VOLUME_LEVEL + "=\"" + string(itoa(m_config.m_TrgVolumeLevel, buffer, 10)) + "\" " +
 		ATTR_MIC_MUTE + "=\"" + string(itoa(m_config.m_MicMute, buffer, 10)) + "\" " + 
 		ATTR_TRG_MUTE + "=\"" + string(itoa(m_config.m_TrgMute, buffer, 10)) + "\" " + 
 		ATTR_SOUND_SYS_WIN + "=\"" + string(itoa(m_config.m_isSoundSystemWin, buffer, 10)) + "\" " + 
