@@ -29,6 +29,8 @@ public:
     explicit RemoteTranslatorUI(QWidget *parent = 0);
     ~RemoteTranslatorUI();
     int init();
+
+    int enableAudioFilters();
     
 private slots:
 
@@ -53,6 +55,7 @@ private slots:
     void on_UserTimeout();
 
     void ActivateSoundDevices();
+    void ActivateAudioFilters();
 
 private:
 

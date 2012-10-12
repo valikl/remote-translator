@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'remotetranslatorui.ui'
 **
-** Created: Fri Sep 14 11:31:17 2012
+** Created: Thu Oct 11 04:20:31 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -41,6 +41,7 @@ public:
     QAction *actionChange_password;
     QAction *actionTT_server_conenection;
     QAction *actionControl_server_connection;
+    QAction *actionAudio_Filters;
     QWidget *centralWidget;
     QLabel *label;
     QComboBox *HapList;
@@ -105,6 +106,8 @@ public:
         actionTT_server_conenection->setObjectName(QString::fromUtf8("actionTT_server_conenection"));
         actionControl_server_connection = new QAction(RemoteTranslatorUI);
         actionControl_server_connection->setObjectName(QString::fromUtf8("actionControl_server_connection"));
+        actionAudio_Filters = new QAction(RemoteTranslatorUI);
+        actionAudio_Filters->setObjectName(QString::fromUtf8("actionAudio_Filters"));
         centralWidget = new QWidget(RemoteTranslatorUI);
         centralWidget->setObjectName(QString::fromUtf8("centralWidget"));
         label = new QLabel(centralWidget);
@@ -263,6 +266,7 @@ public:
         menuBar->addAction(menuPersonal->menuAction());
         menuBar->addAction(menuManual_TT_connection->menuAction());
         menuSound_Settings->addAction(actionConfigure_Audio);
+        menuSound_Settings->addAction(actionAudio_Filters);
         menuPersonal->addSeparator();
         menuPersonal->addAction(actionChange_nickname);
         menuPersonal->addAction(actionChange_password);
@@ -282,6 +286,7 @@ public:
         actionChange_password->setText(QApplication::translate("RemoteTranslatorUI", "Change password", 0, QApplication::UnicodeUTF8));
         actionTT_server_conenection->setText(QApplication::translate("RemoteTranslatorUI", "TT server connection", 0, QApplication::UnicodeUTF8));
         actionControl_server_connection->setText(QApplication::translate("RemoteTranslatorUI", "Control server connection", 0, QApplication::UnicodeUTF8));
+        actionAudio_Filters->setText(QApplication::translate("RemoteTranslatorUI", "Audio Filters", 0, QApplication::UnicodeUTF8));
         label->setText(QApplication::translate("RemoteTranslatorUI", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
