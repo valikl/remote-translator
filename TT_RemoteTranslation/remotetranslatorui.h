@@ -50,6 +50,7 @@ private slots:
     void on_TrgMuteBut_clicked(bool checked);
     void on_TrgLvlSld_valueChanged(int val);
     void on_SrcLevelSld_valueChanged(int val);
+    void on_VideoQualitylSld_valueChanged(int val);
 
 
     void on_Timeout();

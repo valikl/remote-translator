@@ -54,7 +54,7 @@ void RemoteTranslatorUI::setSliders()
 
     ui->TrgLvlSld->setMinimum(0);
     ui->TrgLvlSld->setMaximum(SOUND_VOLUME_MAX);
-    ui->TrgLvlSld->setValue(ConfigUI.m_trgVolumeLevel);
+    ui->TrgLvlSld->setValue(ConfigUI.m_TrgVolumeLevel);
 
     ui->SrcLevelSld->setMinimum(0);
     ui->SrcLevelSld->setMaximum(SOUND_VOLUME_MAX);
@@ -111,11 +111,12 @@ int RemoteTranslatorUI::init()
 
 int RemoteTranslatorUI::enableAudioFilters()
 {
-
-    TRANSLATOR.SetAGCEnable(ConfigUI.m_AGC.m_enable, &(ConfigUI.m_AGC));
-    TRANSLATOR.EnableEchoCancellation(ConfigUI.m_echoCancel);
-    TRANSLATOR.EnableDenoising(ConfigUI.m_noiseCancel);
+    int ret = EXIT_SUCCESS;
+    CHECK_ret(TRANSLATOR.SetAGCEnable(ConfigUI.m_AGC.m_enable, &(ConfigUI.m_AGC)));
+    CHECK_ret(TRANSLATOR.EnableEchoCancellation(ConfigUI.m_echoCancel));
+    CHECK_ret(TRANSLATOR.EnableDenoising(ConfigUI.m_noiseCancel));
     //To add Voice activation functions when Dima will do it
+    return ret;
 }
 
 // Activate sound devices
@@ -257,17 +258,25 @@ void RemoteTranslatorUI::on_LangConnect_clicked(bool checked)
 void RemoteTranslatorUI::on_MicGainSld_valueChanged(int val)
 {
     BB_ClientConfigMgr::Instance().SetMicGainLevel(ui->MicGainSld->value());
+    TRANSLATOR.UpdateMicrophoneGainLevel(ConfigUI.m_MicGainLevel);
 }
 
 void RemoteTranslatorUI::on_TrgLvlSld_valueChanged(int val)
 {
     BB_ClientConfigMgr::Instance().SetTrgVolumeLevel(ui->TrgLvlSld->value());
+    TRANSLATOR.UpdateVolumeLevel(ConfigUI.m_TrgVolumeLevel, false);
 }
 
 void RemoteTranslatorUI::on_SrcLevelSld_valueChanged(int val)
 {
     BB_ClientConfigMgr::Instance().SetSrcVolumeLevel(ui->SrcLevelSld->value());
+    TRANSLATOR.UpdateVolumeLevel(ConfigUI.m_SrcVolumeLevel, true);
+}
 
+void RemoteTranslatorUI::on_VideoQualitylSld_valueChanged(int val)
+{
+    BB_ClientConfigMgr::Instance().SetVideoQuality(ui->VideoLvlSld->value());
+    TRANSLATOR.UpdateVideoQuality(ConfigUI.m_VideoQuality);
 }
 
 static QString getMuteButtonFormat(QString name, QString status, QString bg_color, QString fg_color)
@@ -314,4 +323,5 @@ void RemoteTranslatorUI::on_TrgMuteBut_clicked(bool checked)
         setStatusLabel(ui->TrgStatusLbl, "Target", "active", "green", "white");
         BB_ClientConfigMgr::Instance().SetTrgMute(false);
     }
+    TRANSLATOR.MuteTarget(ConfigUI.m_TrgMute);
 }
