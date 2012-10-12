@@ -16,7 +16,7 @@ class SoundDevices : public QDialog
     Q_OBJECT
     
 public:
-    explicit SoundDevices(QWidget *parent, std::vector<BB_SoundDevice>& soundDevList, BB_Translator* trans);
+    explicit SoundDevices(QWidget *parent, std::vector<BB_SoundDevice>& soundDevList);
     ~SoundDevices();
     
 private slots:

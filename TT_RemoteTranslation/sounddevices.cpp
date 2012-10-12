@@ -4,11 +4,10 @@
 #include "sounddevices.h"
 #include "ui_sounddevices.h"
 
-SoundDevices::SoundDevices(QWidget *parent, vector<BB_SoundDevice>& soundDevList, BB_Translator* trans) :
+SoundDevices::SoundDevices(QWidget *parent, vector<BB_SoundDevice>& soundDevList) :
     QDialog(parent),
     ui(new Ui::SoundDevices),
-    m_soundDevList(soundDevList),
-    translator(trans)
+    m_soundDevList(soundDevList)
 {
     ui->setupUi(this);
     setSystemDevice();
@@ -104,10 +103,10 @@ void SoundDevices::on_SelfTestButton_clicked(bool checked)
 
         bool sound_system = !(ui->DirectSoundButton->isChecked());
 
-        translator->StartSoundLoopbackTest(in_device.m_deviceId, out_device.m_deviceId, sound_system);
+        TRANSLATOR.StartSoundLoopbackTest(in_device.m_deviceId, out_device.m_deviceId, sound_system);
     }
     else
     {
-        translator->StopSoundLoopbackTest();
+        TRANSLATOR.StopSoundLoopbackTest();
     }
 }

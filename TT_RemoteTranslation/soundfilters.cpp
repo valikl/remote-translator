@@ -36,12 +36,6 @@ SoundFilters::SoundFilters(QWidget *parent) :
 */
     ui->DenoiseEn->setChecked(ConfigUI.m_noiseCancel);
     ui->EchoEn->setChecked(ConfigUI.m_echoCancel);
-
-
-
-
-
-
 }
 
 SoundFilters::~SoundFilters()
@@ -65,5 +59,7 @@ void SoundFilters::on_FiltersOK_accepted()
 
     //To add Noise activation functions
     //Enable all activated filters
-//    RemoteTranslatorUI::enableAudioFilters();
+    TRANSLATOR.SetAGCEnable(ConfigUI.m_AGC.m_enable, &(ConfigUI.m_AGC));
+    TRANSLATOR.EnableEchoCancellation(ConfigUI.m_echoCancel);
+    TRANSLATOR.EnableDenoising(ConfigUI.m_noiseCancel);
 }

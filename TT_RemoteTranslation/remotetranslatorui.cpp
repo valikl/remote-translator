@@ -35,7 +35,7 @@ RemoteTranslatorUI::RemoteTranslatorUI(QWidget *parent) :
 void RemoteTranslatorUI::initHapsMenu()
 {
     // get list of happenings
-    happenings = translator.getHappenings();
+    happenings = TRANSLATOR.getHappenings();
 
     for (unsigned int i = 0; i < happenings.size(); ++i)
     {
@@ -74,7 +74,7 @@ int RemoteTranslatorUI::init()
     int ret = 0;
 
     CHECK_ret(BB_ClientConfigMgr::Instance().init("config.xml"));
-    CHECK_ret(translator.init());
+    CHECK_ret(TRANSLATOR.init());
 
     //Initialize ComboBoxes
     initHapsMenu();
@@ -112,17 +112,17 @@ int RemoteTranslatorUI::init()
 int RemoteTranslatorUI::enableAudioFilters()
 {
 
-    translator.SetAGCEnable(ConfigUI.m_AGC.m_enable, &(ConfigUI.m_AGC));
-    translator.EnableEchoCancellation(ConfigUI.m_echoCancel);
-    translator.EnableDenoising(ConfigUI.m_noiseCancel);
+    TRANSLATOR.SetAGCEnable(ConfigUI.m_AGC.m_enable, &(ConfigUI.m_AGC));
+    TRANSLATOR.EnableEchoCancellation(ConfigUI.m_echoCancel);
+    TRANSLATOR.EnableDenoising(ConfigUI.m_noiseCancel);
     //To add Voice activation functions when Dima will do it
 }
 
 // Activate sound devices
 void RemoteTranslatorUI::ActivateSoundDevices()
 {
-    vector<BB_SoundDevice> soundDevList = translator.getSoundDevices();
-    SoundDevices sound_devices(this, soundDevList, &translator);
+    vector<BB_SoundDevice> soundDevList = TRANSLATOR.getSoundDevices();
+    SoundDevices sound_devices(this, soundDevList);
     sound_devices.exec();
 }
 
@@ -142,11 +142,11 @@ void RemoteTranslatorUI::ActivateAudioFilters()
 
 void RemoteTranslatorUI::setUserItems(bool is_source)
 {
-    if (!translator.isConnected())
+    if (!TRANSLATOR.isConnected())
         return;
 
     vector<BB_ChannelUser> users;
-    translator.getUsers(users, is_source);
+    TRANSLATOR.getUsers(users, is_source);
 
     wstring active_user = _T("");
 
@@ -177,7 +177,7 @@ void RemoteTranslatorUI::on_UserTimeout()
 
 RemoteTranslatorUI::~RemoteTranslatorUI()
 {
-    translator.finalize();
+    TRANSLATOR.finalize();
     delete ui;
 }
 
@@ -234,14 +234,14 @@ void RemoteTranslatorUI::on_TrgLangList_currentIndexChanged(const QString &arg1)
 // Connect to choosen languages
 void RemoteTranslatorUI::on_LangConnect_clicked(bool checked)
 {
-    if (translator.isConnected())
-        translator.disconnectHap();
+    if (TRANSLATOR.isConnected())
+        TRANSLATOR.disconnectHap();
 
     if (ConfigUI.m_InputSoundDevId.empty() || ConfigUI.m_OutputSoundDevId.empty())
         QMessageBox::critical(this,"Connecting error","Sound devices are not defined");
     else
     {
-        int ret = translator.connectHap(HAPPENING_CHANNEL_DEFAULT_NAME, ConfigUI.m_NickName,
+        int ret = TRANSLATOR.connectHap(HAPPENING_CHANNEL_DEFAULT_NAME, ConfigUI.m_NickName,
                               ConfigUI.m_SrcChannel, ConfigUI.m_TrgChannel,
                               ConfigUI.m_InputSoundDevId, ConfigUI.m_OutputSoundDevId);
         if (ret == EXIT_FAILURE)
@@ -292,13 +292,13 @@ void RemoteTranslatorUI::on_MicMuteBut_clicked(bool checked)
     {
         setStatusLabel(ui->MicStatusLbl, "Microphone", "muted", "red", "#5500ff");
         BB_ClientConfigMgr::Instance().SetMicMute(true);
-        translator.MuteMicrophone(true);
+        TRANSLATOR.MuteMicrophone(true);
     }
     else
     {
         setStatusLabel(ui->MicStatusLbl, "Microphone", "active", "green", "white");
         BB_ClientConfigMgr::Instance().SetMicMute(false);
-        translator.MuteMicrophone(false);
+        TRANSLATOR.MuteMicrophone(false);
     }
 }
 

@@ -13,6 +13,7 @@
 #include <QMainWindow>
 
 #define ConfigUI (BB_ClientConfigMgr::Instance().getConfig())
+#define TRANSLATOR (BB_Translator::Instance())
 
 using namespace std;
 
@@ -63,7 +64,6 @@ private:
     void setSliders();
     void setUserItems(bool is_source);
 
-    BB_Translator translator;
     std::vector<Happening> happenings;
 
     Ui::RemoteTranslatorUI *ui;
