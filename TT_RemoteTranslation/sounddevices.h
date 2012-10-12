@@ -26,6 +26,8 @@ private slots:
 
     void on_SelfTestButton_clicked(bool checked);
 
+    void on_ActSDButton_rejected();
+
 private:
     Ui::SoundDevices *ui;
     vector<BB_SoundDevice> m_soundDevList;

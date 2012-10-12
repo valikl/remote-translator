@@ -90,6 +90,7 @@ void SoundDevices::on_ActSDButton_accepted()
     device = m_soundDevList[id];
     BB_ClientConfigMgr::Instance().SetOutputSoundDevId(device.m_deviceId);
     BB_ClientConfigMgr::Instance().SetSoundSystemWin(!(ui->DirectSoundButton->isChecked()));
+    TRANSLATOR.StopSoundLoopbackTest();
 }
 
 void SoundDevices::on_SelfTestButton_clicked(bool checked)
@@ -109,4 +110,9 @@ void SoundDevices::on_SelfTestButton_clicked(bool checked)
     {
         TRANSLATOR.StopSoundLoopbackTest();
     }
+}
+
+void SoundDevices::on_ActSDButton_rejected()
+{
+    TRANSLATOR.StopSoundLoopbackTest();
 }
