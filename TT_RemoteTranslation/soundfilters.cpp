@@ -30,12 +30,13 @@ SoundFilters::SoundFilters(QWidget *parent) :
 
     //Setting up Noise acitivation level filter
     //to merge with Dima
-/*  ui->VoiceActLvl->setMinimum(0);
+    ui->VoiceActLvl->setMinimum(0);
     ui->VoiceActLvl->setMaximum(20);
-    ui->VoiceActLvl->setValue(ConfigUI.m_AGC.m_maxIncrement);
-*/
+    ui->VoiceActLvl->setValue(ConfigUI.m_VoiceActivationLevel);
+
     ui->DenoiseEn->setChecked(ConfigUI.m_noiseCancel);
     ui->EchoEn->setChecked(ConfigUI.m_echoCancel);
+    ui->VoiceActEn->setChecked(ConfigUI.m_EnableVoiceActivation);
 }
 
 SoundFilters::~SoundFilters()
@@ -55,11 +56,13 @@ void SoundFilters::on_FiltersOK_accepted()
     BB_ClientConfigMgr::Instance().SetAGC(AGC_tmp);
     BB_ClientConfigMgr::Instance().SetEchoCancel(ui->EchoEn->isChecked());
     BB_ClientConfigMgr::Instance().SetNoiseCancel(ui->DenoiseEn->isChecked());
-
+    BB_ClientConfigMgr::Instance().SetVoiceActivationLevel(ui->VoiceActLvl->value());
+    BB_ClientConfigMgr::Instance().SetEnableVoiceActivation(ui->VoiceActEn->isChecked());
 
     //To add Noise activation functions
     //Enable all activated filters
     TRANSLATOR.SetAGCEnable(ConfigUI.m_AGC.m_enable, &(ConfigUI.m_AGC));
     TRANSLATOR.EnableEchoCancellation(ConfigUI.m_echoCancel);
     TRANSLATOR.EnableDenoising(ConfigUI.m_noiseCancel);
+    TRANSLATOR.EnableVoiceActivation(ConfigUI.m_EnableVoiceActivation, ConfigUI.m_VoiceActivationLevel);
 }

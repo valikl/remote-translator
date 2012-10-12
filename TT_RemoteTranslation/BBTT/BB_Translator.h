@@ -82,6 +82,8 @@ public:
     int EnableVoiceActivation(bool bEnable, int voiceactSlider = 0);
     // Microphone(target)
     int SetAGCEnable(bool bEnable, const AGC *agc = NULL);
+    // Microphone(target)
+    int GetMicrophoneLevel(INT32 &level);
 
 private:
     BB_Translator();

@@ -650,6 +650,12 @@ int BB_Instance::EnableVoiceActivation(bool bEnable, int voiceactSlider)
     return EXIT_SUCCESS;
 }
 
+int BB_Instance::GetMicrophoneLevel(INT32 &level)
+{
+    level = TT_GetSoundInputLevel(m_ttInst);
+    return EXIT_SUCCESS;
+}
+
 void BB_Instance::OpenVideoWindow()
 {
     if (m_thread)

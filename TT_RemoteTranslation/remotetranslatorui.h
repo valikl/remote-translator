@@ -52,12 +52,13 @@ private slots:
     void on_SrcLevelSld_valueChanged(int val);
     void on_VideoQualitylSld_valueChanged(int val);
 
-
     void on_Timeout();
     void on_UserTimeout();
 
     void ActivateSoundDevices();
     void ActivateAudioFilters();
+
+    void on_SelfTestEn_stateChanged(int checked);
 
 private:
 

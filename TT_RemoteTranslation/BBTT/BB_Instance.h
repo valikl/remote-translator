@@ -99,6 +99,8 @@ public:
     int EnableEchoCancellation(bool bEnable);
     int EnableVoiceActivation(bool bEnable, int voiceactSlider = 0);
     int SetAGCEnable(bool bEnable, const AGC *agc = NULL);
+    int GetMicrophoneLevel(int &level);
+
     void OpenVideoWindow();
     void CloseVideoWindow();
 

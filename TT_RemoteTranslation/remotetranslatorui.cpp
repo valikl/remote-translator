@@ -67,7 +67,7 @@ void RemoteTranslatorUI::setSliders()
     ui->MicLevelInd->setMinimum(0);
     ui->MicLevelInd->setMaximum(20);
     ui->MicLevelInd->setTextVisible(false);
-    ui->MicLevelInd->setValue(GetMicLevel());
+    ui->MicLevelInd->setValue(0);
 }
 int RemoteTranslatorUI::init()
 {
@@ -129,8 +129,9 @@ void RemoteTranslatorUI::ActivateSoundDevices()
 
 void RemoteTranslatorUI::on_Timeout()
 {
-//    ui->MicLevelInd->setValue(0);
-    ui->MicLevelInd->setValue(GetMicLevel());
+    int level;
+    TRANSLATOR.GetMicrophoneLevel(level);
+    ui->MicLevelInd->setValue(level);
 }
 
 void RemoteTranslatorUI::ActivateAudioFilters()
@@ -324,4 +325,21 @@ void RemoteTranslatorUI::on_TrgMuteBut_clicked(bool checked)
         BB_ClientConfigMgr::Instance().SetTrgMute(false);
     }
     TRANSLATOR.MuteTarget(ConfigUI.m_TrgMute);
+}
+
+void RemoteTranslatorUI::on_SelfTestEn_stateChanged(int checked)
+{
+    int ret;
+
+    if (checked)
+    {
+        ret = TRANSLATOR.StartSoundLoopbackTest(ConfigUI.m_InputSoundDevId, ConfigUI.m_OutputSoundDevId, ConfigUI.m_isSoundSystemWin);
+        if (ret == EXIT_FAILURE)
+            QMessageBox::critical(this,"Loopback error","Check sound devices definition");
+        ui->SelfTestEn->setChecked(false);
+    }
+    else
+    {
+        TRANSLATOR.StopSoundLoopbackTest();
+    }
 }
