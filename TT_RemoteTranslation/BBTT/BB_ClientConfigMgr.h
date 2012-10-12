@@ -47,6 +47,10 @@ const std::string ATTR_MAX_INC("maxIncrement");
 const std::string ATTR_MAX_DEC("maxDecrement");
 const std::string ATTR_MAX_GAIN("maxGain");
 
+const std::string NODE_VOICE_ACTIVATION("VoiceActivation");
+const std::string ATTR_VOICE_ACTIVATION_ENABLE("voiceActivationEnable");
+const std::string ATTR_VOICE_ACTIVATION_LEVEL("voiceActivationLevel");
+
 const std::string NODE_VIDEO_SETTINGS("VideoSettings");
 const std::string ATTR_VIDEO_QUALITY("videoQuality");
 
@@ -101,6 +105,10 @@ struct ClientConfig
     // Percentage of frames to show 100% - All frames shown, 0% - No frames shown
     int m_framesPerSec;
 
+    // Voice Activation
+    bool m_EnableVoiceActivation;
+    int m_VoiceActivationLevel;
+
     //Structure fields for GUI intitialization
     std::wstring m_NickName;
     std::wstring m_Happening;
@@ -145,6 +153,8 @@ public:
     void SetAGC(AGC agc) {m_config.m_AGC.m_enable = agc.m_enable; m_config.m_AGC.m_gainLevel = agc.m_gainLevel;
         m_config.m_AGC.m_maxIncrement = agc.m_maxIncrement; m_config.m_AGC.m_maxDecrement = agc.m_maxDecrement;
         m_config.m_AGC.m_maxGain = agc.m_maxGain;}
+    void SetEnableVoiceActivation(bool enable) { m_config.m_EnableVoiceActivation = enable; }
+    void SetVoiceActivationLevel(bool level) { m_config.m_VoiceActivationLevel = level; }
     void SetNoiseCancel(int noiseCancel) {m_config.m_noiseCancel = noiseCancel;}
     void SetEchoCancel(bool echoCancel) {m_config.m_echoCancel = echoCancel;}
     void SetFramesPerSec(int framesPerSec) {m_config.m_framesPerSec = framesPerSec;}
@@ -180,7 +190,9 @@ private:
 	void loadServerConnectConfig(const ticpp::Document &doc);
 	void loadTemplateConfig(const ticpp::Document &doc);
 	void loadAudioSettingsConfig(const ticpp::Document &doc);
-	void loadVideoSettings(const ticpp::Document &doc);
+    void loadAgcConfig(const ticpp::Iterator<ticpp::Element> &element);
+    void loadVoiceActivationConfig(const ticpp::Iterator<ticpp::Element> &element);
+    void loadVideoSettings(const ticpp::Document &doc);
 
 	ClientConfig m_config;
 	std::string m_fileName;
