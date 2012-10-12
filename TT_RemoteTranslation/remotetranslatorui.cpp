@@ -83,6 +83,8 @@ int RemoteTranslatorUI::init()
     connect(ui->actionConfigure_Audio, SIGNAL(triggered()), this, SLOT(ActivateSoundDevices()));
     connect(ui->actionAudio_Filters, SIGNAL(triggered()), this, SLOT(ActivateAudioFilters()));
 
+    //Activate Audio filters
+    enableAudioFilters();
     // set nick name
     ui->NickName->setText(QString::fromStdWString(ConfigUI.m_NickName));
 
@@ -105,6 +107,15 @@ int RemoteTranslatorUI::init()
     user_timer->start(1000);
 
     return ret;
+}
+
+int RemoteTranslatorUI::enableAudioFilters()
+{
+
+    translator.SetAGCEnable(ConfigUI.m_AGC.m_enable, &(ConfigUI.m_AGC));
+    translator.EnableEchoCancellation(ConfigUI.m_echoCancel);
+    translator.EnableDenoising(ConfigUI.m_noiseCancel);
+    //To add Voice activation functions when Dima will do it
 }
 
 // Activate sound devices
