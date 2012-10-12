@@ -433,3 +433,12 @@ int BB_Translator::EnableVoiceActivation(bool bEnable, int voiceactSlider)
     }
     return m_channelDst->EnableVoiceActivation(bEnable, voiceactSlider);
 }
+
+int BB_Translator::GetMicrophoneLevel(INT32 &level)
+{
+    if (!m_isConnected)
+    {
+        return EXIT_FAILURE;
+    }
+    return m_channelDst->GetMicrophoneLevel(level);
+}

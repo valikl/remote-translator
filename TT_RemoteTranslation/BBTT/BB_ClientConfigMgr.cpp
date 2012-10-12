@@ -274,7 +274,7 @@ void BB_ClientConfigMgr::loadAudioSettingsConfig(const ticpp::Document &doc)
 
 			if (strName == ATTR_TRG_VOLUME_LEVEL)
 			{
-				m_config.m_trgVolumeLevel = atoi(strValue.c_str());
+                m_config.m_TrgVolumeLevel = atoi(strValue.c_str());
 				continue;
 			}
 
@@ -313,55 +313,98 @@ void BB_ClientConfigMgr::loadAudioSettingsConfig(const ticpp::Document &doc)
 			}
 		}
 
-		ticpp::Iterator< ticpp::Node > node;
-		for (node = node.begin(child.Get()); node != node.end(); node++)
-		{
-			node->GetValue(&strName);
-			if (strName != NODE_AGC)
-			{
-				continue;
-			}
-
-			// now parse through all the attributes of this element
-			ticpp::Iterator< ticpp::Attribute > attribute;
-			for(attribute = attribute.begin(node.Get()); attribute != attribute.end(); attribute++)
-			{
-				string strValue;
-				attribute->GetName(&strName);
-                attribute->GetValue(&strValue);
-                    
-				if (strName == ATTR_ENABLE)
-				{
-					m_config.m_AGC.m_enable = atoi(strValue.c_str());
-					continue;
-				}
-
-				if (strName == ATTR_GAIN_LEVEL)
-				{
-					m_config.m_AGC.m_gainLevel = atoi(strValue.c_str());
-					continue;
-				}
-
-				if (strName == ATTR_MAX_INC)
-				{
-					m_config.m_AGC.m_maxIncrement = atoi(strValue.c_str());
-					continue;
-				}
-
-				if (strName == ATTR_MAX_DEC)
-				{
-					m_config.m_AGC.m_maxDecrement = atoi(strValue.c_str());
-					continue;
-				}
-
-				if (strName == ATTR_MAX_GAIN)
-				{
-					m_config.m_AGC.m_maxGain = atoi(strValue.c_str());
-					continue;
-				}
-			}
-		}
+        loadAgcConfig(child);
+        loadVoiceActivationConfig(child);
 	}
+}
+
+void BB_ClientConfigMgr::loadAgcConfig(const ticpp::Iterator<ticpp::Element> &element)
+{
+    ticpp::Iterator< ticpp::Node > node;
+    for (node = node.begin(element.Get()); node != node.end(); node++)
+    {
+        string strName;
+        node->GetValue(&strName);
+        if (strName != NODE_AGC)
+        {
+            continue;
+        }
+
+        // now parse through all the attributes of this element
+        ticpp::Iterator< ticpp::Attribute > attribute;
+        for(attribute = attribute.begin(node.Get()); attribute != attribute.end(); attribute++)
+        {
+            string strValue;
+            attribute->GetName(&strName);
+            attribute->GetValue(&strValue);
+
+            if (strName == ATTR_ENABLE)
+            {
+                m_config.m_AGC.m_enable = atoi(strValue.c_str());
+                continue;
+            }
+
+            if (strName == ATTR_GAIN_LEVEL)
+            {
+                m_config.m_AGC.m_gainLevel = atoi(strValue.c_str());
+                continue;
+            }
+
+            if (strName == ATTR_MAX_INC)
+            {
+                m_config.m_AGC.m_maxIncrement = atoi(strValue.c_str());
+                continue;
+            }
+
+            if (strName == ATTR_MAX_DEC)
+            {
+                m_config.m_AGC.m_maxDecrement = atoi(strValue.c_str());
+                continue;
+            }
+
+            if (strName == ATTR_MAX_GAIN)
+            {
+                m_config.m_AGC.m_maxGain = atoi(strValue.c_str());
+                continue;
+            }
+        }
+    }
+}
+
+
+void BB_ClientConfigMgr::loadVoiceActivationConfig(const ticpp::Iterator<ticpp::Element> &element)
+{
+    ticpp::Iterator< ticpp::Node > node;
+    for (node = node.begin(element.Get()); node != node.end(); node++)
+    {
+        string strName;
+        node->GetValue(&strName);
+        if (strName != NODE_VOICE_ACTIVATION)
+        {
+            continue;
+        }
+
+        // now parse through all the attributes of this element
+        ticpp::Iterator< ticpp::Attribute > attribute;
+        for(attribute = attribute.begin(node.Get()); attribute != attribute.end(); attribute++)
+        {
+            string strValue;
+            attribute->GetName(&strName);
+            attribute->GetValue(&strValue);
+
+            if (strName == ATTR_VOICE_ACTIVATION_ENABLE)
+            {
+                m_config.m_EnableVoiceActivation = atoi(strValue.c_str());
+                continue;
+            }
+
+            if (strName == ATTR_VOICE_ACTIVATION_LEVEL)
+            {
+                m_config.m_VoiceActivationLevel = atoi(strValue.c_str());
+                continue;
+            }
+        }
+    }
 }
 
 
@@ -397,7 +440,7 @@ int BB_ClientConfigMgr::saveConfig()
 		ATTR_FRAMES_PER_SEC + "=\"" + string(itoa(m_config.m_framesPerSec, buffer, 10)) + "\" " + 
 		ATTR_MIC_GAIN_LEVEL + "=\"" + string(itoa(m_config.m_MicGainLevel, buffer, 10)) + "\" " + 
 		ATTR_SRC_VOLUME_LEVEL + "=\"" + string(itoa(m_config.m_SrcVolumeLevel, buffer, 10)) + "\" " + 
-		ATTR_TRG_VOLUME_LEVEL + "=\"" + string(itoa(m_config.m_trgVolumeLevel, buffer, 10)) + "\" " + 
+        ATTR_TRG_VOLUME_LEVEL + "=\"" + string(itoa(m_config.m_TrgVolumeLevel, buffer, 10)) + "\" " +
 		ATTR_MIC_MUTE + "=\"" + string(itoa(m_config.m_MicMute, buffer, 10)) + "\" " + 
 		ATTR_TRG_MUTE + "=\"" + string(itoa(m_config.m_TrgMute, buffer, 10)) + "\" " + 
 		ATTR_SOUND_SYS_WIN + "=\"" + string(itoa(m_config.m_isSoundSystemWin, buffer, 10)) + "\" " + 
@@ -410,6 +453,10 @@ int BB_ClientConfigMgr::saveConfig()
 		ATTR_MAX_INC + "=\"" + string(itoa(m_config.m_AGC.m_maxIncrement, buffer, 10)) + "\" " +
 		ATTR_MAX_DEC + "=\"" + string(itoa(m_config.m_AGC.m_maxDecrement, buffer, 10)) + "\" " +
 		ATTR_MAX_GAIN + "=\"" + string(itoa(m_config.m_AGC.m_maxGain, buffer, 10)) + "\" " + "/>\n";
+
+    xml += "<" + NODE_VOICE_ACTIVATION + " " +
+        ATTR_VOICE_ACTIVATION_ENABLE + "=\"" + string(itoa(m_config.m_EnableVoiceActivation, buffer, 10)) + "\" " +
+        ATTR_VOICE_ACTIVATION_LEVEL + "=\"" + string(itoa(m_config.m_VoiceActivationLevel, buffer, 10)) + "\" " + "/>\n";
 
 	xml += "</" + NODE_AUDIO_SETTINGS + ">\n";
 
