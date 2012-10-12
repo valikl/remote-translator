@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'sounddevices.ui'
 **
-** Created: Thu Oct 11 04:20:31 2012
+** Created: Fri Oct 12 04:06:30 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!

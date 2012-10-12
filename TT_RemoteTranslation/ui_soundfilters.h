@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'soundfilters.ui'
 **
-** Created: Thu Oct 11 04:20:31 2012
+** Created: Fri Oct 12 04:06:30 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -108,10 +108,8 @@ public:
         label_8->setGeometry(QRect(50, 130, 121, 20));
 
         retranslateUi(SoundFilters);
-
         QObject::connect(FiltersOK, SIGNAL(accepted()), SoundFilters, SLOT(accept()));
         QObject::connect(FiltersOK, SIGNAL(rejected()), SoundFilters, SLOT(reject()));
-
 
         QMetaObject::connectSlotsByName(SoundFilters);
     } // setupUi
