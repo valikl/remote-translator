@@ -1,6 +1,7 @@
 #include "remotetranslatorui.h"
 #include "sounddevices.h"
 #include "soundfilters.h"
+#include "manconnect.h"
 #include "BBTT/BB_ClientConfigMgr.h"
 #include "BBTT/Utils.h"
 #include "ui_remotetranslatorui.h"
@@ -82,6 +83,7 @@ int RemoteTranslatorUI::init()
     // activate sound devices
     connect(ui->actionConfigure_Audio, SIGNAL(triggered()), this, SLOT(ActivateSoundDevices()));
     connect(ui->actionAudio_Filters, SIGNAL(triggered()), this, SLOT(ActivateAudioFilters()));
+    connect(ui->actionTT_server_conenection, SIGNAL(triggered()), this, SLOT(ActivateManConnect()));
 
     //Activate Audio filters
     enableAudioFilters();
@@ -140,6 +142,11 @@ void RemoteTranslatorUI::ActivateAudioFilters()
     sound_filters.exec();
 }
 
+void RemoteTranslatorUI::ActivateManConnect()
+{
+    ManConnect man_connect(this);
+    man_connect.exec();
+}
 
 
 void RemoteTranslatorUI::setUserItems(bool is_source)
@@ -186,6 +193,7 @@ RemoteTranslatorUI::~RemoteTranslatorUI()
 void RemoteTranslatorUI::on_NickName_editingFinished()
 {
     BB_ClientConfigMgr::Instance().SetNickName(ui->NickName->text().toStdWString());
+
 }
 
 //////////////////////////////
@@ -335,8 +343,10 @@ void RemoteTranslatorUI::on_SelfTestEn_stateChanged(int checked)
     {
         ret = TRANSLATOR.StartSoundLoopbackTest(ConfigUI.m_InputSoundDevId, ConfigUI.m_OutputSoundDevId, ConfigUI.m_isSoundSystemWin);
         if (ret == EXIT_FAILURE)
+        {
             QMessageBox::critical(this,"Loopback error","Check sound devices definition");
-        ui->SelfTestEn->setChecked(false);
+            ui->SelfTestEn->setChecked(false);
+        }
     }
     else
     {

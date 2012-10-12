@@ -57,6 +57,7 @@ private slots:
 
     void ActivateSoundDevices();
     void ActivateAudioFilters();
+    void ActivateManConnect();
 
     void on_SelfTestEn_stateChanged(int checked);
 

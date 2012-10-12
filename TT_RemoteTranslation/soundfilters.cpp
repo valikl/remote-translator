@@ -4,11 +4,25 @@
 #include "soundfilters.h"
 #include "ui_soundfilters.h"
 
+#include <QtCore/QVariant>
+#include <QtGui/QAction>
+#include <QtGui/QApplication>
+#include <QtGui/QButtonGroup>
+#include <QtGui/QCheckBox>
+#include <QtGui/QDialog>
+#include <QtGui/QDialogButtonBox>
+#include <QtGui/QHeaderView>
+#include <QtGui/QLabel>
+#include <QtGui/QSpinBox>
+
+
 SoundFilters::SoundFilters(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::SoundFilters)
 {
     ui->setupUi(this);
+
+
     //Setting up default values for AGC filter
     ui->AGCDecLvl->setMaximum(0);
     ui->AGCDecLvl->setMinimum(-80);
