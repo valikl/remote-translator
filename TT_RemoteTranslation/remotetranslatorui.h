@@ -29,9 +29,15 @@ public:
 
     explicit RemoteTranslatorUI(QWidget *parent = 0);
     ~RemoteTranslatorUI();
+
+    int initMainConfig();
     int init();
 
     int enableAudioFilters();
+
+public slots:
+
+    void changeMainConfig();
     
 private slots:
 

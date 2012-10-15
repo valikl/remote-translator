@@ -646,7 +646,7 @@ p, li { white-space: pre-wrap; }
     <property name="title">
      <string>Manual connection</string>
     </property>
-    <addaction name="actionTT_server_conenection"/>
+    <addaction name="actionTT_server_connection"/>
     <addaction name="actionControl_server_connection"/>
    </widget>
    <addaction name="menuSound_Settings"/>
@@ -677,7 +677,7 @@ p, li { white-space: pre-wrap; }
     <string>Change password</string>
    </property>
   </action>
-  <action name="actionTT_server_conenection">
+  <action name="actionTT_server_connection">
    <property name="text">
     <string>TT server connection</string>
    </property>

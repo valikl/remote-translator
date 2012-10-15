@@ -70,6 +70,25 @@ void RemoteTranslatorUI::setSliders()
     ui->MicLevelInd->setTextVisible(false);
     ui->MicLevelInd->setValue(0);
 }
+
+int RemoteTranslatorUI::initMainConfig()
+{
+    int ret = 0;
+
+    //Initialize ComboBoxes
+    initHapsMenu();
+
+    // set nick name
+    ui->NickName->setText(QString::fromStdWString(ConfigUI.m_NickName));
+
+    return ret;
+}
+
+void RemoteTranslatorUI::changeMainConfig()
+{
+    initMainConfig();
+}
+
 int RemoteTranslatorUI::init()
 {
     int ret = 0;
@@ -77,18 +96,16 @@ int RemoteTranslatorUI::init()
     CHECK_ret(BB_ClientConfigMgr::Instance().init("config.xml"));
     CHECK_ret(TRANSLATOR.init());
 
-    //Initialize ComboBoxes
-    initHapsMenu();
+    // init main configuration
+    CHECK_ret(initMainConfig());
 
     // activate sound devices
     connect(ui->actionConfigure_Audio, SIGNAL(triggered()), this, SLOT(ActivateSoundDevices()));
     connect(ui->actionAudio_Filters, SIGNAL(triggered()), this, SLOT(ActivateAudioFilters()));
-    connect(ui->actionTT_server_conenection, SIGNAL(triggered()), this, SLOT(ActivateManConnect()));
+    connect(ui->actionTT_server_connection, SIGNAL(triggered()), this, SLOT(ActivateManConnect()));
 
     //Activate Audio filters
     enableAudioFilters();
-    // set nick name
-    ui->NickName->setText(QString::fromStdWString(ConfigUI.m_NickName));
 
     // set buttons checkable
     ui->LangConnect->setCheckable(true);
@@ -147,7 +164,6 @@ void RemoteTranslatorUI::ActivateManConnect()
     ManConnect man_connect(this);
     man_connect.exec();
 }
-
 
 void RemoteTranslatorUI::setUserItems(bool is_source)
 {
