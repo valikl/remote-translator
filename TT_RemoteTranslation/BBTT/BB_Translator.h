@@ -69,6 +69,8 @@ public:
     // Operations
     int StartSoundLoopbackTest(std::wstring inputSoundDevId, std::wstring outputSoundDevId, bool m_isSoundSystemWin);
     int StopSoundLoopbackTest();
+    int StartTargetSoundLoopbackTest(const AGC &agc, bool bEnableDenoise, INT32 maxNoiseSuppress, bool bEchoCancel);
+    int StopTargetSoundLoopbackTest();
     // Disable/Enable my microphone
     int MuteMicrophone(bool bMute);
     // Mute other users in my channel
@@ -85,6 +87,10 @@ public:
     // Microphone(target)
     int GetMicrophoneLevel(INT32 &level);
 
+    // Video
+    int OpenVideoWindow(HWND hWnd);
+    int CloseVideoWindow();
+
 private:
     BB_Translator();
     BB_Translator(const BB_Translator &);
@@ -99,9 +105,6 @@ private:
     bool findSoundDev(std::wstring deviceId, bool isSoundSystemWin, BB_SoundDevice &soundDevice);
 
     void initInstanceContext(BB_InstanceContext &context);
-	
-    void OpenVideoWindow();
-    void CloseVideoWindow();
 
 	BB_Instance *m_channelVideo;
 	BB_Instance *m_channelSrc;
@@ -119,6 +122,7 @@ private:
 
     bool m_isConnected;
     bool m_isLoopbackStarted;
+    bool m_isTargetLoopbackStarted;
 };
 
 #endif

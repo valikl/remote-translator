@@ -580,6 +580,32 @@ int BB_Instance::StopSoundLoopbackTest()
     return EXIT_SUCCESS;
 }
 
+int BB_Instance::StartTargetSoundLoopbackTest(const AGC &agc, bool bEnableDenoise, INT32 maxNoiseSuppress, bool bEchoCancel)
+{
+    AudioConfig audioConfig;
+    audioConfig.bEnableAGC = agc.m_enable;
+    audioConfig.nGainLevel = agc.m_gainLevel;
+    audioConfig.nMaxIncDBSec = agc.m_maxIncrement;
+    audioConfig.nMaxDecDBSec = agc.m_maxDecrement;
+    audioConfig.nMaxGainDB = agc.m_maxGain;
+    audioConfig.bEnableDenoise = bEnableDenoise;
+    audioConfig.nMaxNoiseSuppressDB = maxNoiseSuppress;
+
+    if (!TT_StartSoundLoopbackTestEx(m_ttInst, m_context.m_inputSoundDevId, m_context.m_outputSoundDevId,
+        16000, 2, &audioConfig, bEchoCancel))
+    {
+        return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
+}
+
+int BB_Instance::StopTargetSoundLoopbackTest()
+{
+    TT_StopSoundLoopbackTest(m_ttInst);
+    return EXIT_SUCCESS;
+}
+
 int BB_Instance::MuteMicrophone(bool bMute)
 {
     int ret;
@@ -656,29 +682,110 @@ int BB_Instance::GetMicrophoneLevel(INT32 &level)
     return EXIT_SUCCESS;
 }
 
-void BB_Instance::OpenVideoWindow()
+
+LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+    switch(msg)
+    {
+        case WM_CLOSE:
+            DestroyWindow(hwnd);
+        break;
+        case WM_DESTROY:
+            PostQuitMessage(0);
+        break;
+        default:
+            return DefWindowProc(hwnd, msg, wParam, lParam);
+    }
+    return 0;
+}
+
+HWND CreateVideoWindow(HWND hWnd)
+{
+    // Based on example from http://www.winprog.org/tutorial/simple_window.html
+
+    HINSTANCE hInstance = (HINSTANCE)GetWindowLong(hWnd, GWL_HINSTANCE/*GWL_STYLE*/);
+
+    WNDCLASSEX wc;
+    HWND hwnd;
+    MSG Msg;
+
+    //Step 1: Registering the Window Class
+    wc.cbSize        = sizeof(WNDCLASSEX);
+    wc.style         = 0;
+    wc.lpfnWndProc   = WndProc;
+    wc.cbClsExtra    = 0;
+    wc.cbWndExtra    = 0;
+    wc.hInstance     = hInstance;
+    wc.hIcon         = LoadIcon(NULL, IDI_APPLICATION);
+    wc.hCursor       = LoadCursor(NULL, IDC_ARROW);
+    wc.hbrBackground = (HBRUSH)(COLOR_WINDOW+1);
+    wc.lpszMenuName  = NULL;
+    wc.lpszClassName = L"BBVideoWindowClass";
+    wc.hIconSm       = LoadIcon(NULL, IDI_APPLICATION);
+
+    if(!RegisterClassEx(&wc))
+    {
+        //MessageBox(NULL, "Window Registration Failed!", "Error!",
+          //  MB_ICONEXCLAMATION | MB_OK);
+        return NULL;
+    }
+
+    // Step 2: Creating the Window
+    hwnd = CreateWindowEx(
+        WS_EX_CLIENTEDGE,
+        L"BBVideoWindowClass",
+        L"Video",
+        WS_OVERLAPPEDWINDOW,
+        CW_USEDEFAULT, CW_USEDEFAULT, 240, 120,
+        NULL, NULL, hInstance, NULL);
+
+    if(hwnd == NULL)
+    {
+       // MessageBox(NULL, "Window Creation Failed!", "Error!",
+       //     MB_ICONEXCLAMATION | MB_OK);
+        return NULL;
+    }
+
+    ShowWindow(hwnd, SW_SHOWNORMAL);
+    UpdateWindow(hwnd);
+
+    // Step 3: The Message Loop
+    while(GetMessage(&Msg, NULL, 0, 0) > 0)
+    {
+        TranslateMessage(&Msg);
+        DispatchMessage(&Msg);
+    }
+    //return Msg.wParam;
+    return hwnd;
+}
+
+
+int BB_Instance::OpenVideoWindow(HWND hWnd)
 {
     if (m_thread)
     {
         // Video window is already opened
-        return;
+        return EXIT_FAILURE;
     }
     m_stopThread = false;
+    m_hWnd = hWnd;
     m_thread = new Thread(this);
+    return EXIT_SUCCESS;
 }
 
-void BB_Instance::CloseVideoWindow()
+int BB_Instance::CloseVideoWindow()
 {
     if (m_thread == NULL)
     {
         // Video window is not opened
-        return;
+        return EXIT_FAILURE;
     }
     m_stopThread = true;
     m_thread->Join();
 
     delete m_thread;
     m_thread = NULL;
+    return EXIT_SUCCESS;
 }
 
 void BB_Instance::run()
@@ -689,7 +796,6 @@ void BB_Instance::run()
         return;
     }
 
-    //CHECK_ret(m_channelOrigIn->getVideoDevice());
     int userId = -1;
     for (unsigned int i = 0; i < userList.size(); i++)
     {
@@ -715,10 +821,7 @@ void BB_Instance::run()
          cout << "Failed to issue subscribe command" << endl;
     }
 
-    //http://qt-project.org/forums/viewthread/497
-    //WId QWidget::effectiveWinId () const
-    //WId QWidget::winId () const
-    HWND hWnd = NULL;
+    HWND hWnd = CreateVideoWindow(m_hWnd);
     HDC hDC = GetDC(hWnd);
 
     TTMessage msg;
@@ -728,8 +831,8 @@ void BB_Instance::run()
         if (msg.wmMsg == WM_TEAMTALK_USER_VIDEOFRAME)
         {         
             processTTMessage(msg);
-            VideoFrame video_frame;
-            int res = TT_AcquireUserVideoFrame(m_ttInst, userId, &video_frame);
+            VideoFrame videoFrame;
+            int res = TT_AcquireUserVideoFrame(m_ttInst, userId, &videoFrame);
             res = TT_PaintVideoFrame(m_ttInst, userId, hDC, 0, 0, 100, 100);
             TT_ReleaseUserVideoFrame(m_ttInst, userId);
         }
@@ -737,4 +840,5 @@ void BB_Instance::run()
 
     ReleaseDC(hWnd, hDC);
 }
+
 
