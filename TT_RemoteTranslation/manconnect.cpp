@@ -20,6 +20,8 @@ ManConnect::ManConnect(QWidget *parent) :
     ui->UserName->setText(QString::fromStdWString(ConfigUI.m_srvUser));
     ui->UserPassword->setText(QString::fromStdWString(ConfigUI.m_srvUserPsw));
     ui->NickName->setText(QString::fromStdWString(ConfigUI.m_NickName));
+
+    connect(ui->ConnectAccept, SIGNAL(accepted()), this->parent(), SLOT(changeMainConfig()));
 }
 
 ManConnect::~ManConnect()

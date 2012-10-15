@@ -51,6 +51,7 @@ SoundFilters::SoundFilters(QWidget *parent) :
     ui->DenoiseEn->setChecked(ConfigUI.m_noiseCancel);
     ui->EchoEn->setChecked(ConfigUI.m_echoCancel);
     ui->VoiceActEn->setChecked(ConfigUI.m_EnableVoiceActivation);
+
 }
 
 SoundFilters::~SoundFilters()
