@@ -12,6 +12,7 @@ BB_Translator::BB_Translator()
     m_isConnected = NULL;
     m_channelDummy = NULL;
     m_isLoopbackStarted = false;
+    m_isTargetLoopbackStarted = false;
     m_isConnected = false;
 }
 
@@ -328,6 +329,41 @@ int BB_Translator::StopSoundLoopbackTest()
     return m_channelDummy->StopSoundLoopbackTest();
 }
 
+int BB_Translator::StartTargetSoundLoopbackTest(const AGC &agc, bool bEnableDenoise, INT32 maxNoiseSuppress, bool bEchoCancel)
+{
+    if (!m_isConnected)
+    {
+        return EXIT_FAILURE;
+    }
+
+    if (m_isTargetLoopbackStarted)
+    {
+        return EXIT_FAILURE;
+    }
+
+    int ret = m_channelDst->StartTargetSoundLoopbackTest(agc, bEnableDenoise, maxNoiseSuppress, bEchoCancel);
+    if (EXIT_SUCCESS == ret)
+    {
+        m_isTargetLoopbackStarted = true;
+    }
+    return ret;
+}
+
+int BB_Translator::StopTargetSoundLoopbackTest()
+{
+    if (!m_isConnected)
+    {
+        return EXIT_FAILURE;
+    }
+
+    if (!m_isTargetLoopbackStarted)
+    {
+        return EXIT_FAILURE;
+    }
+    m_isTargetLoopbackStarted = false;
+    return m_channelDst->StopTargetSoundLoopbackTest();
+}
+
 void BB_Translator::initInstanceContext(BB_InstanceContext &context)
 {
     ClientConfig config = BB_ClientConfigMgr::Instance().getConfig();
@@ -441,4 +477,22 @@ int BB_Translator::GetMicrophoneLevel(INT32 &level)
         return EXIT_FAILURE;
     }
     return m_channelDst->GetMicrophoneLevel(level);
+}
+
+int BB_Translator::OpenVideoWindow(HWND hWnd)
+{
+    if (!m_isConnected)
+    {
+        return EXIT_FAILURE;
+    }
+   return  m_channelVideo->OpenVideoWindow(hWnd);
+}
+
+int BB_Translator::CloseVideoWindow()
+{
+    if (!m_isConnected)
+    {
+        return EXIT_FAILURE;
+    }
+    return m_channelVideo->CloseVideoWindow();
 }

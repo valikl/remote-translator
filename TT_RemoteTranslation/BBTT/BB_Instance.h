@@ -90,6 +90,8 @@ public:
     // Operations
     int StartSoundLoopbackTest(INT32 inputSoundDevId, INT32 outputSoundDevId);
     int StopSoundLoopbackTest();
+    int StartTargetSoundLoopbackTest(const AGC &agc, bool bEnableDenoise, INT32 maxNoiseSuppress, bool bEchoCancel);
+    int StopTargetSoundLoopbackTest();
     int MuteMicrophone(bool bMute);
     int MuteTarget(bool bMute);
     int UpdateVolumeLevel(int volumeLevel);
@@ -101,8 +103,8 @@ public:
     int SetAGCEnable(bool bEnable, const AGC *agc = NULL);
     int GetMicrophoneLevel(int &level);
 
-    void OpenVideoWindow();
-    void CloseVideoWindow();
+    int OpenVideoWindow(HWND hWnd);
+    int CloseVideoWindow();
 
 private:
 		
@@ -123,6 +125,7 @@ private:
     // Used for video channel
     Thread *m_thread;
     bool m_stopThread;
+    HWND m_hWnd;
 };
 
 
