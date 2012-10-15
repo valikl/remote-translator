@@ -357,7 +357,7 @@ void RemoteTranslatorUI::on_SelfTestEn_stateChanged(int checked)
 
     if (checked)
     {
-        ret = TRANSLATOR.StartSoundLoopbackTest(ConfigUI.m_InputSoundDevId, ConfigUI.m_OutputSoundDevId, ConfigUI.m_isSoundSystemWin);
+        ret = TRANSLATOR.StartTargetSoundLoopbackTest(ConfigUI.m_AGC, true, true, ConfigUI.m_echoCancel);
         if (ret == EXIT_FAILURE)
         {
             QMessageBox::critical(this,"Loopback error","Check sound devices definition");
@@ -366,6 +366,6 @@ void RemoteTranslatorUI::on_SelfTestEn_stateChanged(int checked)
     }
     else
     {
-        TRANSLATOR.StopSoundLoopbackTest();
+        TRANSLATOR.StopTargetSoundLoopbackTest();
     }
 }
