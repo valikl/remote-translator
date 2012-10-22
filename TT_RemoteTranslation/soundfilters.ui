@@ -249,5 +249,38 @@ p, li { white-space: pre-wrap; }
   </widget>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>FiltersOK</sender>
+   <signal>accepted()</signal>
+   <receiver>SoundFilters</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>200</x>
+     <y>255</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>199</x>
+     <y>149</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>FiltersOK</sender>
+   <signal>rejected()</signal>
+   <receiver>SoundFilters</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>200</x>
+     <y>255</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>199</x>
+     <y>149</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

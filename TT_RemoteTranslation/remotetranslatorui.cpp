@@ -111,6 +111,7 @@ int RemoteTranslatorUI::init()
     ui->LangConnect->setCheckable(true);
     ui->MicMuteBut->setCheckable(true);
     ui->TrgMuteBut->setCheckable(true);
+    ui->showVideoButton->setCheckable(true);
 
     // set slider values
     setSliders();
@@ -368,4 +369,12 @@ void RemoteTranslatorUI::on_SelfTestEn_stateChanged(int checked)
     {
         TRANSLATOR.StopTargetSoundLoopbackTest();
     }
+}
+
+void RemoteTranslatorUI::on_showVideoButton_clicked(bool checked)
+{
+    if (checked)
+        TRANSLATOR.OpenVideoWindow(effectiveWinId());
+    else
+        TRANSLATOR.CloseVideoWindow();
 }
