@@ -42,7 +42,8 @@ HEADERS  += \
     soundfilters.h \
     BBTT/IRunnable.h \
     BBTT/BB_Thread.h \
-    manconnect.h
+    manconnect.h \
+    Utils/BB_Exception.h
 
 FORMS    += remotetranslatorui.ui \
     sounddevices.ui \
