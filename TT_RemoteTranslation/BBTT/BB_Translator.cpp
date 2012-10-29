@@ -481,10 +481,6 @@ int BB_Translator::GetMicrophoneLevel(INT32 &level)
 
 int BB_Translator::OpenVideoWindow(HWND hWnd)
 {
-    if (!m_isConnected)
-    {
-        return EXIT_FAILURE;
-    }
    return  m_channelVideo->OpenVideoWindow(hWnd);
 }
 

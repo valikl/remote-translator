@@ -5,7 +5,8 @@
 
 using namespace std;
 
-BB_Instance::BB_Instance(const BB_InstanceContext &context) : m_context(context), m_thread(NULL), m_stopThread(false)
+BB_Instance::BB_Instance(const BB_InstanceContext &context) :
+    m_context(context), m_videoLoopThread(NULL), m_stopThread(false)
 {
 	// We don't want to call TT functions in Ctor
 	// Caller must call init()
@@ -535,7 +536,7 @@ int BB_Instance::getUsers(std::vector<BB_ChannelUser> &userList)
         BB_ChannelUser user;
         // TODO ask Valik, do we need szNickname or szUsername
         // What happen if name is changed or new user connected/disconnected
-        user.m_userName = ttUser.szUsername;
+        user.m_userName = ttUser.szNickname;
         user.m_id = userIDs[i];
         m_UserList.push_back(user);
     }
@@ -682,109 +683,42 @@ int BB_Instance::GetMicrophoneLevel(INT32 &level)
     return EXIT_SUCCESS;
 }
 
-
-LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+int BB_Instance::OpenVideoWindow(HWND hEffectiveWnd)
 {
-    switch(msg)
-    {
-        case WM_CLOSE:
-            DestroyWindow(hwnd);
-        break;
-        case WM_DESTROY:
-            PostQuitMessage(0);
-        break;
-        default:
-            return DefWindowProc(hwnd, msg, wParam, lParam);
-    }
-    return 0;
-}
-
-HWND CreateVideoWindow(HWND hWnd)
-{
-    // Based on example from http://www.winprog.org/tutorial/simple_window.html
-
-    HINSTANCE hInstance = (HINSTANCE)GetWindowLong(hWnd, GWL_HINSTANCE/*GWL_STYLE*/);
-
-    WNDCLASSEX wc;
-    HWND hwnd;
-    MSG Msg;
-
-    //Step 1: Registering the Window Class
-    wc.cbSize        = sizeof(WNDCLASSEX);
-    wc.style         = 0;
-    wc.lpfnWndProc   = WndProc;
-    wc.cbClsExtra    = 0;
-    wc.cbWndExtra    = 0;
-    wc.hInstance     = hInstance;
-    wc.hIcon         = LoadIcon(NULL, IDI_APPLICATION);
-    wc.hCursor       = LoadCursor(NULL, IDC_ARROW);
-    wc.hbrBackground = (HBRUSH)(COLOR_WINDOW+1);
-    wc.lpszMenuName  = NULL;
-    wc.lpszClassName = L"BBVideoWindowClass";
-    wc.hIconSm       = LoadIcon(NULL, IDI_APPLICATION);
-
-    if(!RegisterClassEx(&wc))
-    {
-        //MessageBox(NULL, "Window Registration Failed!", "Error!",
-          //  MB_ICONEXCLAMATION | MB_OK);
-        return NULL;
-    }
-
-    // Step 2: Creating the Window
-    hwnd = CreateWindowEx(
-        WS_EX_CLIENTEDGE,
-        L"BBVideoWindowClass",
-        L"Video",
-        WS_OVERLAPPEDWINDOW,
-        CW_USEDEFAULT, CW_USEDEFAULT, 240, 120,
-        NULL, NULL, hInstance, NULL);
-
-    if(hwnd == NULL)
-    {
-       // MessageBox(NULL, "Window Creation Failed!", "Error!",
-       //     MB_ICONEXCLAMATION | MB_OK);
-        return NULL;
-    }
-
-    ShowWindow(hwnd, SW_SHOWNORMAL);
-    UpdateWindow(hwnd);
-
-    // Step 3: The Message Loop
-    while(GetMessage(&Msg, NULL, 0, 0) > 0)
-    {
-        TranslateMessage(&Msg);
-        DispatchMessage(&Msg);
-    }
-    //return Msg.wParam;
-    return hwnd;
-}
-
-
-int BB_Instance::OpenVideoWindow(HWND hWnd)
-{
-    if (m_thread)
+    if (m_videoLoopThread != NULL)
     {
         // Video window is already opened
         return EXIT_FAILURE;
     }
     m_stopThread = false;
-    m_hWnd = hWnd;
-    m_thread = new Thread(this);
+
+    // Create window in thread
+    m_videoWin = new BB_Window(BB_VIDEO_WINDOW_CLASS, BB_VIDEO_WINDOW_CHANNEL, hEffectiveWnd);
+    m_videoWinThread = new Thread(m_videoWin);
+
+    // Create video loop thread
+    m_videoLoopThread = new Thread(this);
+
     return EXIT_SUCCESS;
 }
 
 int BB_Instance::CloseVideoWindow()
 {
-    if (m_thread == NULL)
+    if (m_videoLoopThread == NULL)
     {
         // Video window is not opened
         return EXIT_FAILURE;
     }
-    m_stopThread = true;
-    m_thread->Join();
 
-    delete m_thread;
-    m_thread = NULL;
+    m_stopThread = true;
+    m_videoLoopThread->Join();
+    m_videoWin->BBDestroy();
+    m_videoWinThread->Join();
+
+    delete m_videoLoopThread;
+    delete m_videoWin;
+    m_videoLoopThread = NULL;
+
     return EXIT_SUCCESS;
 }
 
@@ -799,7 +733,7 @@ void BB_Instance::run()
     int userId = -1;
     for (unsigned int i = 0; i < userList.size(); i++)
     {
-        if (userList[i].m_userName == m_context.m_nickName)
+        if (userList[i].m_userName == L"Vasia"/*m_context.m_nickName*/)
         {
             userId = userList[i].m_id;
             break;
@@ -821,8 +755,10 @@ void BB_Instance::run()
          cout << "Failed to issue subscribe command" << endl;
     }
 
-    HWND hWnd = CreateVideoWindow(m_hWnd);
-    HDC hDC = GetDC(hWnd);
+    // Wait in order to be sure video window was loaded
+    Sleep(5000);
+
+    HDC hDC = GetDC(m_videoWin->BBGetHandle());
 
     TTMessage msg;
     int wait_ms = 10000;
@@ -833,12 +769,23 @@ void BB_Instance::run()
             processTTMessage(msg);
             VideoFrame videoFrame;
             int res = TT_AcquireUserVideoFrame(m_ttInst, userId, &videoFrame);
-            res = TT_PaintVideoFrame(m_ttInst, userId, hDC, 0, 0, 100, 100);
+
+            // Calculate coordinates
+            RECT rect;
+            LONG width = 600;
+            LONG height = 400;
+            if (GetWindowRect(m_videoWin->BBGetHandle(), &rect))
+            {
+                width = rect.right - rect.left;
+                height = rect.bottom - rect.top;
+            }
+
+            res = TT_PaintVideoFrame(m_ttInst, userId, hDC, 0, 0, width, height);
             TT_ReleaseUserVideoFrame(m_ttInst, userId);
         }
     }
 
-    ReleaseDC(hWnd, hDC);
+    ReleaseDC(m_videoWin->BBGetHandle(), hDC);
 }
 
 

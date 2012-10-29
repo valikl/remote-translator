@@ -23,7 +23,8 @@ SOURCES += main.cpp\
     sounddevices.cpp \
     soundfilters.cpp \
     BBTT/BB_Thread.cpp \
-    manconnect.cpp
+    manconnect.cpp \
+    Utils/BB_Window.cpp
 
 HEADERS  += \
     common.h \
@@ -43,7 +44,8 @@ HEADERS  += \
     BBTT/IRunnable.h \
     BBTT/BB_Thread.h \
     manconnect.h \
-    Utils/BB_Exception.h
+    Utils/BB_Exception.h \
+    Utils/BB_Window.h
 
 FORMS    += remotetranslatorui.ui \
     sounddevices.ui \

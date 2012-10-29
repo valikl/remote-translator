@@ -17,6 +17,10 @@
 #include "BB_ClientConfigMgr.h"
 #include "IRunnable.h"
 #include "BB_Thread.h"
+#include "Utils/BB_Window.h"
+
+const std::wstring BB_VIDEO_WINDOW_CLASS(L"BBVideoWindowClass");
+const std::wstring BB_VIDEO_WINDOW_CHANNEL(L"Video Channel");
 
 struct BB_InstanceContext
 {
@@ -123,7 +127,9 @@ private:
     std::vector<BB_ChannelUser> m_UserList;
 
     // Used for video channel
-    Thread *m_thread;
+    BB_Window *m_videoWin;
+    Thread *m_videoWinThread;
+    Thread *m_videoLoopThread;
     bool m_stopThread;
     HWND m_hWnd;
 };
