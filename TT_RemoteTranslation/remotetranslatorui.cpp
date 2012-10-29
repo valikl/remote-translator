@@ -4,6 +4,7 @@
 #include "manconnect.h"
 #include "BBTT/BB_ClientConfigMgr.h"
 #include "BBTT/Utils.h"
+#include "Utils/BB_Exception.h"
 #include "ui_remotetranslatorui.h"
 #include <QMessageBox>
 #include <QTimer>
@@ -373,8 +374,10 @@ void RemoteTranslatorUI::on_SelfTestEn_stateChanged(int checked)
 
 void RemoteTranslatorUI::on_showVideoButton_clicked(bool checked)
 {
-    if (checked)
-        TRANSLATOR.OpenVideoWindow(effectiveWinId());
-    else
-        TRANSLATOR.CloseVideoWindow();
+    TRY_BLOCK(
+        if (checked)
+            TRANSLATOR.OpenVideoWindow(effectiveWinId());
+        else
+            TRANSLATOR.CloseVideoWindow();
+    );
 }
