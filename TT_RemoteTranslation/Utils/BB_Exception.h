@@ -48,11 +48,11 @@ protected:
     wstring m_sInfo;
 };
 
-#define THROW_SE(exceptionToThrow, problem) \
+#define THROW_EXCEPT(problem) \
 {\
     wostringstream stream; \
     stream<< problem;\
-    throw exceptionToThrow(stream.str());\
+    throw BB_Exception(stream.str());\
 }
 
 #endif // BB_EXCEPTION_H
