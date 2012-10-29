@@ -55,4 +55,15 @@ protected:
     throw BB_Exception(stream.str());\
 }
 
+#define TRY_CATCH(func) \
+    try \
+    { \
+        (func); \
+    } \
+    catch(BB_Exception excp) \
+    { \
+        QMessageBox::critical(this, "Error:", QString::fromStdWString(excp.GetInfo())); \
+    }
+
+
 #endif // BB_EXCEPTION_H
