@@ -372,12 +372,10 @@ void RemoteTranslatorUI::on_SelfTestEn_stateChanged(int checked)
     }
 }
 
-void RemoteTranslatorUI::on_showVideoButton_clicked(bool checked)
+void RemoteTranslatorUI::on_showVideoButton_clicked(bool clicked)
 {
     TRY_BLOCK(
-        if (checked)
+        if (clicked)
             TRANSLATOR.OpenVideoWindow(effectiveWinId());
-        else
-            TRANSLATOR.CloseVideoWindow();
     );
 }

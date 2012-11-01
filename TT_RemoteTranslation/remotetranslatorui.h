@@ -67,7 +67,7 @@ private slots:
 
     void on_SelfTestEn_stateChanged(int checked);
 
-    void on_showVideoButton_clicked(bool checked);
+    void on_showVideoButton_clicked(bool clicked);
 
 private:
 
