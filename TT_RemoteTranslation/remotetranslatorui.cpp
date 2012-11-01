@@ -112,7 +112,6 @@ int RemoteTranslatorUI::init()
     ui->LangConnect->setCheckable(true);
     ui->MicMuteBut->setCheckable(true);
     ui->TrgMuteBut->setCheckable(true);
-    ui->showVideoButton->setCheckable(true);
 
     // set slider values
     setSliders();
