@@ -358,7 +358,7 @@ void RemoteTranslatorUI::on_SelfTestEn_stateChanged(int checked)
 
     if (checked)
     {
-        ret = TRANSLATOR.StartTargetSoundLoopbackTest(ConfigUI.m_AGC, true, true, ConfigUI.m_echoCancel);
+        ret = TRANSLATOR.StartTargetSoundLoopbackTest(ConfigUI.m_AGC, ConfigUI.m_noiseCancel, -30, ConfigUI.m_echoCancel);
         if (ret == EXIT_FAILURE)
         {
             QMessageBox::critical(this,"Loopback error","Check sound devices definition");
@@ -374,7 +374,6 @@ void RemoteTranslatorUI::on_SelfTestEn_stateChanged(int checked)
 void RemoteTranslatorUI::on_showVideoButton_clicked(bool clicked)
 {
     TRY_BLOCK(
-        if (clicked)
-            TRANSLATOR.OpenVideoWindow(effectiveWinId());
+        TRANSLATOR.OpenVideoWindow(effectiveWinId());
     );
 }
