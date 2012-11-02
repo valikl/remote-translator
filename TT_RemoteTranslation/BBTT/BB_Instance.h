@@ -64,6 +64,8 @@ struct BB_ChannelUser
 {
     std::wstring m_userName;
     INT32 m_id;
+    bool m_isActive;
+    bool m_isVideo;
 };
 
 class BB_Instance : public IRunnable

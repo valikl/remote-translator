@@ -547,6 +547,8 @@ int BB_Instance::getUsers(std::vector<BB_ChannelUser> &userList)
         // TODO ask Valik, do we need szNickname or szUsername
         // What happen if name is changed or new user connected/disconnected
         user.m_userName = ttUser.szNickname;
+        user.m_isActive = (ttUser.uUserState & USERSTATE_TALKING) ==  USERSTATE_TALKING;
+        user.m_isVideo = (ttUser.uUserState & USERSTATE_VIDEO) ==  USERSTATE_VIDEO;
         user.m_id = userIDs[i];
         m_UserList.push_back(user);
     }
@@ -748,7 +750,7 @@ void BB_Instance::run()
     int userId = -1;
     for (unsigned int i = 0; i < userList.size(); i++)
     {
-        if (userList[i].m_userName == L"Vasia"/*m_context.m_nickName*/)
+        if (userList[i].m_isVideo)
         {
             userId = userList[i].m_id;
             break;

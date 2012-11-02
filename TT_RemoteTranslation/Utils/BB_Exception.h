@@ -1,6 +1,3 @@
-#ifndef BB_EXCEPTION_H
-#define BB_EXCEPTION_H
-
 #pragma once
 
 #include <exception>
@@ -75,5 +72,3 @@ catch(BB_Exception excp) \
     QMessageBox::critical(this, "Error:", QString::fromStdWString(excp.GetInfo())); \
 }
 
-
-#endif // BB_EXCEPTION_H
