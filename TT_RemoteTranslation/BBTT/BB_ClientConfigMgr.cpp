@@ -18,10 +18,25 @@ BB_ClientConfigMgr& BB_ClientConfigMgr::Instance()
 	return instance;
 }
 
-int BB_ClientConfigMgr::init(string fileName)
+int BB_ClientConfigMgr::init(bool bRestore)
 {
-	m_fileName = fileName;
-	return loadConfig();
+    if (bRestore)
+    {
+        m_fileName = DEFAULT_CONFIG_FILE;
+    }
+    else
+    {
+        m_fileName = CONFIG_FILE;
+    }
+
+    int err = loadConfig();
+    if (err == EXIT_FAILURE && !bRestore)
+    {
+        m_fileName = DEFAULT_CONFIG_FILE;
+        err = loadConfig();
+    }
+
+    return err;
 }
 
 int BB_ClientConfigMgr::loadConfig()
@@ -465,7 +480,7 @@ int BB_ClientConfigMgr::saveConfig()
 
 	xml += "</" + NODE_BBCONFIG + ">\n";
 
-	FILE *pFile = fopen(m_fileName.c_str(), "wb");
+    FILE *pFile = fopen(CONFIG_FILE.c_str(), "wb");
 	if (pFile == NULL)
 	{
 		return EXIT_FAILURE;

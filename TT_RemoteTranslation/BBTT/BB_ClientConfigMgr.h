@@ -54,6 +54,10 @@ const std::string ATTR_VOICE_ACTIVATION_LEVEL("voiceActivationLevel");
 const std::string NODE_VIDEO_SETTINGS("VideoSettings");
 const std::string ATTR_VIDEO_QUALITY("videoQuality");
 
+// Restore/Original config files
+const std::string CONFIG_FILE("config.xml");
+const std::string DEFAULT_CONFIG_FILE("default_config.xml");
+
 // template for happening structure:
 // hap_<happening name>/source_<source language channel>
 // hap_<happening name>/destination_<destination language channel>
@@ -136,7 +140,7 @@ public:
 	// Returns the instance of the singleton
 	static BB_ClientConfigMgr &Instance();
 
-    int init(std::string fileName = "config.xml");
+    int init(bool bRestore);
 	int saveConfig();
 	
 	ClientConfig getConfig();
