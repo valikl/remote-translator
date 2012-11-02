@@ -484,11 +484,3 @@ int BB_Translator::OpenVideoWindow(HWND hWnd)
    return  m_channelVideo->OpenVideoWindow(hWnd);
 }
 
-int BB_Translator::CloseVideoWindow()
-{
-    if (!m_isConnected)
-    {
-        return EXIT_FAILURE;
-    }
-    return m_channelVideo->CloseVideoWindow();
-}

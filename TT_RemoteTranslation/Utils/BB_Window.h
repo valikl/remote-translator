@@ -14,6 +14,7 @@ public:
     virtual void run();
 
     HWND BBGetHandle() { return m_hWnd; }
+    bool IsActive();
     void BBDestroy();
 
 private:

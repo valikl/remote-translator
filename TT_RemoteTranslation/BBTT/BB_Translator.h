@@ -89,7 +89,6 @@ public:
 
     // Video
     int OpenVideoWindow(HWND hWnd);
-    int CloseVideoWindow();
 
 private:
     BB_Translator();

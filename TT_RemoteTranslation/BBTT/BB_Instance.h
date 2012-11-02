@@ -108,7 +108,6 @@ public:
     int GetMicrophoneLevel(int &level);
 
     int OpenVideoWindow(HWND hWnd);
-    int CloseVideoWindow();
 
 private:
 		

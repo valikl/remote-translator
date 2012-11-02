@@ -3,7 +3,7 @@
 using namespace std;
 
 BB_Window::BB_Window(wstring windowClassName, wstring title, HWND hEffectiveWnd) :
-    m_windowClassName(windowClassName), m_title(title), m_hEffectiveWnd(hEffectiveWnd)
+    m_windowClassName(windowClassName), m_title(title), m_hEffectiveWnd(hEffectiveWnd), m_hWnd(NULL)
 {
 }
 
@@ -85,10 +85,22 @@ void BB_Window::run()
             TranslateMessage(&Msg);
             DispatchMessage(&Msg);
         }
+
+        if ((Msg.hwnd == m_hWnd || Msg.hwnd == NULL)
+             &&
+            ((Msg.message && WM_CLOSE != 0) || (Msg.message && WM_DESTROY != 0)))
+        {
+            m_hWnd = NULL;
+        }
     }
 }
 
 void BB_Window::BBDestroy()
 {
     DestroyWindow(m_hWnd);
+}
+
+bool BB_Window::IsActive()
+{
+    return (m_hWnd != NULL);
 }

@@ -6,7 +6,7 @@
 using namespace std;
 
 BB_Instance::BB_Instance(const BB_InstanceContext &context) :
-    m_context(context), m_videoLoopThread(NULL), m_stopThread(false)
+    m_context(context), m_videoWinThread(NULL), m_videoLoopThread(NULL), m_stopThread(false)
 {
 	// We don't want to call TT functions in Ctor
 	// Caller must call init()
@@ -685,10 +685,29 @@ int BB_Instance::GetMicrophoneLevel(INT32 &level)
 
 int BB_Instance::OpenVideoWindow(HWND hEffectiveWnd)
 {
-    if (m_videoLoopThread != NULL)
+    if (m_videoWinThread != NULL)
     {
-        // Video window is already opened
-        return EXIT_FAILURE;
+        if (m_videoWin->IsActive())
+        {
+            // Video window is already opened
+            return EXIT_FAILURE;
+        }
+        else
+        {
+            // Window was closed/destroyed
+
+            // Stop all the threads
+            m_stopThread = true;
+            m_videoLoopThread->Join();
+            m_videoWinThread->Join();
+
+            delete m_videoLoopThread;
+            delete m_videoWinThread;
+            delete m_videoWin;
+            m_videoLoopThread = NULL;
+            m_videoWinThread = NULL;
+            m_videoWin = NULL;
+        }
     }
     m_stopThread = false;
 
@@ -698,26 +717,6 @@ int BB_Instance::OpenVideoWindow(HWND hEffectiveWnd)
 
     // Create video loop thread
     m_videoLoopThread = new Thread(this);
-
-    return EXIT_SUCCESS;
-}
-
-int BB_Instance::CloseVideoWindow()
-{
-    if (m_videoLoopThread == NULL)
-    {
-        // Video window is not opened
-        return EXIT_FAILURE;
-    }
-
-    m_stopThread = true;
-    m_videoLoopThread->Join();
-    m_videoWin->BBDestroy();
-    m_videoWinThread->Join();
-
-    delete m_videoLoopThread;
-    delete m_videoWin;
-    m_videoLoopThread = NULL;
 
     return EXIT_SUCCESS;
 }
@@ -762,13 +761,15 @@ void BB_Instance::run()
 
     TTMessage msg;
     int wait_ms = 10000;
-    while(TT_GetMessage(m_ttInst, &msg, &wait_ms))
+    while(!m_stopThread           &&
+          m_videoWin->IsActive()  &&
+          TT_GetMessage(m_ttInst, &msg, &wait_ms))
     {
         if (msg.wmMsg == WM_TEAMTALK_USER_VIDEOFRAME)
         {         
             processTTMessage(msg);
             VideoFrame videoFrame;
-            int res = TT_AcquireUserVideoFrame(m_ttInst, userId, &videoFrame);
+            TT_AcquireUserVideoFrame(m_ttInst, userId, &videoFrame);
 
             // Calculate coordinates
             RECT rect;
@@ -780,7 +781,7 @@ void BB_Instance::run()
                 height = rect.bottom - rect.top;
             }
 
-            res = TT_PaintVideoFrame(m_ttInst, userId, hDC, 0, 0, width, height);
+            BOOL res = TT_PaintVideoFrame(m_ttInst, userId, hDC, 0, 0, width, height);
             TT_ReleaseUserVideoFrame(m_ttInst, userId);
         }
     }
