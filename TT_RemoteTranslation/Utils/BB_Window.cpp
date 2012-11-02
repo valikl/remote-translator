@@ -49,9 +49,12 @@ void BB_Window::BBCreateWindow()
     wc.hIconSm       = LoadIcon(NULL, IDI_APPLICATION);
 
     if(!RegisterClassEx(&wc))
-    {
-        // TODO Throw exception "Window Registration Failed!"
-        return;
+    {        
+        if (GetLastError() != ERROR_CLASS_ALREADY_EXISTS)
+        {
+            // TODO Throw exception "Window Registration Failed!"
+            return;
+        }
     }
 
     // Creating the Window

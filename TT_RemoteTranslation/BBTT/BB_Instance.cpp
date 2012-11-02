@@ -18,6 +18,16 @@ BB_Instance::~BB_Instance(void)
 {
 	// We don't want to call TT functions in Dtor
 	// Caller must call finalize()
+
+    if (m_videoWinThread != NULL)
+    {
+        if (m_videoWin->IsActive())
+        {
+            m_videoWin->BBDestroy();
+        }
+
+        StopVideoThreads();
+    }
 }
 
 int BB_Instance::init()
@@ -695,18 +705,7 @@ int BB_Instance::OpenVideoWindow(HWND hEffectiveWnd)
         else
         {
             // Window was closed/destroyed
-
-            // Stop all the threads
-            m_stopThread = true;
-            m_videoLoopThread->Join();
-            m_videoWinThread->Join();
-
-            delete m_videoLoopThread;
-            delete m_videoWinThread;
-            delete m_videoWin;
-            m_videoLoopThread = NULL;
-            m_videoWinThread = NULL;
-            m_videoWin = NULL;
+            StopVideoThreads();
         }
     }
     m_stopThread = false;
@@ -719,6 +718,23 @@ int BB_Instance::OpenVideoWindow(HWND hEffectiveWnd)
     m_videoLoopThread = new Thread(this);
 
     return EXIT_SUCCESS;
+}
+
+void BB_Instance::StopVideoThreads()
+{
+    // Caller must check whether Video window is active
+
+    // Stop all the threads
+    m_stopThread = true;
+    m_videoLoopThread->Join();
+    m_videoWinThread->Join();
+
+    delete m_videoLoopThread;
+    delete m_videoWinThread;
+    delete m_videoWin;
+    m_videoLoopThread = NULL;
+    m_videoWinThread = NULL;
+    m_videoWin = NULL;
 }
 
 void BB_Instance::run()

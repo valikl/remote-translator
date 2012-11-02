@@ -117,6 +117,8 @@ private:
 
 	void processTTMessage(const TTMessage& msg);
 
+    void StopVideoThreads();
+
 	TTInstance* m_ttInst;
 
 	BB_InstanceContext m_context;
