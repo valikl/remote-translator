@@ -65,7 +65,7 @@ catch(BB_Exception excp) \
 #define TRY_BLOCK(block) \
 try \
 { \
-    block; \
+    block \
 } \
 catch(BB_Exception excp) \
 { \

@@ -30,8 +30,8 @@ public:
     explicit RemoteTranslatorUI(QWidget *parent = 0);
     ~RemoteTranslatorUI();
 
-    int initMainConfig();
-    int init();
+    void initMainConfig();
+    void init();
 
     int enableAudioFilters();
 
@@ -64,8 +64,10 @@ private slots:
     void ActivateSoundDevices();
     void ActivateAudioFilters();
     void ActivateManConnect();
+    void RestoreDefaultConfig();
 
-    void on_SelfTestEn_stateChanged(int checked);
+    void on_LocalSelfTestEn_stateChanged(int checked);
+    void on_ServerSelfTestEn_stateChanged(int checked);
 
     void on_showVideoButton_clicked(bool clicked);
 

@@ -37,7 +37,9 @@ RemoteTranslatorUI::RemoteTranslatorUI(QWidget *parent) :
 void RemoteTranslatorUI::initHapsMenu()
 {
     // get list of happenings
-    happenings = TRANSLATOR.getHappenings();
+    TRY_BLOCK(
+        happenings = TRANSLATOR.getHappenings();
+    );
 
     for (unsigned int i = 0; i < happenings.size(); ++i)
     {
@@ -72,17 +74,13 @@ void RemoteTranslatorUI::setSliders()
     ui->MicLevelInd->setValue(0);
 }
 
-int RemoteTranslatorUI::initMainConfig()
+void RemoteTranslatorUI::initMainConfig()
 {
-    int ret = 0;
-
     //Initialize ComboBoxes
     initHapsMenu();
 
     // set nick name
     ui->NickName->setText(QString::fromStdWString(ConfigUI.m_NickName));
-
-    return ret;
 }
 
 void RemoteTranslatorUI::changeMainConfig()
@@ -90,20 +88,19 @@ void RemoteTranslatorUI::changeMainConfig()
     initMainConfig();
 }
 
-int RemoteTranslatorUI::init()
+void RemoteTranslatorUI::init()
 {
-    int ret = 0;
-
-    CHECK_ret(BB_ClientConfigMgr::Instance().init("config.xml"));
-    CHECK_ret(TRANSLATOR.init());
+    TRY_FUNC(BB_ClientConfigMgr::Instance().init(false));
+    TRY_FUNC(TRANSLATOR.init());
 
     // init main configuration
-    CHECK_ret(initMainConfig());
+    initMainConfig();
 
     // activate sound devices
     connect(ui->actionConfigure_Audio, SIGNAL(triggered()), this, SLOT(ActivateSoundDevices()));
     connect(ui->actionAudio_Filters, SIGNAL(triggered()), this, SLOT(ActivateAudioFilters()));
     connect(ui->actionTT_server_connection, SIGNAL(triggered()), this, SLOT(ActivateManConnect()));
+    connect(ui->actionRestore_default_configuration, SIGNAL(triggered()), this, SLOT(RestoreDefaultConfig()));
 
     //Activate Audio filters
     enableAudioFilters();
@@ -125,8 +122,6 @@ int RemoteTranslatorUI::init()
     user_timer = new QTimer(this);
     connect(user_timer, SIGNAL(timeout()), this, SLOT(on_UserTimeout()));
     user_timer->start(1000);
-
-    return ret;
 }
 
 int RemoteTranslatorUI::enableAudioFilters()
@@ -166,6 +161,13 @@ void RemoteTranslatorUI::ActivateManConnect()
     man_connect.exec();
 }
 
+void RemoteTranslatorUI::RestoreDefaultConfig()
+{
+    TRY_FUNC(TRANSLATOR.finalize());
+    TRY_FUNC(BB_ClientConfigMgr::Instance().init(true));
+    init();
+}
+
 void RemoteTranslatorUI::setUserItems(bool is_source)
 {
     if (!TRANSLATOR.isConnected())
@@ -174,14 +176,12 @@ void RemoteTranslatorUI::setUserItems(bool is_source)
     vector<BB_ChannelUser> users;
     TRANSLATOR.getUsers(users, is_source);
 
-    wstring active_user = _T("");
-
     QListWidget* users_list = is_source ? ui->SrcUsersList : ui->TrgUsersList;
     users_list->clear();
     for (unsigned int i = 0; i < users.size(); ++i)
     {
         wstring user = users[i].m_userName;
-        if (user != active_user)
+        if (!users[i].m_isActive)
             users_list->addItem(QString::fromStdWString(user));
         else
         {
@@ -203,6 +203,8 @@ void RemoteTranslatorUI::on_UserTimeout()
 
 RemoteTranslatorUI::~RemoteTranslatorUI()
 {
+    if (TRANSLATOR.isConnected())
+        BB_ClientConfigMgr::Instance().saveConfig();
     TRANSLATOR.finalize();
     delete ui;
 }
@@ -352,7 +354,7 @@ void RemoteTranslatorUI::on_TrgMuteBut_clicked(bool checked)
     TRANSLATOR.MuteTarget(ConfigUI.m_TrgMute);
 }
 
-void RemoteTranslatorUI::on_SelfTestEn_stateChanged(int checked)
+void RemoteTranslatorUI::on_LocalSelfTestEn_stateChanged(int checked)
 {
     int ret;
 
@@ -362,7 +364,26 @@ void RemoteTranslatorUI::on_SelfTestEn_stateChanged(int checked)
         if (ret == EXIT_FAILURE)
         {
             QMessageBox::critical(this,"Loopback error","Check sound devices definition");
-            ui->SelfTestEn->setChecked(false);
+            ui->LocalSelfTestEn->setChecked(false);
+        }
+    }
+    else
+    {
+        TRANSLATOR.StopTargetSoundLoopbackTest();
+    }
+}
+
+void RemoteTranslatorUI::on_ServerSelfTestEn_stateChanged(int checked)
+{
+    int ret;
+
+    if (checked)
+    {
+        ret = TRANSLATOR.StartTargetSoundLoopbackTest(ConfigUI.m_AGC, ConfigUI.m_noiseCancel, -30, ConfigUI.m_echoCancel);
+        if (ret == EXIT_FAILURE)
+        {
+            QMessageBox::critical(this,"Loopback error","Check sound devices definition");
+            ui->LocalSelfTestEn->setChecked(false);
         }
     }
     else

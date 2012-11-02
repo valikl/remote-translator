@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'remotetranslatorui.ui'
 **
-** Created: Thu Nov 1 04:15:25 2012
+** Created: Fri Nov 2 04:39:52 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -42,6 +42,7 @@ public:
     QAction *actionTT_server_connection;
     QAction *actionControl_server_connection;
     QAction *actionAudio_Filters;
+    QAction *actionRestore_default_configuration;
     QWidget *centralWidget;
     QLabel *label;
     QComboBox *HapList;
@@ -53,7 +54,7 @@ public:
     QLabel *label_4;
     QLabel *label_5;
     QLabel *label_6;
-    QCheckBox *SelfTestEn;
+    QCheckBox *LocalSelfTestEn;
     QLabel *label_8;
     QPushButton *LangConnect;
     QLabel *label_9;
@@ -83,6 +84,8 @@ public:
     QLabel *label_21;
     QLabel *label_22;
     QPushButton *showVideoButton;
+    QLabel *label_13;
+    QCheckBox *ServerSelfTestEn;
     QMenuBar *menuBar;
     QMenu *menuSound_Settings;
     QMenu *menuPersonal;
@@ -107,6 +110,8 @@ public:
         actionControl_server_connection->setObjectName(QString::fromUtf8("actionControl_server_connection"));
         actionAudio_Filters = new QAction(RemoteTranslatorUI);
         actionAudio_Filters->setObjectName(QString::fromUtf8("actionAudio_Filters"));
+        actionRestore_default_configuration = new QAction(RemoteTranslatorUI);
+        actionRestore_default_configuration->setObjectName(QString::fromUtf8("actionRestore_default_configuration"));
         centralWidget = new QWidget(RemoteTranslatorUI);
         centralWidget->setObjectName(QString::fromUtf8("centralWidget"));
         label = new QLabel(centralWidget);
@@ -139,12 +144,12 @@ public:
         label_6 = new QLabel(centralWidget);
         label_6->setObjectName(QString::fromUtf8("label_6"));
         label_6->setGeometry(QRect(30, 510, 261, 41));
-        SelfTestEn = new QCheckBox(centralWidget);
-        SelfTestEn->setObjectName(QString::fromUtf8("SelfTestEn"));
-        SelfTestEn->setGeometry(QRect(140, 560, 71, 18));
+        LocalSelfTestEn = new QCheckBox(centralWidget);
+        LocalSelfTestEn->setObjectName(QString::fromUtf8("LocalSelfTestEn"));
+        LocalSelfTestEn->setGeometry(QRect(120, 560, 16, 18));
         label_8 = new QLabel(centralWidget);
         label_8->setObjectName(QString::fromUtf8("label_8"));
-        label_8->setGeometry(QRect(20, 560, 111, 20));
+        label_8->setGeometry(QRect(20, 560, 91, 20));
         LangConnect = new QPushButton(centralWidget);
         LangConnect->setObjectName(QString::fromUtf8("LangConnect"));
         LangConnect->setGeometry(QRect(140, 460, 61, 23));
@@ -240,6 +245,12 @@ public:
         showVideoButton = new QPushButton(centralWidget);
         showVideoButton->setObjectName(QString::fromUtf8("showVideoButton"));
         showVideoButton->setGeometry(QRect(670, 560, 75, 31));
+        label_13 = new QLabel(centralWidget);
+        label_13->setObjectName(QString::fromUtf8("label_13"));
+        label_13->setGeometry(QRect(170, 560, 111, 20));
+        ServerSelfTestEn = new QCheckBox(centralWidget);
+        ServerSelfTestEn->setObjectName(QString::fromUtf8("ServerSelfTestEn"));
+        ServerSelfTestEn->setGeometry(QRect(280, 560, 16, 18));
         RemoteTranslatorUI->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(RemoteTranslatorUI);
         menuBar->setObjectName(QString::fromUtf8("menuBar"));
@@ -268,6 +279,7 @@ public:
         menuPersonal->addAction(actionChange_password);
         menuManual_TT_connection->addAction(actionTT_server_connection);
         menuManual_TT_connection->addAction(actionControl_server_connection);
+        menuManual_TT_connection->addAction(actionRestore_default_configuration);
 
         retranslateUi(RemoteTranslatorUI);
 
@@ -283,6 +295,7 @@ public:
         actionTT_server_connection->setText(QApplication::translate("RemoteTranslatorUI", "TT server connection", 0, QApplication::UnicodeUTF8));
         actionControl_server_connection->setText(QApplication::translate("RemoteTranslatorUI", "Control server connection", 0, QApplication::UnicodeUTF8));
         actionAudio_Filters->setText(QApplication::translate("RemoteTranslatorUI", "Audio Filters", 0, QApplication::UnicodeUTF8));
+        actionRestore_default_configuration->setText(QApplication::translate("RemoteTranslatorUI", "Restore default configuration", 0, QApplication::UnicodeUTF8));
         label->setText(QApplication::translate("RemoteTranslatorUI", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
@@ -313,12 +326,12 @@ public:
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
 "<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:16pt; font-weight:600;\">Self Test</span></p></body></html>", 0, QApplication::UnicodeUTF8));
-        SelfTestEn->setText(QString());
+        LocalSelfTestEn->setText(QString());
         label_8->setText(QApplication::translate("RemoteTranslatorUI", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; font-weight:600;\">Enable self test</span></p></body></html>", 0, QApplication::UnicodeUTF8));
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; font-weight:600;\">Local self test</span></p></body></html>", 0, QApplication::UnicodeUTF8));
         LangConnect->setText(QApplication::translate("RemoteTranslatorUI", "Connect", 0, QApplication::UnicodeUTF8));
         label_9->setText(QApplication::translate("RemoteTranslatorUI", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
@@ -393,6 +406,12 @@ public:
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt; font-weight:600;\">Video quality</span></p></body></html>", 0, QApplication::UnicodeUTF8));
         label_22->setText(QApplication::translate("RemoteTranslatorUI", "100%", 0, QApplication::UnicodeUTF8));
         showVideoButton->setText(QApplication::translate("RemoteTranslatorUI", "Show video", 0, QApplication::UnicodeUTF8));
+        label_13->setText(QApplication::translate("RemoteTranslatorUI", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; font-weight:600;\">Server self test</span></p></body></html>", 0, QApplication::UnicodeUTF8));
+        ServerSelfTestEn->setText(QString());
         menuSound_Settings->setTitle(QApplication::translate("RemoteTranslatorUI", "Sound Settings", 0, QApplication::UnicodeUTF8));
         menuPersonal->setTitle(QApplication::translate("RemoteTranslatorUI", "Personal", 0, QApplication::UnicodeUTF8));
         menuManual_TT_connection->setTitle(QApplication::translate("RemoteTranslatorUI", "Manual connection", 0, QApplication::UnicodeUTF8));
