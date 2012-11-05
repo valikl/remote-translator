@@ -6,7 +6,6 @@
 #include "BBTT/Utils.h"
 #include "Utils/BB_Exception.h"
 #include "ui_remotetranslatorui.h"
-#include <QMessageBox>
 #include <QTimer>
 #include <time.h>
 
@@ -124,28 +123,27 @@ void RemoteTranslatorUI::init()
     user_timer->start(1000);
 }
 
-int RemoteTranslatorUI::enableAudioFilters()
+void RemoteTranslatorUI::enableAudioFilters()
 {
-    int ret = EXIT_SUCCESS;
-    CHECK_ret(TRANSLATOR.SetAGCEnable(ConfigUI.m_AGC.m_enable, &(ConfigUI.m_AGC)));
-    CHECK_ret(TRANSLATOR.EnableEchoCancellation(ConfigUI.m_echoCancel));
-    CHECK_ret(TRANSLATOR.EnableDenoising(ConfigUI.m_noiseCancel));
-    //To add Voice activation functions when Dima will do it
-    return ret;
+    TRY_FUNC(TRANSLATOR.SetAGCEnable(ConfigUI.m_AGC.m_enable, &(ConfigUI.m_AGC)));
+    TRY_FUNC(TRANSLATOR.EnableEchoCancellation(ConfigUI.m_echoCancel));
+    TRY_FUNC(TRANSLATOR.EnableDenoising(ConfigUI.m_noiseCancel));
 }
 
 // Activate sound devices
 void RemoteTranslatorUI::ActivateSoundDevices()
 {
-    vector<BB_SoundDevice> soundDevList = TRANSLATOR.getSoundDevices();
-    SoundDevices sound_devices(this, soundDevList);
-    sound_devices.exec();
+    TRY_BLOCK(
+        vector<BB_SoundDevice> soundDevList = TRANSLATOR.getSoundDevices();
+        SoundDevices sound_devices(this, soundDevList);
+        sound_devices.exec();
+    );
 }
 
 void RemoteTranslatorUI::on_Timeout()
 {
     int level;
-    TRANSLATOR.GetMicrophoneLevel(level);
+    TRY_FUNC(TRANSLATOR.GetMicrophoneLevel(level));
     ui->MicLevelInd->setValue(level);
 }
 
@@ -174,7 +172,7 @@ void RemoteTranslatorUI::setUserItems(bool is_source)
         return;
 
     vector<BB_ChannelUser> users;
-    TRANSLATOR.getUsers(users, is_source);
+    TRY_FUNC(TRANSLATOR.getUsers(users, is_source));
 
     QListWidget* users_list = is_source ? ui->SrcUsersList : ui->TrgUsersList;
     users_list->clear();
@@ -204,8 +202,10 @@ void RemoteTranslatorUI::on_UserTimeout()
 RemoteTranslatorUI::~RemoteTranslatorUI()
 {
     if (TRANSLATOR.isConnected())
-        BB_ClientConfigMgr::Instance().saveConfig();
-    TRANSLATOR.finalize();
+    {
+        TRY_FUNC(BB_ClientConfigMgr::Instance().saveConfig());
+    }
+    TRY_FUNC(TRANSLATOR.finalize());
     delete ui;
 }
 
@@ -264,17 +264,17 @@ void RemoteTranslatorUI::on_TrgLangList_currentIndexChanged(const QString &arg1)
 void RemoteTranslatorUI::on_LangConnect_clicked(bool checked)
 {
     if (TRANSLATOR.isConnected())
-        TRANSLATOR.disconnectHap();
+    {
+        TRY_FUNC(TRANSLATOR.disconnectHap());
+    }
 
     if (ConfigUI.m_InputSoundDevId.empty() || ConfigUI.m_OutputSoundDevId.empty())
         QMessageBox::critical(this,"Connecting error","Sound devices are not defined");
     else
     {
-        int ret = TRANSLATOR.connectHap(HAPPENING_CHANNEL_DEFAULT_NAME, ConfigUI.m_NickName,
-                              ConfigUI.m_SrcChannel, ConfigUI.m_TrgChannel,
-                              ConfigUI.m_InputSoundDevId, ConfigUI.m_OutputSoundDevId);
-        if (ret == EXIT_FAILURE)
-            QMessageBox::critical(this,"Connecting error","Check properties");
+        TRY_FUNC(TRANSLATOR.connectHap(HAPPENING_CHANNEL_DEFAULT_NAME, ConfigUI.m_NickName,
+                                       ConfigUI.m_SrcChannel, ConfigUI.m_TrgChannel,
+                                       ConfigUI.m_InputSoundDevId, ConfigUI.m_OutputSoundDevId));
     }
 
     if (checked)
@@ -286,25 +286,25 @@ void RemoteTranslatorUI::on_LangConnect_clicked(bool checked)
 void RemoteTranslatorUI::on_MicGainSld_valueChanged(int val)
 {
     BB_ClientConfigMgr::Instance().SetMicGainLevel(ui->MicGainSld->value());
-    TRANSLATOR.UpdateMicrophoneGainLevel(ConfigUI.m_MicGainLevel);
+    TRY_FUNC(TRANSLATOR.UpdateMicrophoneGainLevel(ConfigUI.m_MicGainLevel));
 }
 
 void RemoteTranslatorUI::on_TrgLvlSld_valueChanged(int val)
 {
     BB_ClientConfigMgr::Instance().SetTrgVolumeLevel(ui->TrgLvlSld->value());
-    TRANSLATOR.UpdateVolumeLevel(ConfigUI.m_TrgVolumeLevel, false);
+    TRY_FUNC(TRANSLATOR.UpdateVolumeLevel(ConfigUI.m_TrgVolumeLevel, false));
 }
 
 void RemoteTranslatorUI::on_SrcLevelSld_valueChanged(int val)
 {
     BB_ClientConfigMgr::Instance().SetSrcVolumeLevel(ui->SrcLevelSld->value());
-    TRANSLATOR.UpdateVolumeLevel(ConfigUI.m_SrcVolumeLevel, true);
+    TRY_FUNC(TRANSLATOR.UpdateVolumeLevel(ConfigUI.m_SrcVolumeLevel, true));
 }
 
 void RemoteTranslatorUI::on_VideoQualitylSld_valueChanged(int val)
 {
     BB_ClientConfigMgr::Instance().SetVideoQuality(ui->VideoLvlSld->value());
-    TRANSLATOR.UpdateVideoQuality(ConfigUI.m_VideoQuality);
+    TRY_FUNC(TRANSLATOR.UpdateVideoQuality(ConfigUI.m_VideoQuality));
 }
 
 static QString getMuteButtonFormat(QString name, QString status, QString bg_color, QString fg_color)
@@ -329,13 +329,13 @@ void RemoteTranslatorUI::on_MicMuteBut_clicked(bool checked)
     {
         setStatusLabel(ui->MicStatusLbl, "Microphone", "muted", "red", "#5500ff");
         BB_ClientConfigMgr::Instance().SetMicMute(true);
-        TRANSLATOR.MuteMicrophone(true);
+        TRY_FUNC(TRANSLATOR.MuteMicrophone(true));
     }
     else
     {
         setStatusLabel(ui->MicStatusLbl, "Microphone", "active", "green", "white");
         BB_ClientConfigMgr::Instance().SetMicMute(false);
-        TRANSLATOR.MuteMicrophone(false);
+        TRY_FUNC(TRANSLATOR.MuteMicrophone(false));
     }
 }
 
@@ -351,50 +351,50 @@ void RemoteTranslatorUI::on_TrgMuteBut_clicked(bool checked)
         setStatusLabel(ui->TrgStatusLbl, "Target", "active", "green", "white");
         BB_ClientConfigMgr::Instance().SetTrgMute(false);
     }
-    TRANSLATOR.MuteTarget(ConfigUI.m_TrgMute);
+    TRY_FUNC(TRANSLATOR.MuteTarget(ConfigUI.m_TrgMute));
 }
 
 void RemoteTranslatorUI::on_LocalSelfTestEn_stateChanged(int checked)
 {
-    int ret;
-
     if (checked)
     {
-        ret = TRANSLATOR.StartTargetSoundLoopbackTest(ConfigUI.m_AGC, ConfigUI.m_noiseCancel, -30, ConfigUI.m_echoCancel);
-        if (ret == EXIT_FAILURE)
+        try
         {
-            QMessageBox::critical(this,"Loopback error","Check sound devices definition");
+            TRANSLATOR.StartTargetSoundLoopbackTest(ConfigUI.m_AGC, ConfigUI.m_noiseCancel, -30, ConfigUI.m_echoCancel);
+        }
+        catch(BB_Exception excp)
+        {
+            QMessageBox::critical(this, "Error:", QString::fromStdWString(excp.GetInfo()));
             ui->LocalSelfTestEn->setChecked(false);
         }
     }
     else
     {
-        TRANSLATOR.StopTargetSoundLoopbackTest();
+        TRY_FUNC(TRANSLATOR.StopTargetSoundLoopbackTest());
     }
 }
 
 void RemoteTranslatorUI::on_ServerSelfTestEn_stateChanged(int checked)
 {
-    int ret;
-
     if (checked)
     {
-        ret = TRANSLATOR.StartTargetSoundLoopbackTest(ConfigUI.m_AGC, ConfigUI.m_noiseCancel, -30, ConfigUI.m_echoCancel);
-        if (ret == EXIT_FAILURE)
+        try
         {
-            QMessageBox::critical(this,"Loopback error","Check sound devices definition");
+            TRANSLATOR.StartTargetSoundLoopbackTest(ConfigUI.m_AGC, ConfigUI.m_noiseCancel, -30, ConfigUI.m_echoCancel);
+        }
+        catch(BB_Exception excp)
+        {
+            QMessageBox::critical(this, "Error:", QString::fromStdWString(excp.GetInfo()));
             ui->LocalSelfTestEn->setChecked(false);
         }
     }
     else
     {
-        TRANSLATOR.StopTargetSoundLoopbackTest();
+        TRY_FUNC(TRANSLATOR.StopTargetSoundLoopbackTest());
     }
 }
 
 void RemoteTranslatorUI::on_showVideoButton_clicked(bool clicked)
 {
-    TRY_BLOCK(
-        TRANSLATOR.OpenVideoWindow(effectiveWinId());
-    );
+    TRY_FUNC(TRANSLATOR.OpenVideoWindow(effectiveWinId()));
 }
