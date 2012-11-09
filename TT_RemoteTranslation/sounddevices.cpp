@@ -3,6 +3,7 @@
 #include "remotetranslatorui.h"
 #include "sounddevices.h"
 #include "ui_sounddevices.h"
+#include "Utils/BB_Exception.h"
 
 SoundDevices::SoundDevices(QWidget *parent, vector<BB_SoundDevice>& soundDevList) :
     QDialog(parent),
@@ -90,7 +91,7 @@ void SoundDevices::on_ActSDButton_accepted()
     device = m_soundDevList[id];
     BB_ClientConfigMgr::Instance().SetOutputSoundDevId(device.m_deviceId);
     BB_ClientConfigMgr::Instance().SetSoundSystemWin(!(ui->DirectSoundButton->isChecked()));
-    TRANSLATOR.StopSoundLoopbackTest();
+    TRY_FUNC(TRANSLATOR.StopSoundLoopbackTest());
 }
 
 void SoundDevices::on_SelfTestButton_clicked(bool checked)
@@ -104,15 +105,15 @@ void SoundDevices::on_SelfTestButton_clicked(bool checked)
 
         bool sound_system = !(ui->DirectSoundButton->isChecked());
 
-        TRANSLATOR.StartSoundLoopbackTest(in_device.m_deviceId, out_device.m_deviceId, sound_system);
+        TRY_FUNC(TRANSLATOR.StartSoundLoopbackTest(in_device.m_deviceId, out_device.m_deviceId, sound_system));
     }
     else
     {
-        TRANSLATOR.StopSoundLoopbackTest();
+        TRY_FUNC(TRANSLATOR.StopSoundLoopbackTest());
     }
 }
 
 void SoundDevices::on_ActSDButton_rejected()
 {
-    TRANSLATOR.StopSoundLoopbackTest();
+    TRY_FUNC(TRANSLATOR.StopSoundLoopbackTest());
 }

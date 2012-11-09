@@ -3,6 +3,7 @@
 #include <exception>
 #include <string>
 #include <sstream>
+#include <QMessageBox>
 
 using std::wstring;
 using std::exception;

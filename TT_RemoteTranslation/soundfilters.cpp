@@ -3,6 +3,7 @@
 #include "remotetranslatorui.h"
 #include "soundfilters.h"
 #include "ui_soundfilters.h"
+#include "Utils/BB_Exception.h"
 
 #include <QtCore/QVariant>
 #include <QtGui/QAction>
@@ -76,8 +77,8 @@ void SoundFilters::on_FiltersOK_accepted()
 
     //To add Noise activation functions
     //Enable all activated filters
-    TRANSLATOR.SetAGCEnable(ConfigUI.m_AGC.m_enable, &(ConfigUI.m_AGC));
-    TRANSLATOR.EnableEchoCancellation(ConfigUI.m_echoCancel);
-    TRANSLATOR.EnableDenoising(ConfigUI.m_noiseCancel);
-    TRANSLATOR.EnableVoiceActivation(ConfigUI.m_EnableVoiceActivation, ConfigUI.m_VoiceActivationLevel);
+    TRY_FUNC(TRANSLATOR.SetAGCEnable(ConfigUI.m_AGC.m_enable, &(ConfigUI.m_AGC)));
+    TRY_FUNC(TRANSLATOR.EnableEchoCancellation(ConfigUI.m_echoCancel));
+    TRY_FUNC(TRANSLATOR.EnableDenoising(ConfigUI.m_noiseCancel));
+    TRY_FUNC(TRANSLATOR.EnableVoiceActivation(ConfigUI.m_EnableVoiceActivation, ConfigUI.m_VoiceActivationLevel));
 }

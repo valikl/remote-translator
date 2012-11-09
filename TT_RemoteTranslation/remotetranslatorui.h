@@ -33,7 +33,7 @@ public:
     void initMainConfig();
     void init();
 
-    int enableAudioFilters();
+    void enableAudioFilters();
 
 public slots:
 
