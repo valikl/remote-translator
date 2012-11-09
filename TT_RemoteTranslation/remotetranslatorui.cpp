@@ -9,21 +9,18 @@
 #include <QTimer>
 #include <time.h>
 
-//Dummy function for Mic level return
-
-static int GetMicLevel()
+static void GetDroppedFrames(int video_quality, vector<int>& dropped_frames)
 {
-    static INT32 i,f;
-    INT32 xx;
-    if (i==0)
-    {
-        i=3;
-        f=7;
-    }
-    i = abs(i*f);
+    //generates a new random set each time:
+    srand(time(0));
+    for (int i = 0; i < 100 - video_quality; ++i)
+        dropped_frames.push_back(rand()%100);
+}
 
-    xx = i % 19;
-    return xx;
+static bool IsFrameDropped(int frame_idx, vector<int>& dropped_frames)
+{
+    vector<int>::iterator it = find(dropped_frames.begin(), dropped_frames.end(), frame_idx);
+    return it != dropped_frames.end();
 }
 
 RemoteTranslatorUI::RemoteTranslatorUI(QWidget *parent) :
@@ -51,19 +48,18 @@ void RemoteTranslatorUI::initHapsMenu()
 
 void RemoteTranslatorUI::setSliders()
 {
-    ui->MicGainSld->setMinimum(0);
-    ui->MicGainSld->setMaximum(SOUND_GAIN_MAX);
+    int gainMax = 4000; /* real max: SOUND_LEVEL_MAX but it's too much */
+
+    ui->MicGainSld->setRange(SOUND_GAIN_MIN, gainMax);
     ui->MicGainSld->setValue(ConfigUI.m_MicGainLevel);
 
-    ui->TrgLvlSld->setMinimum(0);
-    ui->TrgLvlSld->setMaximum(SOUND_VOLUME_MAX);
+    ui->TrgLvlSld->setRange(SOUND_VOLUME_MIN, SOUND_VOLUME_MAX*(gainMax/SOUND_GAIN_DEFAULT));
     ui->TrgLvlSld->setValue(ConfigUI.m_TrgVolumeLevel);
 
-    ui->SrcLevelSld->setMinimum(0);
-    ui->SrcLevelSld->setMaximum(SOUND_VOLUME_MAX);
+    ui->SrcLevelSld->setRange(SOUND_VOLUME_MIN, SOUND_VOLUME_MAX*(gainMax/SOUND_GAIN_DEFAULT));
     ui->SrcLevelSld->setValue(ConfigUI.m_SrcVolumeLevel);
 
-    ui->VideoLvlSld->setMinimum(0);
+    ui->VideoLvlSld->setMinimum(50);
     ui->VideoLvlSld->setMaximum(100);
     ui->VideoLvlSld->setValue(ConfigUI.m_VideoQuality);
 
@@ -107,7 +103,9 @@ void RemoteTranslatorUI::init()
     // set buttons checkable
     ui->LangConnect->setCheckable(true);
     ui->MicMuteBut->setCheckable(true);
+    ui->MicMuteBut->click();
     ui->TrgMuteBut->setCheckable(true);
+    ui->TrgMuteBut->click();
 
     // set slider values
     setSliders();
@@ -161,6 +159,8 @@ void RemoteTranslatorUI::ActivateManConnect()
 
 void RemoteTranslatorUI::RestoreDefaultConfig()
 {
+    ui->SrcUsersList->clear();
+    ui->TrgUsersList->clear();
     TRY_FUNC(TRANSLATOR.finalize());
     TRY_FUNC(BB_ClientConfigMgr::Instance().init(true));
     init();
@@ -396,5 +396,11 @@ void RemoteTranslatorUI::on_ServerSelfTestEn_stateChanged(int checked)
 
 void RemoteTranslatorUI::on_showVideoButton_clicked(bool clicked)
 {
+    if (!TRANSLATOR.isConnected())
+    {
+        QMessageBox::critical(this, "Error:", "You aren't connected!");
+        return;
+    }
+
     TRY_FUNC(TRANSLATOR.OpenVideoWindow(effectiveWinId()));
 }

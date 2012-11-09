@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'remotetranslatorui.ui'
 **
-** Created: Fri Nov 2 04:39:52 2012
+** Created: Thu Nov 8 04:12:46 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -82,7 +82,6 @@ public:
     QPushButton *TrgMuteBut;
     QSlider *VideoLvlSld;
     QLabel *label_21;
-    QLabel *label_22;
     QPushButton *showVideoButton;
     QLabel *label_13;
     QCheckBox *ServerSelfTestEn;
@@ -239,9 +238,6 @@ public:
         label_21 = new QLabel(centralWidget);
         label_21->setObjectName(QString::fromUtf8("label_21"));
         label_21->setGeometry(QRect(350, 570, 111, 20));
-        label_22 = new QLabel(centralWidget);
-        label_22->setObjectName(QString::fromUtf8("label_22"));
-        label_22->setGeometry(QRect(630, 570, 46, 13));
         showVideoButton = new QPushButton(centralWidget);
         showVideoButton->setObjectName(QString::fromUtf8("showVideoButton"));
         showVideoButton->setGeometry(QRect(670, 560, 75, 31));
@@ -404,7 +400,6 @@ public:
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt; font-weight:600;\">Video quality</span></p></body></html>", 0, QApplication::UnicodeUTF8));
-        label_22->setText(QApplication::translate("RemoteTranslatorUI", "100%", 0, QApplication::UnicodeUTF8));
         showVideoButton->setText(QApplication::translate("RemoteTranslatorUI", "Show video", 0, QApplication::UnicodeUTF8));
         label_13->setText(QApplication::translate("RemoteTranslatorUI", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
