@@ -1,7 +1,10 @@
 #include "BB_Instance.h"
+#include "Utils/BB_Exception.h"
 #include "Utils.h"
 #include <stdio.h>
 #include <tchar.h>
+#include <time.h>
+#include <vector>
 
 using namespace std;
 
@@ -30,15 +33,12 @@ BB_Instance::~BB_Instance(void)
     }
 }
 
-int BB_Instance::init()
+void BB_Instance::init()
 {
-	int ret;
-	CHECK_ret(getInstance());
-	CHECK_ret(joinChannel());
-	CHECK_ret(setInstProp());
-    CHECK_ret(initSoundDevices());
-
-	return EXIT_SUCCESS;
+    getInstance();
+    joinChannel();
+    setInstProp();
+    initSoundDevices();
 }
 
 void BB_Instance::finalize()
@@ -48,7 +48,7 @@ void BB_Instance::finalize()
 	TT_DoQuit(m_ttInst);
 }
 
-int BB_Instance::getInstance()
+void BB_Instance::getInstance()
 {
     TTMessage msg;
     int wait_ms, cmd_id;
@@ -95,68 +95,71 @@ int BB_Instance::getInstance()
     //ensure account we used is administrator
     assert(TT_GetMyUserType(m_ttInst) & USERTYPE_ADMIN);
 
-	return EXIT_SUCCESS;
-
 error_connect:
-    cout << "Failed to connect to server." << endl;
-    return EXIT_FAILURE;
+    THROW_EXCEPT("Connection to the server failed");
 
 error_login:
-    cout << "Failed to log on to server." << endl;
-    return EXIT_FAILURE;
+    THROW_EXCEPT("Log on to the server failed");
 }
 
-int BB_Instance::closeSoundDevices()
+void BB_Instance::closeSoundDevices()
 {
     TT_CloseSoundDuplexDevices(m_ttInst);
     TT_CloseSoundOutputDevice(m_ttInst);
     TT_CloseSoundInputDevice(m_ttInst);
-
-    return EXIT_SUCCESS;
 }
 
-int BB_Instance::initSoundDevices()
+void BB_Instance::initSoundDevices()
 {
     // Init input sound device
-    CHECK_ret_bool(TT_InitSoundInputDevice(m_ttInst, m_context.m_inputSoundDevId));
-    CHECK_ret_bool(TT_EnableTransmission(m_ttInst, (TRANSMIT_AUDIO), false));
+    if (!TT_InitSoundInputDevice(m_ttInst, m_context.m_inputSoundDevId))
+    {
+        THROW_EXCEPT("Cannot initialize sound input device");
+    }
+    if (!TT_EnableTransmission(m_ttInst, (TRANSMIT_AUDIO), false))
+    {
+        THROW_EXCEPT("Enable transmission failed");
+    }
 
     // Init output sound device
-    CHECK_ret_bool(TT_InitSoundOutputDevice(m_ttInst, m_context.m_outputSoundDevId));
-    CHECK_ret_bool(TT_EnableTransmission(m_ttInst, (TRANSMIT_AUDIO), true));
+    if (!TT_InitSoundOutputDevice(m_ttInst, m_context.m_outputSoundDevId))
+    {
+        THROW_EXCEPT("Cannot initialize sound output device");
+    }
+    if (!TT_EnableTransmission(m_ttInst, (TRANSMIT_AUDIO), true))
+    {
+        THROW_EXCEPT("Enable transmission failed");
+    }
 
-    CHECK_ret_bool(TT_InitSoundDuplexDevices(m_ttInst, m_context.m_inputSoundDevId,
-        m_context.m_outputSoundDevId));
+    if (!TT_InitSoundDuplexDevices(m_ttInst, m_context.m_inputSoundDevId,
+            m_context.m_outputSoundDevId))
+    {
+        THROW_EXCEPT("Sound duplex devices initialization failed");
+    }
 
     ClientFlags flags = TT_GetFlags(m_ttInst);
 	if (!(flags & CLIENT_SNDINOUTPUT_DUPLEX) && (flags & CLIENT_SNDOUTPUT_READY) &&(flags & CLIENT_SNDINPUT_READY))
     {
-        return EXIT_FAILURE;
-		cout << "Cannot initialize Duplex mode"<<endl;
+        THROW_EXCEPT("Cannot initialize Duplex mode");
     }
-
-	return EXIT_SUCCESS;
 }
 
 
-int BB_Instance::joinChannel()
+void BB_Instance::joinChannel()
 {
     TTMessage msg;
     int wait_ms = 10000;
 
 	if (TT_DoJoinChannelByID(m_ttInst, m_channelId, _T("")) == -1) 	
 	{
- 		printf("Cannot connect to channel!\n");
-		return EXIT_FAILURE;
+        THROW_EXCEPT("Cannot join the channel");
 	}
 
 	while(TT_GetMessage(m_ttInst, &msg, &wait_ms) &&  msg.wmMsg != WM_TEAMTALK_CMD_MYSELF_JOINED)
  		processTTMessage(msg);
-
-	return EXIT_SUCCESS;
 }
 
-int BB_Instance::setInstProp()
+void BB_Instance::setInstProp()
 {
 	int ret = 0;
     TTMessage msg;
@@ -167,9 +170,9 @@ int BB_Instance::setInstProp()
  		processTTMessage(msg);
 
 	if (msg.wmMsg == CMDERR_NOT_LOGGEDIN)
-		return EXIT_FAILURE;
-
-	return EXIT_SUCCESS;
+    {
+        THROW_EXCEPT("Set nickname failed");
+    }
 }
 
 void BB_Instance::processTTMessage(const TTMessage& msg)
@@ -330,7 +333,7 @@ void BB_Instance::processTTMessage(const TTMessage& msg)
     }
 }
 
-int BB_Instance::SetAudioLevels()
+void BB_Instance::SetAudioLevels()
 {
 	INT32 volume, vmin, vmax;
 
@@ -346,52 +349,19 @@ int BB_Instance::SetAudioLevels()
 //volume = TT_GetUserVolume(ttInst, TT_GetMyUserID(ttInst));
 
 //TT_SetSoundOutputVolume(ttInst, SOUND_VOLUME_MIN);
-	return EXIT_SUCCESS;
-
 }
 
-int BB_Instance::EnableTransmition()
+void BB_Instance::EnableTransmition()
 {
 	TT_EnableTransmission(m_ttInst, (TRANSMIT_AUDIO), TRUE);
 	if (!(TT_GetFlags(m_ttInst) & CLIENT_TX_AUDIO))
 	{
-		cout <<"Video or audio transmission is not enabled" <<endl;
-		return EXIT_FAILURE;
+        THROW_EXCEPT("Enabling of Video or Audio transmission failed");
 	}
-
-	return EXIT_SUCCESS;
-
 }
 
-
-int BB_Instance::getVideoDevice()
+void BB_Instance::getChannels(std::vector<BB_Channel> &channels)
 {
-	int num;
-	VideoCaptureDevice* video_devices = NULL;
-
-	CHECK_ret_bool(TT_GetVideoCaptureDevices(m_ttInst, video_devices, &num));
-	if (num == 0)
-	{
-		cout << "No video devices found" << endl;
-		return EXIT_FAILURE;
-	}
-	video_devices = new VideoCaptureDevice[num];
-	CHECK_ret_bool(TT_GetVideoCaptureDevices(m_ttInst, video_devices, &num));
-
-	for (int i = 0; i < num; ++i)
-	{
-		VideoCaptureDevice& video_device = video_devices[i];
-		cout << "Video device name: " << video_device.szDeviceName << endl;
-	}
-
-	delete video_devices;
-	return EXIT_SUCCESS;
-}
-
-
-int BB_Instance::getChannels(std::vector<BB_Channel> &channels)
-{
-	INT32 ret = EXIT_FAILURE;
 	INT32* channelIDs = NULL;
 	INT32 size = 0;
 
@@ -426,17 +396,14 @@ int BB_Instance::getChannels(std::vector<BB_Channel> &channels)
 		channels.push_back(channelToList);
 	}
 
-	ret = EXIT_SUCCESS;
-
 __err_exit2:
 	delete[] channelIDs;
 __err_exit1:
-	return ret;
+    THROW_EXCEPT("Cannot get channels list");
 }
 
-int BB_Instance::getSoundDevices(vector<BB_SoundDevice> &soundDevs)
+void BB_Instance::getSoundDevices(vector<BB_SoundDevice> &soundDevs)
 {
-	INT32 ret = EXIT_FAILURE;
 	SoundDevice* soundDevices = NULL;
 	INT32 size = 0;
 
@@ -500,18 +467,15 @@ int BB_Instance::getSoundDevices(vector<BB_SoundDevice> &soundDevs)
 		soundDevs.push_back(soundDev);
 	}
 
-	ret = EXIT_SUCCESS;
-
 __err_exit2:
 	delete[] soundDevices;
 __err_exit1:
-	return ret;
+    THROW_EXCEPT("Cannot build sound devices list");
 }
 
 
-int BB_Instance::getUsers(std::vector<BB_ChannelUser> &userList)
+void BB_Instance::getUsers(std::vector<BB_ChannelUser> &userList)
 {
-    INT32 ret = EXIT_FAILURE;
     INT32* userIDs = NULL;
     INT32 size = 0;
 
@@ -554,46 +518,44 @@ int BB_Instance::getUsers(std::vector<BB_ChannelUser> &userList)
     }
 
     userList = m_UserList;
-    ret = EXIT_SUCCESS;
 
 __err_exit2:
     delete[] userIDs;
 __err_exit1:
-    return ret;
+    THROW_EXCEPT("Build channel users list failed");
 }
 
-int BB_Instance::StartSoundLoopbackTest(INT32 inputSoundDevId, INT32 outputSoundDevId)
+void BB_Instance::StartSoundLoopbackTest(INT32 inputSoundDevId, INT32 outputSoundDevId)
 {
     if (!TT_InitSoundInputDevice(m_ttInst, inputSoundDevId))
     {
-        return EXIT_FAILURE;
+        THROW_EXCEPT("Sound input device initialization failed");
     }
 
     if (!TT_InitSoundOutputDevice(m_ttInst, outputSoundDevId))
     {
-        TT_CloseSoundInputDevice(m_ttInst);
-        return EXIT_FAILURE;
+        THROW_EXCEPT("Sound output device initialization failed");
     }
 
     if (!TT_StartSoundLoopbackTest(m_ttInst, inputSoundDevId, outputSoundDevId, 16000, 2))
     {
         TT_CloseSoundOutputDevice(m_ttInst);
         TT_CloseSoundInputDevice(m_ttInst);
-        return EXIT_FAILURE;
+        THROW_EXCEPT("Cannot start sound loopback test");
     }
-
-    return EXIT_SUCCESS;
 }
 
-int BB_Instance::StopSoundLoopbackTest()
+void BB_Instance::StopSoundLoopbackTest()
 {
-    TT_StopSoundLoopbackTest(m_ttInst);
+    if (!TT_StopSoundLoopbackTest(m_ttInst))
+    {
+        THROW_EXCEPT("Cannot stop sound loopback test");
+    }
     TT_CloseSoundOutputDevice(m_ttInst);
     TT_CloseSoundInputDevice(m_ttInst);
-    return EXIT_SUCCESS;
 }
 
-int BB_Instance::StartTargetSoundLoopbackTest(const AGC &agc, bool bEnableDenoise, INT32 maxNoiseSuppress, bool bEchoCancel)
+void BB_Instance::StartTargetSoundLoopbackTest(const AGC &agc, bool bEnableDenoise, INT32 maxNoiseSuppress, bool bEchoCancel)
 {
     AudioConfig audioConfig;
     audioConfig.bEnableAGC = agc.m_enable;
@@ -607,102 +569,115 @@ int BB_Instance::StartTargetSoundLoopbackTest(const AGC &agc, bool bEnableDenois
     if (!TT_StartSoundLoopbackTestEx(m_ttInst, m_context.m_inputSoundDevId, m_context.m_outputSoundDevId,
         16000, 2, &audioConfig, bEchoCancel))
     {
-        return EXIT_FAILURE;
+        THROW_EXCEPT("Cannot start extended sound loopback test");
     }
-
-    return EXIT_SUCCESS;
 }
 
-int BB_Instance::StopTargetSoundLoopbackTest()
+void BB_Instance::StopTargetSoundLoopbackTest()
 {
-    TT_StopSoundLoopbackTest(m_ttInst);
-    return EXIT_SUCCESS;
+    if (!TT_StopSoundLoopbackTest(m_ttInst))
+    {
+        THROW_EXCEPT("Cannot stop sound loopback test");
+    }
 }
 
-int BB_Instance::MuteMicrophone(bool bMute)
+void BB_Instance::MuteMicrophone(bool bMute)
 {
-    int ret;
-    CHECK_ret(TT_EnableTransmission(m_ttInst, TRANSMIT_AUDIO, !(bMute)));
-    return EXIT_SUCCESS;
+    if (!TT_EnableTransmission(m_ttInst, TRANSMIT_AUDIO, !(bMute)))
+    {
+        THROW_EXCEPT("Mute Microphone failed");
+    }
 }
 
-int BB_Instance::MuteTarget(bool bMute)
+void BB_Instance::MuteTarget(bool bMute)
 {
-    int ret;
-    CHECK_ret(TT_SetSoundOutputMute(m_ttInst, bMute));
-    return EXIT_SUCCESS;
+    if (!TT_SetSoundOutputMute(m_ttInst, bMute))
+    {
+        THROW_EXCEPT("Mute Target failed");
+    }
 }
 
-int BB_Instance::UpdateVolumeLevel(int volumeLevel)
+void BB_Instance::UpdateVolumeLevel(int volumeLevel)
 {
-    int ret;
-    CHECK_ret(TT_SetSoundOutputVolume(m_ttInst, volumeLevel));
-    return EXIT_SUCCESS;
+    if (!TT_SetSoundOutputVolume(m_ttInst, volumeLevel))
+    {
+        THROW_EXCEPT("Update volume level failed");
+    }
 }
 
-int BB_Instance::UpdateMicrophoneGainLevel(int gainLevel)
+void BB_Instance::UpdateMicrophoneGainLevel(int gainLevel)
 {
-    int ret;
-    CHECK_ret(TT_SetSoundInputGainLevel(m_ttInst, gainLevel));
-    return EXIT_SUCCESS;
+    if (!TT_SetSoundInputGainLevel(m_ttInst, gainLevel))
+    {
+        THROW_EXCEPT("Update microphone gain level failed");
+    }
 }
 
-int BB_Instance::UpdateVideoQuality(int videoQuality)
+void BB_Instance::UpdateVideoQuality(int videoQuality)
 {
-    return EXIT_SUCCESS;
 }
 
-int BB_Instance::EnableDenoising(bool bEnable)
+void BB_Instance::EnableDenoising(bool bEnable)
 {
-    int ret;
-    CHECK_ret(TT_EnableDenoising(m_ttInst, bEnable));
-    return EXIT_SUCCESS;
+    if (!TT_EnableDenoising(m_ttInst, bEnable))
+    {
+        THROW_EXCEPT("Denoising update failed");
+    }
 }
 
-int BB_Instance::EnableEchoCancellation(bool bEnable)
+void BB_Instance::EnableEchoCancellation(bool bEnable)
 {
-    int ret;
-    CHECK_ret(TT_EnableEchoCancellation(m_ttInst, bEnable));
-    return EXIT_SUCCESS;
+    if (!TT_EnableEchoCancellation(m_ttInst, bEnable))
+    {
+        THROW_EXCEPT("Echo cancelation update failed");
+    }
 }
 
-int BB_Instance::SetAGCEnable(bool bEnable, const AGC *agc)
+void BB_Instance::SetAGCEnable(bool bEnable, const AGC *agc)
 {
-    int ret;
     if (bEnable)
     {
-        CHECK_ret(TT_SetAGCSettings(m_ttInst, agc->m_gainLevel, agc->m_maxIncrement, agc->m_maxDecrement, agc->m_maxGain));
+        if (!TT_SetAGCSettings(m_ttInst, agc->m_gainLevel, agc->m_maxIncrement,
+                agc->m_maxDecrement, agc->m_maxGain))
+        {
+            THROW_EXCEPT("AGC settings update failed");
+        }
     }
 
-    CHECK_ret(TT_EnableAGC(m_ttInst, bEnable));
-    return EXIT_SUCCESS;
+    if (!TT_EnableAGC(m_ttInst, bEnable))
+    {
+        THROW_EXCEPT("Enable/disable AGC failed");
+    }
 }
 
-int BB_Instance::EnableVoiceActivation(bool bEnable, int voiceactSlider)
+void BB_Instance::EnableVoiceActivation(bool bEnable, int voiceactSlider)
 {
-    int ret;
-    CHECK_ret(TT_EnableVoiceActivation(m_ttInst, bEnable));
+    if (!TT_EnableVoiceActivation(m_ttInst, bEnable))
+    {
+        THROW_EXCEPT("Enable/disable voice activation failed");
+    }
     if (bEnable)
     {
-        CHECK_ret(TT_SetVoiceActivationLevel(m_ttInst, voiceactSlider));
+        if (!TT_SetVoiceActivationLevel(m_ttInst, voiceactSlider))
+        {
+            THROW_EXCEPT("Set voice activation level failed");
+        }
     }
-    return EXIT_SUCCESS;
 }
 
-int BB_Instance::GetMicrophoneLevel(INT32 &level)
+void BB_Instance::GetMicrophoneLevel(INT32 &level)
 {
     level = TT_GetSoundInputLevel(m_ttInst);
-    return EXIT_SUCCESS;
 }
 
-int BB_Instance::OpenVideoWindow(HWND hEffectiveWnd)
+void BB_Instance::OpenVideoWindow(HWND hEffectiveWnd)
 {
     if (m_videoWinThread != NULL)
     {
         if (m_videoWin->IsActive())
         {
             // Video window is already opened
-            return EXIT_FAILURE;
+            THROW_EXCEPT("Video window already opened");
         }
         else
         {
@@ -718,8 +693,6 @@ int BB_Instance::OpenVideoWindow(HWND hEffectiveWnd)
 
     // Create video loop thread
     m_videoLoopThread = new Thread(this);
-
-    return EXIT_SUCCESS;
 }
 
 void BB_Instance::StopVideoThreads()
@@ -742,10 +715,10 @@ void BB_Instance::StopVideoThreads()
 void BB_Instance::run()
 {
     std::vector<BB_ChannelUser> userList;
-    if (getUsers(userList) != EXIT_SUCCESS)
-    {
-        return;
-    }
+
+    TRY_BLOCK_RETURN_ON_ERR(
+        getUsers(userList);
+    );
 
     int userId = -1;
     for (unsigned int i = 0; i < userList.size(); i++)
@@ -779,12 +752,27 @@ void BB_Instance::run()
 
     TTMessage msg;
     int wait_ms = 10000;
+    int frameIdx = 0;
+    vector<int> droppedFrames;
+
     while(!m_stopThread           &&
           m_videoWin->IsActive()  &&
           TT_GetMessage(m_ttInst, &msg, &wait_ms))
     {
         if (msg.wmMsg == WM_TEAMTALK_USER_VIDEOFRAME)
-        {         
+        {
+#if 0
+            if (frameIdx == 0 || frameIdx == 101)
+            {
+                frameIdx = 0;
+                droppedFrames.clear();
+                GetDroppedFrames(100, droppedFrames);
+            }
+            if (IsFrameDropped(frameIdx++, droppedFrames))
+            {
+                continue;
+            }
+#endif
             processTTMessage(msg);
             VideoFrame videoFrame;
             TT_AcquireUserVideoFrame(m_ttInst, userId, &videoFrame);
@@ -799,7 +787,7 @@ void BB_Instance::run()
                 height = rect.bottom - rect.top;
             }
 
-            BOOL res = TT_PaintVideoFrame(m_ttInst, userId, hDC, 0, 0, width, height);
+            TT_PaintVideoFrame(m_ttInst, userId, hDC, 0, 0, width, height);
             TT_ReleaseUserVideoFrame(m_ttInst, userId);
         }
     }
@@ -807,4 +795,17 @@ void BB_Instance::run()
     ReleaseDC(m_videoWin->BBGetHandle(), hDC);
 }
 
+void BB_Instance::GetDroppedFrames(int videoQuality, vector<int>& droppedFrames, int seed)
+{
+    droppedFrames.clear();
+    //generates a new random set each time:
+    srand(seed);
+    for (int i = 0; i < 100 - videoQuality; ++i)
+        droppedFrames.push_back(rand()%100);
+}
 
+bool BB_Instance::IsFrameDropped(int frameIdx, vector<int>& droppedFrames)
+{
+    vector<int>::iterator it = find(droppedFrames.begin(), droppedFrames.end(), frameIdx);
+    return it != droppedFrames.end();
+}

@@ -2,6 +2,7 @@
 #include "BB_ClientConfigMgr.h"
 #include "Utils.h"
 #include "Utils/Lock.h"
+#include "Utils/BB_Exception.h"
 
 using namespace std;
 
@@ -27,7 +28,7 @@ BB_Translator& BB_Translator::Instance()
     return instance;
 }
 
-int BB_Translator::disconnectHap()
+void BB_Translator::disconnectHap()
 {
     Lock lock(m_cs);
 
@@ -52,11 +53,9 @@ int BB_Translator::disconnectHap()
     m_channelVideo = NULL;
     m_channelSrc = NULL;
     m_channelDst = NULL;
-
-    return EXIT_SUCCESS;
 }
 
-int BB_Translator::connectHap(wstring hapName, wstring nickName, wstring srcName, wstring dstName,
+void BB_Translator::connectHap(wstring hapName, wstring nickName, wstring srcName, wstring dstName,
     wstring inputSoundDevId, wstring outputSoundDevId)
 {
     Lock lock(m_cs);
@@ -64,7 +63,7 @@ int BB_Translator::connectHap(wstring hapName, wstring nickName, wstring srcName
     if (m_isConnected)
     {
         // Already connected
-        return EXIT_FAILURE;
+        THROW_EXCEPT("Translator already connected");
     }
 
     BB_InstanceContext context;
@@ -73,13 +72,13 @@ int BB_Translator::connectHap(wstring hapName, wstring nickName, wstring srcName
     BB_SoundDevice soundDevice;
     if (!findSoundDev(inputSoundDevId, BB_ClientConfigMgr::Instance().getConfig().m_isSoundSystemWin, soundDevice))
     {
-        return EXIT_FAILURE;
+        THROW_EXCEPT("Sound input device not found");
     }
     context.m_inputSoundDevId = soundDevice.m_id;
 
     if (!findSoundDev(outputSoundDevId, BB_ClientConfigMgr::Instance().getConfig().m_isSoundSystemWin, soundDevice))
     {
-        return EXIT_FAILURE;
+        THROW_EXCEPT("Sound output device not found");
     }
     context.m_outputSoundDevId = soundDevice.m_id;
 	
@@ -87,12 +86,12 @@ int BB_Translator::connectHap(wstring hapName, wstring nickName, wstring srcName
 	HappeningEx hap;
     if (!findHap(hap, hapName))
 	{
-		return EXIT_FAILURE;
+        THROW_EXCEPT("Happening not found");
 	}
 
 	if (!findSrcChannelId(hap, srcName, context.channelId))
 	{
-		return EXIT_FAILURE;
+        THROW_EXCEPT("Source channel not found");
 	}
 	context.m_nickName = SRC_CHANNEL_PREFIX + nickName;
 	context.m_channelName = srcName;
@@ -101,7 +100,7 @@ int BB_Translator::connectHap(wstring hapName, wstring nickName, wstring srcName
 
 	if (!findDstChannelId(hap, dstName, context.channelId))
 	{
-		return EXIT_FAILURE;
+        THROW_EXCEPT("Destination channel not found");
 	}
 	context.m_nickName = DST_CHANNEL_PREFIX + nickName;
 	context.m_channelName = dstName;
@@ -115,19 +114,18 @@ int BB_Translator::connectHap(wstring hapName, wstring nickName, wstring srcName
     m_channelVideo->init();
 
     m_isConnected = true;
-	return EXIT_SUCCESS;
 }
 
-int BB_Translator::finalize()
+void BB_Translator::finalize()
 {
     if (m_channelDummy)
     {
         delete m_channelDummy;
     }
-    return disconnectHap();
+    disconnectHap();
 }
 
-int BB_Translator::init()
+void BB_Translator::init()
 {
 	// Get Dummy Instance
     BB_InstanceContext context;
@@ -137,21 +135,14 @@ int BB_Translator::init()
     m_channelDummy->getInstance();
 
 	std::vector<BB_Channel> channels;
-    int ret = m_channelDummy->getChannels(channels);
-	if (ret != EXIT_SUCCESS)
+    m_channelDummy->getChannels(channels);
+
+    if (initHapsList(channels) != EXIT_SUCCESS)
 	{
-		return ret;
+        THROW_EXCEPT("Cannot build happenings list");
 	}
 
-	ret = initHapsList(channels);
-	if (ret != EXIT_SUCCESS)
-	{
-		return ret;
-	}
-
-    ret = m_channelDummy->getSoundDevices(m_soundDevList);
-
-    return ret;
+    m_channelDummy->getSoundDevices(m_soundDevList);
 }
 
 int BB_Translator::initHapsList(const std::vector<BB_Channel> &channels)
@@ -288,106 +279,95 @@ bool BB_Translator::findSoundDev(wstring deviceId, bool isSoundSystemWin, BB_Sou
     return false;
 }
 
-int BB_Translator::getUsers(std::vector<BB_ChannelUser> &userList, bool isSource)
+void BB_Translator::getUsers(std::vector<BB_ChannelUser> &userList, bool isSource)
 {
     Lock lock(m_cs);
 
     if (!m_isConnected)
     {
-        return EXIT_FAILURE;
+        THROW_EXCEPT("Cannot generate Users list. Translator is not connected");
     }
 
-    int ret;
     if (isSource)
     {
-        ret = m_channelSrc->getUsers(userList);
+        m_channelSrc->getUsers(userList);
     }
     else
     {
-        ret = m_channelDst->getUsers(userList);
+        m_channelDst->getUsers(userList);
     }
-
-    return ret;
 }
 
-int BB_Translator::StartSoundLoopbackTest(wstring inputSoundDevId, wstring outputSoundDevId, bool isSoundSystemWin)
+void BB_Translator::StartSoundLoopbackTest(wstring inputSoundDevId, wstring outputSoundDevId, bool isSoundSystemWin)
 {
     Lock lock(m_cs);
 
     if (m_isLoopbackStarted)
     {
-        return EXIT_FAILURE;
+        THROW_EXCEPT("Sound loopback already started");
     }
 
     BB_SoundDevice inputSoundDev;
     if (!findSoundDev(inputSoundDevId, isSoundSystemWin, inputSoundDev))
     {
-        return EXIT_FAILURE;
+        THROW_EXCEPT("Input sound device was not found");
     }
 
     BB_SoundDevice outputSoundDev;
     if (!findSoundDev(outputSoundDevId, isSoundSystemWin, outputSoundDev))
     {
-        return EXIT_FAILURE;
+        THROW_EXCEPT("Output sound device was not found");
     }
 
-    int ret = m_channelDummy->StartSoundLoopbackTest(inputSoundDev.m_id, outputSoundDev.m_id);
-    if (EXIT_SUCCESS == ret)
-    {
-        m_isLoopbackStarted = true;
-    }
-    return ret;
+    m_channelDummy->StartSoundLoopbackTest(inputSoundDev.m_id, outputSoundDev.m_id);
+    m_isLoopbackStarted = true;
 }
 
-int BB_Translator::StopSoundLoopbackTest()
+void BB_Translator::StopSoundLoopbackTest()
 {
     Lock lock(m_cs);
 
     if (!m_isLoopbackStarted)
     {
-        return EXIT_FAILURE;
+        THROW_EXCEPT("Sound loopback test was not started");
     }
     m_isLoopbackStarted = false;
-    return m_channelDummy->StopSoundLoopbackTest();
+    m_channelDummy->StopSoundLoopbackTest();
 }
 
-int BB_Translator::StartTargetSoundLoopbackTest(const AGC &agc, bool bEnableDenoise, INT32 maxNoiseSuppress, bool bEchoCancel)
+void BB_Translator::StartTargetSoundLoopbackTest(const AGC &agc, bool bEnableDenoise, INT32 maxNoiseSuppress, bool bEchoCancel)
 {
     Lock lock(m_cs);
 
     if (!m_isConnected)
     {
-        return EXIT_FAILURE;
+        THROW_EXCEPT("Cannot start target sound loopback test. Translator is not connected");
     }
 
     if (m_isTargetLoopbackStarted)
     {
-        return EXIT_FAILURE;
+        THROW_EXCEPT("Target loopback is already started");
     }
 
-    int ret = m_channelDst->StartTargetSoundLoopbackTest(agc, bEnableDenoise, maxNoiseSuppress, bEchoCancel);
-    if (EXIT_SUCCESS == ret)
-    {
-        m_isTargetLoopbackStarted = true;
-    }
-    return ret;
+    m_channelDst->StartTargetSoundLoopbackTest(agc, bEnableDenoise, maxNoiseSuppress, bEchoCancel);
+    m_isTargetLoopbackStarted = true;
 }
 
-int BB_Translator::StopTargetSoundLoopbackTest()
+void BB_Translator::StopTargetSoundLoopbackTest()
 {
     Lock lock(m_cs);
 
     if (!m_isConnected)
     {
-        return EXIT_FAILURE;
+        THROW_EXCEPT("Target loopback was not started. Translator is not connected");
     }
 
     if (!m_isTargetLoopbackStarted)
     {
-        return EXIT_FAILURE;
+        THROW_EXCEPT("Target loopback already started");
     }
     m_isTargetLoopbackStarted = false;
-    return m_channelDst->StopTargetSoundLoopbackTest();
+    m_channelDst->StopTargetSoundLoopbackTest();
 }
 
 void BB_Translator::initInstanceContext(BB_InstanceContext &context)
@@ -402,133 +382,129 @@ void BB_Translator::initInstanceContext(BB_InstanceContext &context)
     context.m_audioDir = DEFAULT_AUDIO_STORAGE;
 }
 
-int BB_Translator::MuteMicrophone(bool bMute)
+void BB_Translator::MuteMicrophone(bool bMute)
 {
     Lock lock(m_cs);
 
     if (!m_isConnected)
     {
-        return EXIT_FAILURE;
+        THROW_EXCEPT("Cannot mute microphone. Translator is not connected");
     }
-    return m_channelDst->MuteMicrophone(bMute);
+    m_channelDst->MuteMicrophone(bMute);
 }
 
-int BB_Translator::MuteTarget(bool bMute)
+void BB_Translator::MuteTarget(bool bMute)
 {
     Lock lock(m_cs);
 
     if (!m_isConnected)
     {
-        return EXIT_FAILURE;
+        THROW_EXCEPT("Cannot mute target. Translator is not connected");
     }
-   return m_channelDst->MuteTarget(bMute);
+    m_channelDst->MuteTarget(bMute);
 }
 
-int BB_Translator::UpdateVideoQuality(int videoQuality)
+void BB_Translator::UpdateVideoQuality(int videoQuality)
 {
     Lock lock(m_cs);
 
     if (!m_isConnected)
     {
-        return EXIT_FAILURE;
+        THROW_EXCEPT("Cannot update video quality. Translator is not connected");
     }
-    return m_channelVideo->UpdateVideoQuality(videoQuality);
+    m_channelVideo->UpdateVideoQuality(videoQuality);
 }
 
-int BB_Translator::UpdateVolumeLevel(int volumeLevel, bool isSource)
+void BB_Translator::UpdateVolumeLevel(int volumeLevel, bool isSource)
 {
     Lock lock(m_cs);
 
     if (!m_isConnected)
     {
-        return EXIT_FAILURE;
+        THROW_EXCEPT("Cannot update volume level. Translator is not connected");
     }
     if (isSource)
     {
-        return m_channelSrc->UpdateVolumeLevel(volumeLevel);
+        m_channelSrc->UpdateVolumeLevel(volumeLevel);
     }
     else
     {
-        return m_channelDst->UpdateVolumeLevel(volumeLevel);
+        m_channelDst->UpdateVolumeLevel(volumeLevel);
     }
 }
 
-int BB_Translator::UpdateMicrophoneGainLevel(int gainLevel)
+void BB_Translator::UpdateMicrophoneGainLevel(int gainLevel)
 {
     Lock lock(m_cs);
 
     if (!m_isConnected)
     {
-        return EXIT_FAILURE;
+        THROW_EXCEPT("Cannot update microphone gain level. Translator is not connected");
     }
-    return m_channelDst->UpdateMicrophoneGainLevel(gainLevel);
+    m_channelDst->UpdateMicrophoneGainLevel(gainLevel);
 }
 
-int BB_Translator::EnableDenoising(bool bEnable)
+void BB_Translator::EnableDenoising(bool bEnable)
 {
     Lock lock(m_cs);
 
     if (!m_isConnected)
     {
-        return EXIT_FAILURE;
+        THROW_EXCEPT("Cannot update denosing. Translator is not connected");
     }
-    int ret;
-    CHECK_ret(m_channelSrc->EnableDenoising(bEnable));
-    CHECK_ret(m_channelDst->EnableDenoising(bEnable));
-    return EXIT_SUCCESS;
+
+    m_channelSrc->EnableDenoising(bEnable);
+    m_channelDst->EnableDenoising(bEnable);
 }
 
-int BB_Translator::EnableEchoCancellation(bool bEnable)
+void BB_Translator::EnableEchoCancellation(bool bEnable)
 {
     Lock lock(m_cs);
 
     if (!m_isConnected)
     {
-        return EXIT_FAILURE;
+        THROW_EXCEPT("Cannot update echo cancellation. Translator is not connected");
     }
-    int ret;
-    CHECK_ret(m_channelSrc->EnableEchoCancellation(bEnable));
-    CHECK_ret(m_channelDst->EnableEchoCancellation(bEnable));
-    return EXIT_SUCCESS;
+    m_channelSrc->EnableEchoCancellation(bEnable);
+    m_channelDst->EnableEchoCancellation(bEnable);
 }
 
-int BB_Translator::SetAGCEnable(bool bEnable, const AGC *agc)
+void BB_Translator::SetAGCEnable(bool bEnable, const AGC *agc)
 {
     Lock lock(m_cs);
 
     if (!m_isConnected)
     {
-        return EXIT_FAILURE;
+        THROW_EXCEPT("Cannot update AGC. Translator is not connected");
     }
-    return m_channelDst->SetAGCEnable(bEnable, agc);
+    m_channelDst->SetAGCEnable(bEnable, agc);
 }
 
-int BB_Translator::EnableVoiceActivation(bool bEnable, int voiceactSlider)
+void BB_Translator::EnableVoiceActivation(bool bEnable, int voiceactSlider)
 {
     Lock lock(m_cs);
 
     if (!m_isConnected)
     {
-        return EXIT_FAILURE;
+        THROW_EXCEPT("Cannot update voice activation. Translator is not connected");
     }
-    return m_channelDst->EnableVoiceActivation(bEnable, voiceactSlider);
+    m_channelDst->EnableVoiceActivation(bEnable, voiceactSlider);
 }
 
-int BB_Translator::GetMicrophoneLevel(INT32 &level)
+void BB_Translator::GetMicrophoneLevel(INT32 &level)
 {
     Lock lock(m_cs);
 
     if (!m_isConnected)
     {
-        return EXIT_FAILURE;
+        THROW_EXCEPT("Cannot return microphone level. Translator is not connected");
     }
-    return m_channelDst->GetMicrophoneLevel(level);
+    m_channelDst->GetMicrophoneLevel(level);
 }
 
-int BB_Translator::OpenVideoWindow(HWND hWnd)
+void BB_Translator::OpenVideoWindow(HWND hWnd)
 {
     Lock lock(m_cs);
-
-    return  m_channelVideo->OpenVideoWindow(hWnd);
+    m_channelVideo->OpenVideoWindow(hWnd);
 }
 

@@ -79,43 +79,44 @@ public:
 
 	// We don't want to call TT functions in Ctor & Dtor
 	// Use init and finalize instead
-	int init();
+    void init();
 	void finalize();
-	int getInstance();
+    void getInstance();
 
-    int initSoundDevices();
-    int closeSoundDevices();
-	int SetAudioLevels();
-	int EnableTransmition();
-	int getVideoDevice();
+    void initSoundDevices();
+    void closeSoundDevices();
+    void SetAudioLevels();
+    void EnableTransmition();
 	
-	int getChannels(std::vector<BB_Channel> &channels);
-	int getSoundDevices(std::vector<BB_SoundDevice> &soundDevs);
-    int getUsers(std::vector<BB_ChannelUser> &userList);
+    void getChannels(std::vector<BB_Channel> &channels);
+    void getSoundDevices(std::vector<BB_SoundDevice> &soundDevs);
+    void getUsers(std::vector<BB_ChannelUser> &userList);
 
     // Operations
-    int StartSoundLoopbackTest(INT32 inputSoundDevId, INT32 outputSoundDevId);
-    int StopSoundLoopbackTest();
-    int StartTargetSoundLoopbackTest(const AGC &agc, bool bEnableDenoise, INT32 maxNoiseSuppress, bool bEchoCancel);
-    int StopTargetSoundLoopbackTest();
-    int MuteMicrophone(bool bMute);
-    int MuteTarget(bool bMute);
-    int UpdateVolumeLevel(int volumeLevel);
-    int UpdateMicrophoneGainLevel(int gainLevel);
-    int UpdateVideoQuality(int videoQuality);
-    int EnableDenoising(bool bEnable);
-    int EnableEchoCancellation(bool bEnable);
-    int EnableVoiceActivation(bool bEnable, int voiceactSlider = 0);
-    int SetAGCEnable(bool bEnable, const AGC *agc = NULL);
-    int GetMicrophoneLevel(int &level);
+    void StartSoundLoopbackTest(INT32 inputSoundDevId, INT32 outputSoundDevId);
+    void StopSoundLoopbackTest();
+    void StartTargetSoundLoopbackTest(const AGC &agc, bool bEnableDenoise, INT32 maxNoiseSuppress, bool bEchoCancel);
+    void StopTargetSoundLoopbackTest();
+    void MuteMicrophone(bool bMute);
+    void MuteTarget(bool bMute);
+    void UpdateVolumeLevel(int volumeLevel);
+    void UpdateMicrophoneGainLevel(int gainLevel);
+    void UpdateVideoQuality(int videoQuality);
+    void EnableDenoising(bool bEnable);
+    void EnableEchoCancellation(bool bEnable);
+    void EnableVoiceActivation(bool bEnable, int voiceactSlider = 0);
+    void SetAGCEnable(bool bEnable, const AGC *agc = NULL);
+    void GetMicrophoneLevel(int &level);
 
-    int OpenVideoWindow(HWND hWnd);
+    void OpenVideoWindow(HWND hWnd);
 
 private:
 		
-	int joinChannel();
-	int setInstProp();
-    int createUserList();
+    static void GetDroppedFrames(int videoQuality, std::vector<int>& droppedFrames, int seed);
+    static bool IsFrameDropped(int frameIdx, std::vector<int>& droppedFrames);
+
+    void joinChannel();
+    void setInstProp();
 
 	void processTTMessage(const TTMessage& msg);
 

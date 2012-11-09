@@ -73,3 +73,13 @@ catch(BB_Exception excp) \
     QMessageBox::critical(this, "Error:", QString::fromStdWString(excp.GetInfo())); \
 }
 
+#define TRY_BLOCK_RETURN_ON_ERR(block) \
+try \
+{ \
+    block \
+} \
+catch(BB_Exception excp) \
+{ \
+    return; \
+}
+

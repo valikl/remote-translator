@@ -50,46 +50,46 @@ public:
     static BB_Translator &Instance();
 
 	// connect to the server and get happenings
-	int init();
+    void init();
 
     // disconnect etc.
-    int finalize();
+    void finalize();
 
 	std::vector<Happening> getHappenings() { return m_hapList; }
 	//int setActiveHappening(std::string hapName);
 
 	std::vector<BB_SoundDevice> getSoundDevices() { return m_soundDevList; }
 
-    int connectHap(std::wstring hapName, std::wstring nickName, std::wstring srcName, std::wstring dstName,
-                  std::wstring inputSoundDevId, std::wstring outputSoundDevId);
-    int disconnectHap();
-    int getUsers(std::vector<BB_ChannelUser> &userList, bool isSource);
+    void connectHap(std::wstring hapName, std::wstring nickName, std::wstring srcName, std::wstring dstName,
+        std::wstring inputSoundDevId, std::wstring outputSoundDevId);
+    void disconnectHap();
+    void getUsers(std::vector<BB_ChannelUser> &userList, bool isSource);
 
-    bool isConnected() {return m_isConnected; }
+    bool isConnected() { return m_isConnected; }
 
     // Operations
-    int StartSoundLoopbackTest(std::wstring inputSoundDevId, std::wstring outputSoundDevId, bool m_isSoundSystemWin);
-    int StopSoundLoopbackTest();
-    int StartTargetSoundLoopbackTest(const AGC &agc, bool bEnableDenoise, INT32 maxNoiseSuppress, bool bEchoCancel);
-    int StopTargetSoundLoopbackTest();
+    void StartSoundLoopbackTest(std::wstring inputSoundDevId, std::wstring outputSoundDevId, bool m_isSoundSystemWin);
+    void StopSoundLoopbackTest();
+    void StartTargetSoundLoopbackTest(const AGC &agc, bool bEnableDenoise, INT32 maxNoiseSuppress, bool bEchoCancel);
+    void StopTargetSoundLoopbackTest();
     // Disable/Enable my microphone
-    int MuteMicrophone(bool bMute);
+    void MuteMicrophone(bool bMute);
     // Mute other users in my channel
-    int MuteTarget(bool bMute);
-    int UpdateVolumeLevel(int volumeLevel, bool isSource);
-    int UpdateMicrophoneGainLevel(int gainLevel);
-    int UpdateVideoQuality(int videoQuality);
-    int EnableDenoising(bool bEnable);
-    int EnableEchoCancellation(bool bEnable);
+    void MuteTarget(bool bMute);
+    void UpdateVolumeLevel(int volumeLevel, bool isSource);
+    void UpdateMicrophoneGainLevel(int gainLevel);
+    void UpdateVideoQuality(int videoQuality);
+    void EnableDenoising(bool bEnable);
+    void EnableEchoCancellation(bool bEnable);
     // Target
-    int EnableVoiceActivation(bool bEnable, int voiceactSlider = 0);
+    void EnableVoiceActivation(bool bEnable, int voiceactSlider = 0);
     // Microphone(target)
-    int SetAGCEnable(bool bEnable, const AGC *agc = NULL);
+    void SetAGCEnable(bool bEnable, const AGC *agc = NULL);
     // Microphone(target)
-    int GetMicrophoneLevel(INT32 &level);
+    void GetMicrophoneLevel(INT32 &level);
 
     // Video
-    int OpenVideoWindow(HWND hWnd);
+    void OpenVideoWindow(HWND hWnd);
 
 private:
     BB_Translator();
