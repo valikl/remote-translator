@@ -7,21 +7,6 @@
 #include "Utils/BB_Exception.h"
 #include "ui_remotetranslatorui.h"
 #include <QTimer>
-#include <time.h>
-
-static void GetDroppedFrames(int video_quality, vector<int>& dropped_frames)
-{
-    //generates a new random set each time:
-    srand(time(0));
-    for (int i = 0; i < 100 - video_quality; ++i)
-        dropped_frames.push_back(rand()%100);
-}
-
-static bool IsFrameDropped(int frame_idx, vector<int>& dropped_frames)
-{
-    vector<int>::iterator it = find(dropped_frames.begin(), dropped_frames.end(), frame_idx);
-    return it != dropped_frames.end();
-}
 
 RemoteTranslatorUI::RemoteTranslatorUI(QWidget *parent) :
     QMainWindow(parent),
