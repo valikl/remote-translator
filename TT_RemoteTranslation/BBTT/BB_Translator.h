@@ -7,6 +7,7 @@
 #include <string>
 
 #include "BB_Instance.h"
+#include "Utils/CriticalSection.h"
 
 const std::wstring VIDEO_CHANNEL_NAME(L"Video");
 const std::wstring SOURCE_CHANNEL_NAME(L"Source");
@@ -118,6 +119,8 @@ private:
 
 	// Sound Devices List
 	std::vector<BB_SoundDevice> m_soundDevList;
+
+    BB_CriticalSection m_cs;
 
     bool m_isConnected;
     bool m_isLoopbackStarted;

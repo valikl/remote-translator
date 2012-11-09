@@ -24,7 +24,10 @@ SOURCES += main.cpp\
     soundfilters.cpp \
     BBTT/BB_Thread.cpp \
     manconnect.cpp \
-    Utils/BB_Window.cpp
+    Utils/BB_Window.cpp \
+    Utils/Lock.cpp \
+    Utils/CriticalSection.cpp \
+    Utils/Lockable.cpp
 
 HEADERS  += \
     common.h \
@@ -45,7 +48,10 @@ HEADERS  += \
     BBTT/BB_Thread.h \
     manconnect.h \
     Utils/BB_Exception.h \
-    Utils/BB_Window.h
+    Utils/BB_Window.h \
+    Utils/Lockable.h \
+    Utils/Lock.h \
+    Utils/CriticalSection.h
 
 FORMS    += remotetranslatorui.ui \
     sounddevices.ui \

@@ -1,6 +1,7 @@
 #include "BB_Translator.h"
 #include "BB_ClientConfigMgr.h"
 #include "Utils.h"
+#include "Utils/Lock.h"
 
 using namespace std;
 
@@ -28,6 +29,9 @@ BB_Translator& BB_Translator::Instance()
 
 int BB_Translator::disconnectHap()
 {
+    Lock lock(m_cs);
+
+    m_isConnected = false;
 
     if (m_channelVideo)
     {
@@ -45,12 +49,24 @@ int BB_Translator::disconnectHap()
         delete m_channelDst;
     }
 
+    m_channelVideo = NULL;
+    m_channelSrc = NULL;
+    m_channelDst = NULL;
+
     return EXIT_SUCCESS;
 }
 
 int BB_Translator::connectHap(wstring hapName, wstring nickName, wstring srcName, wstring dstName,
     wstring inputSoundDevId, wstring outputSoundDevId)
 {
+    Lock lock(m_cs);
+
+    if (m_isConnected)
+    {
+        // Already connected
+        return EXIT_FAILURE;
+    }
+
     BB_InstanceContext context;
     initInstanceContext(context);
 
@@ -274,6 +290,8 @@ bool BB_Translator::findSoundDev(wstring deviceId, bool isSoundSystemWin, BB_Sou
 
 int BB_Translator::getUsers(std::vector<BB_ChannelUser> &userList, bool isSource)
 {
+    Lock lock(m_cs);
+
     if (!m_isConnected)
     {
         return EXIT_FAILURE;
@@ -294,6 +312,8 @@ int BB_Translator::getUsers(std::vector<BB_ChannelUser> &userList, bool isSource
 
 int BB_Translator::StartSoundLoopbackTest(wstring inputSoundDevId, wstring outputSoundDevId, bool isSoundSystemWin)
 {
+    Lock lock(m_cs);
+
     if (m_isLoopbackStarted)
     {
         return EXIT_FAILURE;
@@ -321,6 +341,8 @@ int BB_Translator::StartSoundLoopbackTest(wstring inputSoundDevId, wstring outpu
 
 int BB_Translator::StopSoundLoopbackTest()
 {
+    Lock lock(m_cs);
+
     if (!m_isLoopbackStarted)
     {
         return EXIT_FAILURE;
@@ -331,6 +353,8 @@ int BB_Translator::StopSoundLoopbackTest()
 
 int BB_Translator::StartTargetSoundLoopbackTest(const AGC &agc, bool bEnableDenoise, INT32 maxNoiseSuppress, bool bEchoCancel)
 {
+    Lock lock(m_cs);
+
     if (!m_isConnected)
     {
         return EXIT_FAILURE;
@@ -351,6 +375,8 @@ int BB_Translator::StartTargetSoundLoopbackTest(const AGC &agc, bool bEnableDeno
 
 int BB_Translator::StopTargetSoundLoopbackTest()
 {
+    Lock lock(m_cs);
+
     if (!m_isConnected)
     {
         return EXIT_FAILURE;
@@ -378,6 +404,8 @@ void BB_Translator::initInstanceContext(BB_InstanceContext &context)
 
 int BB_Translator::MuteMicrophone(bool bMute)
 {
+    Lock lock(m_cs);
+
     if (!m_isConnected)
     {
         return EXIT_FAILURE;
@@ -387,6 +415,8 @@ int BB_Translator::MuteMicrophone(bool bMute)
 
 int BB_Translator::MuteTarget(bool bMute)
 {
+    Lock lock(m_cs);
+
     if (!m_isConnected)
     {
         return EXIT_FAILURE;
@@ -396,6 +426,8 @@ int BB_Translator::MuteTarget(bool bMute)
 
 int BB_Translator::UpdateVideoQuality(int videoQuality)
 {
+    Lock lock(m_cs);
+
     if (!m_isConnected)
     {
         return EXIT_FAILURE;
@@ -405,6 +437,8 @@ int BB_Translator::UpdateVideoQuality(int videoQuality)
 
 int BB_Translator::UpdateVolumeLevel(int volumeLevel, bool isSource)
 {
+    Lock lock(m_cs);
+
     if (!m_isConnected)
     {
         return EXIT_FAILURE;
@@ -421,6 +455,8 @@ int BB_Translator::UpdateVolumeLevel(int volumeLevel, bool isSource)
 
 int BB_Translator::UpdateMicrophoneGainLevel(int gainLevel)
 {
+    Lock lock(m_cs);
+
     if (!m_isConnected)
     {
         return EXIT_FAILURE;
@@ -430,6 +466,8 @@ int BB_Translator::UpdateMicrophoneGainLevel(int gainLevel)
 
 int BB_Translator::EnableDenoising(bool bEnable)
 {
+    Lock lock(m_cs);
+
     if (!m_isConnected)
     {
         return EXIT_FAILURE;
@@ -442,6 +480,8 @@ int BB_Translator::EnableDenoising(bool bEnable)
 
 int BB_Translator::EnableEchoCancellation(bool bEnable)
 {
+    Lock lock(m_cs);
+
     if (!m_isConnected)
     {
         return EXIT_FAILURE;
@@ -454,6 +494,8 @@ int BB_Translator::EnableEchoCancellation(bool bEnable)
 
 int BB_Translator::SetAGCEnable(bool bEnable, const AGC *agc)
 {
+    Lock lock(m_cs);
+
     if (!m_isConnected)
     {
         return EXIT_FAILURE;
@@ -463,6 +505,8 @@ int BB_Translator::SetAGCEnable(bool bEnable, const AGC *agc)
 
 int BB_Translator::EnableVoiceActivation(bool bEnable, int voiceactSlider)
 {
+    Lock lock(m_cs);
+
     if (!m_isConnected)
     {
         return EXIT_FAILURE;
@@ -472,6 +516,8 @@ int BB_Translator::EnableVoiceActivation(bool bEnable, int voiceactSlider)
 
 int BB_Translator::GetMicrophoneLevel(INT32 &level)
 {
+    Lock lock(m_cs);
+
     if (!m_isConnected)
     {
         return EXIT_FAILURE;
@@ -481,6 +527,8 @@ int BB_Translator::GetMicrophoneLevel(INT32 &level)
 
 int BB_Translator::OpenVideoWindow(HWND hWnd)
 {
-   return  m_channelVideo->OpenVideoWindow(hWnd);
+    Lock lock(m_cs);
+
+    return  m_channelVideo->OpenVideoWindow(hWnd);
 }
 
