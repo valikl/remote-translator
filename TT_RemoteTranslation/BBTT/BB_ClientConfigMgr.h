@@ -140,7 +140,7 @@ public:
 	// Returns the instance of the singleton
 	static BB_ClientConfigMgr &Instance();
 
-    int init(bool bRestore);
+    void init(bool bRestore);
 	int saveConfig();
 	
 	ClientConfig getConfig();
@@ -182,7 +182,7 @@ private:
 	BB_ClientConfigMgr(const BB_ClientConfigMgr &);
 	const BB_ClientConfigMgr &operator=(const BB_ClientConfigMgr &);
 
-	int loadConfig();
+    void loadConfig();
 
 	// read configuration from file
 	void loadConfigFromFile(); 

@@ -56,13 +56,17 @@ void BB_Instance::getInstance()
 	m_ttInst = TT_InitTeamTalkPoll();
 
     //now that we got all the information we needed we can connect and logon
-    if(!TT_Connect(m_ttInst, m_context.m_IP.c_str(), m_context.m_TCP, m_context.m_UDP, 0, 0))
-        goto error_connect;
+    if (!TT_Connect(m_ttInst, m_context.m_IP.c_str(), m_context.m_TCP, m_context.m_UDP, 0, 0))
+    {
+        THROW_EXCEPT("Connection to the server failed");
+    }
      
     //wait for connect event
     wait_ms = 10000;
-    if(!TT_GetMessage(m_ttInst, &msg, &wait_ms) || msg.wmMsg == WM_TEAMTALK_CON_FAILED)
-        goto error_connect;
+    if (!TT_GetMessage(m_ttInst, &msg, &wait_ms) || msg.wmMsg == WM_TEAMTALK_CON_FAILED)
+    {
+        THROW_EXCEPT("Connection to the server failed");
+    }
 
     assert(msg.wmMsg == WM_TEAMTALK_CON_SUCCESS);
     assert(TT_GetFlags(m_ttInst) & CLIENT_CONNECTED);
@@ -71,17 +75,23 @@ void BB_Instance::getInstance()
     //now that we're connected log on
 	cmd_id = TT_DoLogin(m_ttInst, _T(""), m_context.m_srvPsw.c_str(), m_context.m_srvUser.c_str(), m_context.m_srvUserPsw.c_str());
     if(cmd_id < 0)
-        goto error_login;
+    {
+        THROW_EXCEPT("Connection to the server failed");
+    }
 
     cout << "Login command got cmd ID #" << cmd_id << endl;
 
     //wait for server reply
-    if(!TT_GetMessage(m_ttInst, &msg, &wait_ms) || msg.wmMsg != WM_TEAMTALK_CMD_PROCESSING)
-        goto error_login;
+    if (!TT_GetMessage(m_ttInst, &msg, &wait_ms) || msg.wmMsg != WM_TEAMTALK_CMD_PROCESSING)
+    {
+        THROW_EXCEPT("Log on to the server failed");
+    }
 
 	//get response
-    if(!TT_GetMessage(m_ttInst, &msg, &wait_ms) || msg.wmMsg == WM_TEAMTALK_CMD_ERROR)
-        goto error_login;
+    if (!TT_GetMessage(m_ttInst, &msg, &wait_ms) || msg.wmMsg == WM_TEAMTALK_CMD_ERROR)
+    {
+        THROW_EXCEPT("Log on to the server failed");
+    }
 
     //wait for login command to complete
     //client will now post all the server information
@@ -94,13 +104,6 @@ void BB_Instance::getInstance()
     assert(TT_GetFlags(m_ttInst) & CLIENT_AUTHORIZED); //we're authorized
     //ensure account we used is administrator
     assert(TT_GetMyUserType(m_ttInst) & USERTYPE_ADMIN);
-    return;
-
-error_connect:
-    THROW_EXCEPT("Connection to the server failed");
-
-error_login:
-    THROW_EXCEPT("Log on to the server failed");
 }
 
 void BB_Instance::closeSoundDevices()
@@ -112,22 +115,7 @@ void BB_Instance::closeSoundDevices()
 
 void BB_Instance::initSoundDevices()
 {
-    // Init input sound device
-    if (!TT_InitSoundInputDevice(m_ttInst, m_context.m_inputSoundDevId))
-    {
-        THROW_EXCEPT("Cannot initialize sound input device");
-    }
     if (!TT_EnableTransmission(m_ttInst, (TRANSMIT_AUDIO), false))
-    {
-        THROW_EXCEPT("Enable transmission failed");
-    }
-
-    // Init output sound device
-    if (!TT_InitSoundOutputDevice(m_ttInst, m_context.m_outputSoundDevId))
-    {
-        THROW_EXCEPT("Cannot initialize sound output device");
-    }
-    if (!TT_EnableTransmission(m_ttInst, (TRANSMIT_AUDIO), true))
     {
         THROW_EXCEPT("Enable transmission failed");
     }
@@ -368,19 +356,20 @@ void BB_Instance::getChannels(std::vector<BB_Channel> &channels)
 
 	if (!TT_GetServerChannels(m_ttInst, channelIDs, &size) || size == 0)
 	{
-		goto __err_exit1;
+        THROW_EXCEPT("Cannot get channels list");
 	}
 
 	if (size == 0)
 	{
 		cout << "No channels!" << endl;
-		goto __err_exit1;
+        THROW_EXCEPT("Cannot get channels list");
 	}
 
 	channelIDs = new INT32[size];
 	if (!TT_GetServerChannels(m_ttInst, channelIDs, &size))
 	{
-		goto __err_exit2;
+        delete[] channelIDs;
+        THROW_EXCEPT("Cannot get channels list");
 	}
 
 	Channel channel;
@@ -396,13 +385,8 @@ void BB_Instance::getChannels(std::vector<BB_Channel> &channels)
 		channelToList.parentId = channel.nParentID;
 		channels.push_back(channelToList);
 	}
-    delete[] channelIDs;
-    return;
 
-__err_exit2:
-	delete[] channelIDs;
-__err_exit1:
-    THROW_EXCEPT("Cannot get channels list");
+    delete[] channelIDs;
 }
 
 void BB_Instance::getSoundDevices(vector<BB_SoundDevice> &soundDevs)
@@ -414,18 +398,19 @@ void BB_Instance::getSoundDevices(vector<BB_SoundDevice> &soundDevs)
     INT32 outputDeviceId;
     if (!TT_GetDefaultSoundDevices(m_ttInst, &inputDeviceId, &outputDeviceId))
     {
-        goto __err_exit1;
+        THROW_EXCEPT("Cannot build sound devices list");
     }
 
 	if (!TT_GetSoundInputDevices(m_ttInst, soundDevices, &size) || size == 0)
 	{
-		goto __err_exit1;
+        THROW_EXCEPT("Cannot build sound devices list");
 	}
 
 	soundDevices = new SoundDevice[size];
 	if (!TT_GetSoundInputDevices(m_ttInst, soundDevices, &size))
 	{
-		goto __err_exit2;
+        delete[] soundDevices;
+        THROW_EXCEPT("Cannot build sound devices list");
 	}
 
     // Create Input Devices List
@@ -447,13 +432,14 @@ void BB_Instance::getSoundDevices(vector<BB_SoundDevice> &soundDevs)
 	soundDevices = NULL;
 	if (!TT_GetSoundOutputDevices(m_ttInst, soundDevices, &size) || size == 0)
 	{
-		goto __err_exit1;
+        THROW_EXCEPT("Cannot build sound devices list");
 	}
 
 	soundDevices = new SoundDevice[size];
 	if (!TT_GetSoundOutputDevices(m_ttInst, soundDevices, &size))
 	{
-		goto __err_exit2;
+        delete[] soundDevices;
+        THROW_EXCEPT("Cannot build sound devices list");
 	}
 
 	// Create Output Devices List
@@ -470,12 +456,6 @@ void BB_Instance::getSoundDevices(vector<BB_SoundDevice> &soundDevs)
 		soundDevs.push_back(soundDev);
 	}
     delete[] soundDevices;
-    return;
-
-__err_exit2:
-	delete[] soundDevices;
-__err_exit1:
-    THROW_EXCEPT("Cannot build sound devices list");
 }
 
 
@@ -489,19 +469,20 @@ void BB_Instance::getUsers(std::vector<BB_ChannelUser> &userList)
 
     if (!TT_GetChannelUsers(m_ttInst, m_channelId, userIDs, &size) || size == 0)
     {
-        goto __err_exit1;
+        THROW_EXCEPT("Build channel users list failed");
     }
 
     if (size == 0)
     {
         cout << "No users!" << endl;
-        goto __err_exit1;
+        THROW_EXCEPT("Build channel users list failed");
     }
 
     userIDs = new INT32[size];
     if (!TT_GetChannelUsers(m_ttInst, m_channelId, userIDs, &size))
     {
-        goto __err_exit2;
+        delete[] userIDs;
+        THROW_EXCEPT("Build channel users list failed");
     }
 
     for (int i = 0; i < size; ++i)
@@ -524,12 +505,6 @@ void BB_Instance::getUsers(std::vector<BB_ChannelUser> &userList)
 
     userList = m_UserList;
     delete[] userIDs;
-    return;
-
-__err_exit2:
-    delete[] userIDs;
-__err_exit1:
-    THROW_EXCEPT("Build channel users list failed");
 }
 
 void BB_Instance::StartSoundLoopbackTest(INT32 inputSoundDevId, INT32 outputSoundDevId)
@@ -642,6 +617,11 @@ void BB_Instance::EnableEchoCancellation(bool bEnable)
 
 void BB_Instance::SetAGCEnable(bool bEnable, const AGC *agc)
 {
+    if (!TT_EnableAGC(m_ttInst, bEnable))
+    {
+        THROW_EXCEPT("Enable/disable AGC failed");
+    }
+
     if (bEnable)
     {
         if (!TT_SetAGCSettings(m_ttInst, agc->m_gainLevel, agc->m_maxIncrement,
@@ -649,11 +629,6 @@ void BB_Instance::SetAGCEnable(bool bEnable, const AGC *agc)
         {
             THROW_EXCEPT("AGC settings update failed");
         }
-    }
-
-    if (!TT_EnableAGC(m_ttInst, bEnable))
-    {
-        THROW_EXCEPT("Enable/disable AGC failed");
     }
 }
 

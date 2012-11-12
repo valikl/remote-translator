@@ -1,5 +1,6 @@
 #include "BB_ClientConfigMgr.h"
 #include "Ticpp/tinyxml.h"
+#include "Utils/BB_Exception.h"
 
 using namespace std;
 using namespace ticpp;
@@ -18,7 +19,7 @@ BB_ClientConfigMgr& BB_ClientConfigMgr::Instance()
 	return instance;
 }
 
-int BB_ClientConfigMgr::init(bool bRestore)
+void BB_ClientConfigMgr::init(bool bRestore)
 {
     if (bRestore)
     {
@@ -29,30 +30,36 @@ int BB_ClientConfigMgr::init(bool bRestore)
         m_fileName = CONFIG_FILE;
     }
 
-    int err = loadConfig();
-    if (err == EXIT_FAILURE && !bRestore)
+    try
     {
-        m_fileName = DEFAULT_CONFIG_FILE;
-        err = loadConfig();
+        loadConfig();
     }
-
-    return err;
+    catch(ticpp::Exception& ex)
+    {
+        // XML error
+        if (!bRestore)
+        {
+            m_fileName = DEFAULT_CONFIG_FILE;
+            try
+            {
+                loadConfig();
+            }
+            catch(ticpp::Exception& ex)
+            {
+                THROW_EXCEPT(ex.what());
+            }
+        }
+        else
+        {
+            THROW_EXCEPT(ex.what());
+        }
+    }
 }
 
-int BB_ClientConfigMgr::loadConfig()
+void BB_ClientConfigMgr::loadConfig()
 {
-	try
-	{
-		// Currently we support only configuration file
-		loadConfigFromFile();
-	}
-	catch(ticpp::Exception& ex)
-	{
-		// XML error
-		std::cout << ex.what();
-		return EXIT_FAILURE;
-	}
-	return EXIT_SUCCESS;
+    // Currently we support only configuration file
+    loadConfigFromFile();
 }
 
 ClientConfig BB_ClientConfigMgr::getConfig()
