@@ -126,6 +126,7 @@ void BB_Instance::initSoundDevices()
     {
         THROW_EXCEPT("Cannot initialize Duplex mode");
     }
+
 }
 
 
