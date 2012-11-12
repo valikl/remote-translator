@@ -115,11 +115,6 @@ void BB_Instance::closeSoundDevices()
 
 void BB_Instance::initSoundDevices()
 {
-    if (!TT_EnableTransmission(m_ttInst, (TRANSMIT_AUDIO), false))
-    {
-        THROW_EXCEPT("Enable transmission failed");
-    }
-
     if (!TT_InitSoundDuplexDevices(m_ttInst, m_context.m_inputSoundDevId,
             m_context.m_outputSoundDevId))
     {
