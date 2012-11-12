@@ -71,7 +71,15 @@ void RemoteTranslatorUI::changeMainConfig()
 void RemoteTranslatorUI::init()
 {
     TRY_FUNC(BB_ClientConfigMgr::Instance().init(false));
-    TRY_FUNC(TRANSLATOR.init());
+//    TRY_FUNC(TRANSLATOR.init());
+    try
+    {
+        TRANSLATOR.init();
+    }
+    catch(BB_Exception excp)
+    {
+        QMessageBox::critical(this, "Error:", QString::fromStdWString(excp.GetInfo()));
+    }
 
     // init main configuration
     initMainConfig();
@@ -82,18 +90,10 @@ void RemoteTranslatorUI::init()
     connect(ui->actionTT_server_connection, SIGNAL(triggered()), this, SLOT(ActivateManConnect()));
     connect(ui->actionRestore_default_configuration, SIGNAL(triggered()), this, SLOT(RestoreDefaultConfig()));
 
-    //Activate Audio filters
-    enableAudioFilters();
-
     // set buttons checkable
     ui->LangConnect->setCheckable(true);
     ui->MicMuteBut->setCheckable(true);
-    ui->MicMuteBut->click();
     ui->TrgMuteBut->setCheckable(true);
-    ui->TrgMuteBut->click();
-
-    // set slider values
-    setSliders();
 
     //Timer for progress bar
     timer = new QTimer(this);
@@ -125,9 +125,14 @@ void RemoteTranslatorUI::ActivateSoundDevices()
 
 void RemoteTranslatorUI::on_Timeout()
 {
-    int level;
-    TRY_FUNC(TRANSLATOR.GetMicrophoneLevel(level));
-    ui->MicLevelInd->setValue(level);
+    if (TRANSLATOR.isConnected())
+    {
+        int level;
+        TRY_FUNC(TRANSLATOR.GetMicrophoneLevel(level));
+        ui->MicLevelInd->setValue(level);
+    }
+    else
+        ui->MicLevelInd->setValue(0);
 }
 
 void RemoteTranslatorUI::ActivateAudioFilters()
@@ -260,6 +265,15 @@ void RemoteTranslatorUI::on_LangConnect_clicked(bool checked)
         TRY_FUNC(TRANSLATOR.connectHap(HAPPENING_CHANNEL_DEFAULT_NAME, ConfigUI.m_NickName,
                                        ConfigUI.m_SrcChannel, ConfigUI.m_TrgChannel,
                                        ConfigUI.m_InputSoundDevId, ConfigUI.m_OutputSoundDevId));
+
+        //Activate Audio filters
+        enableAudioFilters();
+
+        // set slider values
+        setSliders();
+
+        ui->MicMuteBut->click();
+        ui->TrgMuteBut->click();
     }
 
     if (checked)

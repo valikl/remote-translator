@@ -94,6 +94,7 @@ void BB_Instance::getInstance()
     assert(TT_GetFlags(m_ttInst) & CLIENT_AUTHORIZED); //we're authorized
     //ensure account we used is administrator
     assert(TT_GetMyUserType(m_ttInst) & USERTYPE_ADMIN);
+    return;
 
 error_connect:
     THROW_EXCEPT("Connection to the server failed");
@@ -395,6 +396,8 @@ void BB_Instance::getChannels(std::vector<BB_Channel> &channels)
 		channelToList.parentId = channel.nParentID;
 		channels.push_back(channelToList);
 	}
+    delete[] channelIDs;
+    return;
 
 __err_exit2:
 	delete[] channelIDs;
@@ -466,6 +469,8 @@ void BB_Instance::getSoundDevices(vector<BB_SoundDevice> &soundDevs)
 
 		soundDevs.push_back(soundDev);
 	}
+    delete[] soundDevices;
+    return;
 
 __err_exit2:
 	delete[] soundDevices;
@@ -518,6 +523,8 @@ void BB_Instance::getUsers(std::vector<BB_ChannelUser> &userList)
     }
 
     userList = m_UserList;
+    delete[] userIDs;
+    return;
 
 __err_exit2:
     delete[] userIDs;
