@@ -1,4 +1,5 @@
 #include "BB_Window.h"
+#include <iostream>
 
 using namespace std;
 
@@ -100,7 +101,11 @@ void BB_Window::run()
 
 void BB_Window::BBDestroy()
 {
-    DestroyWindow(m_hWnd);
+    if (!DestroyWindow(m_hWnd))
+    {
+        int err = GetLastError();
+        cout << "Destroy Window failed with error " << err << endl;
+    }
 }
 
 bool BB_Window::IsActive()

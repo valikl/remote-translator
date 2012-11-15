@@ -730,6 +730,7 @@ void BB_Instance::run()
     TTMessage msg;
     int wait_ms = 10000;
     int frameIdx = 0;
+    int loopCnt = 0;
     vector<int> droppedFrames;
 
     while(!m_stopThread           &&
@@ -738,18 +739,24 @@ void BB_Instance::run()
     {
         if (msg.wmMsg == WM_TEAMTALK_USER_VIDEOFRAME)
         {
-#if 0
-            if (frameIdx == 0 || frameIdx == 101)
+            // Drop frames
+            if (frameIdx == 101)
             {
                 frameIdx = 0;
-                droppedFrames.clear();
-                GetDroppedFrames(100, droppedFrames);
             }
+
+            if (frameIdx == 0)
+            {
+                droppedFrames.clear();
+                GetDroppedFrames(BB_ClientConfigMgr::Instance().getConfig().m_VideoQuality,
+                    droppedFrames, loopCnt++);
+            }           
+
             if (IsFrameDropped(frameIdx++, droppedFrames))
             {
                 continue;
             }
-#endif
+
             processTTMessage(msg);
             VideoFrame videoFrame;
             TT_AcquireUserVideoFrame(m_ttInst, userId, &videoFrame);
