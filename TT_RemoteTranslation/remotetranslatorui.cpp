@@ -92,8 +92,8 @@ void RemoteTranslatorUI::init()
 
     // set buttons checkable
     ui->LangConnect->setCheckable(true);
-    ui->MicMuteBut->setCheckable(true);
-    ui->TrgMuteBut->setCheckable(true);
+    ui->MicMuteBut->setEnabled(false);
+    ui->TrgMuteBut->setEnabled(false);
 
     //Timer for progress bar
     timer = new QTimer(this);
@@ -255,10 +255,22 @@ void RemoteTranslatorUI::on_LangConnect_clicked(bool checked)
 {
     if (TRANSLATOR.isConnected())
     {
-        TRY_FUNC(TRANSLATOR.disconnectHap());
-    }
+        if (ui->MicMuteBut->isChecked())
+            ui->MicMuteBut->click();
+        if (ui->TrgMuteBut->isChecked())
+            ui->TrgMuteBut->click();
 
-    if (ConfigUI.m_InputSoundDevId.empty() || ConfigUI.m_OutputSoundDevId.empty())
+        ui->MicMuteBut->setEnabled(false);
+        ui->TrgMuteBut->setEnabled(false);
+
+        TRY_FUNC(TRANSLATOR.disconnectHap());
+
+        ui->SrcUsersList->clear();
+        ui->TrgUsersList->clear();
+
+        ui->LangConnect->setText("Connect");
+    }
+    else if (ConfigUI.m_InputSoundDevId.empty() || ConfigUI.m_OutputSoundDevId.empty())
         QMessageBox::critical(this,"Connecting error","Sound devices are not defined");
     else
     {
@@ -272,8 +284,17 @@ void RemoteTranslatorUI::on_LangConnect_clicked(bool checked)
         // set slider values
         setSliders();
 
-        ui->MicMuteBut->click();
-        ui->TrgMuteBut->click();
+        ui->MicMuteBut->setEnabled(true);
+        ui->TrgMuteBut->setEnabled(true);
+        ui->MicMuteBut->setCheckable(true);
+        ui->TrgMuteBut->setCheckable(true);
+
+        if (!ui->MicMuteBut->isChecked())
+            ui->MicMuteBut->click();
+        if (!ui->TrgMuteBut->isChecked())
+            ui->TrgMuteBut->click();
+
+        ui->LangConnect->setText("Disconnect");
     }
 
     if (checked)
@@ -324,6 +345,12 @@ static void setStatusLabel(QLabel* label, QString name, QString status, QString 
 
 void RemoteTranslatorUI::on_MicMuteBut_clicked(bool checked)
 {
+    if (!TRANSLATOR.isConnected())
+    {
+        QMessageBox::critical(this, "Error:", "You aren't connected!");
+        return;
+    }
+
     if (checked)
     {
         setStatusLabel(ui->MicStatusLbl, "Microphone", "muted", "red", "#5500ff");
@@ -340,6 +367,12 @@ void RemoteTranslatorUI::on_MicMuteBut_clicked(bool checked)
 
 void RemoteTranslatorUI::on_TrgMuteBut_clicked(bool checked)
 {
+    if (!TRANSLATOR.isConnected())
+    {
+        QMessageBox::critical(this, "Error:", "You aren't connected!");
+        return;
+    }
+
     if (checked)
     {
         setStatusLabel(ui->TrgStatusLbl, "Target", "muted", "red", "#5500ff");
