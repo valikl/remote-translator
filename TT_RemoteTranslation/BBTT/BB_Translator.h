@@ -67,7 +67,7 @@ public:
     void disconnectHap();
     void getUsers(std::vector<BB_ChannelUser> &userList, bool isSource);
 
-    void ReconnectSrcChannel(std::wstring srcName);
+    void ReconnectSrcChannel(std::wstring hapName, std::wstring srcName);
 
     bool isConnected() { return m_isConnected; }
 

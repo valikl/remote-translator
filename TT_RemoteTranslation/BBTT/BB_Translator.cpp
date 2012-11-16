@@ -538,7 +538,7 @@ void BB_Translator::StopDstSoundTest()
     m_channelDstTest = NULL;
 }
 
-void BB_Translator::ReconnectSrcChannel(wstring srcName)
+void BB_Translator::ReconnectSrcChannel(wstring hapName, wstring srcName)
 {
     Lock lock(m_cs);
 
@@ -550,6 +550,18 @@ void BB_Translator::ReconnectSrcChannel(wstring srcName)
     BB_InstanceContext context;
     m_channelSrc->getInstanceContext(context);
     context.m_channelName = srcName;
+
+    // Find Happening
+    HappeningEx hap;
+    if (!findHap(hap, hapName))
+    {
+        THROW_EXCEPT("Happening not found");
+    }
+
+    if (!findSrcChannelId(hap, srcName, context.channelId))
+    {
+        THROW_EXCEPT("Source channel not found");
+    }
 
     // Disconnect source channel
     m_channelSrc->finalize();
