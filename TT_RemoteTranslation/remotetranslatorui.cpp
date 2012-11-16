@@ -268,6 +268,8 @@ void RemoteTranslatorUI::on_LangConnect_clicked(bool checked)
         ui->SrcUsersList->clear();
         ui->TrgUsersList->clear();
 
+        ui->TrgLangList->setEnabled(true);
+
         ui->LangConnect->setText("Connect");
     }
     else if (ConfigUI.m_InputSoundDevId.empty() || ConfigUI.m_OutputSoundDevId.empty())
@@ -293,6 +295,8 @@ void RemoteTranslatorUI::on_LangConnect_clicked(bool checked)
             ui->MicMuteBut->click();
         if (!ui->TrgMuteBut->isChecked())
             ui->TrgMuteBut->click();
+
+        ui->TrgLangList->setEnabled(false);
 
         ui->LangConnect->setText("Disconnect");
     }
