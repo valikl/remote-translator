@@ -235,6 +235,9 @@ void RemoteTranslatorUI::on_SrcLangList_currentIndexChanged(const QString &arg1)
 
     int lang_id = ui->SrcLangList->itemData(ui->SrcLangList->currentIndex()).toInt();
     BB_ClientConfigMgr::Instance().SetSrcChannel(hap.m_srcChannels[lang_id]);
+
+    if (TRANSLATOR.isConnected())
+        TRANSLATOR.ReconnectSrcChannel(hap.m_hapName, hap.m_srcChannels[lang_id]);
 }
 
 // Change target language
@@ -415,7 +418,7 @@ void RemoteTranslatorUI::on_ServerSelfTestEn_stateChanged(int checked)
     {
         try
         {
-            TRANSLATOR.StartTargetSoundLoopbackTest(ConfigUI.m_AGC, ConfigUI.m_noiseCancel, -30, ConfigUI.m_echoCancel);
+            TRANSLATOR.StartDstSoundTest();
         }
         catch(BB_Exception excp)
         {
@@ -425,7 +428,7 @@ void RemoteTranslatorUI::on_ServerSelfTestEn_stateChanged(int checked)
     }
     else
     {
-        TRY_FUNC(TRANSLATOR.StopTargetSoundLoopbackTest());
+        TRY_FUNC(TRANSLATOR.StopDstSoundTest());
     }
 }
 
