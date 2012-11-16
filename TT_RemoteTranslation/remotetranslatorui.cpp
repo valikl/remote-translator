@@ -191,10 +191,7 @@ void RemoteTranslatorUI::on_UserTimeout()
 
 RemoteTranslatorUI::~RemoteTranslatorUI()
 {
-    if (TRANSLATOR.isConnected())
-    {
-        TRY_FUNC(BB_ClientConfigMgr::Instance().saveConfig());
-    }
+    TRY_FUNC(BB_ClientConfigMgr::Instance().saveConfig());
     TRY_FUNC(TRANSLATOR.finalize());
     delete ui;
 }
@@ -269,6 +266,7 @@ void RemoteTranslatorUI::on_LangConnect_clicked(bool checked)
         ui->TrgUsersList->clear();
 
         ui->TrgLangList->setEnabled(true);
+        ui->NickName->setEnabled(true);
 
         ui->LangConnect->setText("Connect");
     }
@@ -297,6 +295,7 @@ void RemoteTranslatorUI::on_LangConnect_clicked(bool checked)
             ui->TrgMuteBut->click();
 
         ui->TrgLangList->setEnabled(false);
+        ui->NickName->setEnabled(false);
 
         ui->LangConnect->setText("Disconnect");
     }
@@ -325,7 +324,7 @@ void RemoteTranslatorUI::on_SrcLevelSld_valueChanged(int val)
     TRY_FUNC(TRANSLATOR.UpdateVolumeLevel(ConfigUI.m_SrcVolumeLevel, true));
 }
 
-void RemoteTranslatorUI::on_VideoQualitylSld_valueChanged(int val)
+void RemoteTranslatorUI::on_VideoLvlSld_valueChanged(int val)
 {
     BB_ClientConfigMgr::Instance().SetVideoQuality(ui->VideoLvlSld->value());
     TRY_FUNC(TRANSLATOR.UpdateVideoQuality(ConfigUI.m_VideoQuality));
