@@ -521,7 +521,7 @@ void BB_Translator::StartDstSoundTest()
     context.m_nickName = DST_SOUND_TEST_CHANNEL_NICKNAME;
     m_channelDstTest = new BB_Instance(context);
     m_channelDstTest->init();
-    m_channelDstTest->UpdateVolumeLevel(SOUND_VOLUME_MAX / 2);
+    m_channelDstTest->UpdateVolumeLevel(BB_ClientConfigMgr::Instance().getConfig().m_SrcVolumeLevel);
 }
 
 void BB_Translator::StopDstSoundTest()
@@ -536,4 +536,26 @@ void BB_Translator::StopDstSoundTest()
     m_channelDstTest->finalize();
     delete m_channelDstTest;
     m_channelDstTest = NULL;
+}
+
+void BB_Translator::ReconnectSrcChannel(wstring srcName)
+{
+    Lock lock(m_cs);
+
+    if (!m_isConnected)
+    {
+        THROW_EXCEPT("Cannot re-connect source language. Translator is not connected");
+    }
+
+    BB_InstanceContext context;
+    m_channelSrc->getInstanceContext(context);
+    context.m_channelName = srcName;
+
+    // Disconnect source channel
+    m_channelSrc->finalize();
+    delete m_channelSrc;
+
+    // Connect
+    m_channelSrc = new BB_Instance(context);
+    m_channelSrc->init();
 }
