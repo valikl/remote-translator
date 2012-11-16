@@ -6,16 +6,10 @@
 
 using namespace std;
 
-BB_Translator::BB_Translator()
+BB_Translator::BB_Translator() : m_channelVideo(NULL), m_channelSrc(NULL), m_channelDst(NULL),
+    m_channelDummy(NULL), m_channelDstTest(NULL), m_isLoopbackStarted(false), m_isTargetLoopbackStarted(false),
+    m_isConnected(false)
 {
-    m_channelVideo = NULL;
-    m_channelSrc = NULL;
-    m_channelDst = NULL;
-    m_isConnected = NULL;
-    m_channelDummy = NULL;
-    m_isLoopbackStarted = false;
-    m_isTargetLoopbackStarted = false;
-    m_isConnected = false;
 }
 
 BB_Translator::~BB_Translator(void)
@@ -508,3 +502,38 @@ void BB_Translator::OpenVideoWindow(HWND hWnd)
     m_channelVideo->OpenVideoWindow(hWnd);
 }
 
+void BB_Translator::StartDstSoundTest()
+{
+    Lock lock(m_cs);
+
+    if (!m_isConnected)
+    {
+        THROW_EXCEPT("Cannot start target sound test. Translator is not connected");
+    }
+
+    if (m_channelDstTest != NULL)
+    {
+        THROW_EXCEPT("Target sound test already started");
+    }
+
+    BB_InstanceContext context;
+    m_channelDst->getInstanceContext(context);
+    context.m_nickName = DST_SOUND_TEST_CHANNEL_NICKNAME;
+    m_channelDstTest = new BB_Instance(context);
+    m_channelDstTest->init();
+    m_channelDstTest->UpdateVolumeLevel(SOUND_VOLUME_MAX / 2);
+}
+
+void BB_Translator::StopDstSoundTest()
+{
+    Lock lock(m_cs);
+
+    if (m_channelDstTest == NULL)
+    {
+        THROW_EXCEPT("Target sound test not started");
+    }
+
+    m_channelDstTest->finalize();
+    delete m_channelDstTest;
+    m_channelDstTest = NULL;
+}

@@ -17,6 +17,8 @@ const std::wstring SRC_CHANNEL_PREFIX(L"SRC_");
 const std::wstring DST_CHANNEL_PREFIX(L"DST_");
 const std::wstring VIDEO_CHANNEL_PREFIX(L"VIDEO_");
 
+const std::wstring DST_SOUND_TEST_CHANNEL_NICKNAME(L"DstSoundTestUser");
+
 const std::wstring HAPPENING_CHANNEL_DEFAULT_NAME(L"");
 
 struct Happening
@@ -87,6 +89,9 @@ public:
     void SetAGCEnable(bool bEnable, const AGC *agc = NULL);
     // Microphone(target)
     void GetMicrophoneLevel(INT32 &level);
+    // Destination sound test
+    void StartDstSoundTest();
+    void StopDstSoundTest();
 
     // Video
     void OpenVideoWindow(HWND hWnd);
@@ -110,6 +115,7 @@ private:
 	BB_Instance *m_channelSrc;
 	BB_Instance *m_channelDst;
     BB_Instance *m_channelDummy;
+    BB_Instance *m_channelDstTest;
 
 	// Happening list for GUI
 	std::vector<Happening> m_hapList;

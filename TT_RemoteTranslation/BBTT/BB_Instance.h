@@ -1,6 +1,3 @@
-#ifndef _BB_INSTANCE_H_
-#define _BB_INSTANCE_H_
-
 #pragma once
 
 #ifdef WIN32
@@ -77,6 +74,8 @@ public:
     // the thread procedure
     virtual void run();
 
+    void getInstanceContext(BB_InstanceContext &context) { context = m_context; }
+
 	// We don't want to call TT functions in Ctor & Dtor
 	// Use init and finalize instead
     void init();
@@ -124,7 +123,7 @@ private:
 
 	TTInstance* m_ttInst;
 
-	BB_InstanceContext m_context;
+    BB_InstanceContext m_context;
 
 	INT32 m_channelId;
 
@@ -138,6 +137,4 @@ private:
     HWND m_hWnd;
 };
 
-
-#endif
 
