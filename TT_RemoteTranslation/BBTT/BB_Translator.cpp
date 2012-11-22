@@ -1,5 +1,4 @@
 #include "BB_Translator.h"
-#include "BB_ClientConfigMgr.h"
 #include "Utils.h"
 #include "Utils/Lock.h"
 #include "Utils/BB_Exception.h"
@@ -89,7 +88,7 @@ void BB_Translator::connectHap(wstring hapName, wstring nickName, wstring srcNam
 	}
 	context.m_nickName = SRC_CHANNEL_PREFIX + nickName;
 	context.m_channelName = srcName;
-	m_channelSrc = new BB_Instance(context);
+    m_channelSrc = new BB_InstanceAudio(context);
 	m_channelSrc->init();
 
 	if (!findDstChannelId(hap, dstName, context.channelId))
@@ -98,13 +97,13 @@ void BB_Translator::connectHap(wstring hapName, wstring nickName, wstring srcNam
 	}
 	context.m_nickName = DST_CHANNEL_PREFIX + nickName;
 	context.m_channelName = dstName;
-	m_channelDst = new BB_Instance(context);
+    m_channelDst = new BB_InstanceAudio(context);
 	m_channelDst->init(); 
 
 	context.channelId = hap.m_videoChannel.m_id;
 	context.m_nickName = VIDEO_CHANNEL_PREFIX + nickName;
 	context.m_channelName = VIDEO_CHANNEL_NAME;
-    m_channelVideo = new BB_Instance(context);
+    m_channelVideo = new BB_InstanceVideo(context);
     m_channelVideo->init();
 
     m_isConnected = true;
@@ -125,8 +124,8 @@ void BB_Translator::init()
     BB_InstanceContext context;
     initInstanceContext(context);
 
-    m_channelDummy = new BB_Instance(context);
-    m_channelDummy->getInstance();
+    m_channelDummy = new BB_InstanceAudio(context);
+    m_channelDummy->login();
 
 	std::vector<BB_Channel> channels;
     m_channelDummy->getChannels(channels);
@@ -519,7 +518,7 @@ void BB_Translator::StartDstSoundTest()
     BB_InstanceContext context;
     m_channelDst->getInstanceContext(context);
     context.m_nickName = DST_SOUND_TEST_CHANNEL_NICKNAME;
-    m_channelDstTest = new BB_Instance(context);
+    m_channelDstTest = new BB_InstanceAudio(context);
     m_channelDstTest->init();
     m_channelDstTest->UpdateVolumeLevel(BB_ClientConfigMgr::Instance().getConfig().m_SrcVolumeLevel);
 }
@@ -568,6 +567,6 @@ void BB_Translator::ReconnectSrcChannel(wstring hapName, wstring srcName)
     delete m_channelSrc;
 
     // Connect
-    m_channelSrc = new BB_Instance(context);
+    m_channelSrc = new BB_InstanceAudio(context);
     m_channelSrc->init();
 }

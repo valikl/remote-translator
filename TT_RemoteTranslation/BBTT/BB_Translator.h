@@ -7,6 +7,9 @@
 #include <string>
 
 #include "BB_Instance.h"
+#include "BB_ClientConfigMgr.h"
+#include "BB_InstanceAudio.h"
+#include "BB_InstanceVideo.h"
 #include "Utils/CriticalSection.h"
 
 const std::wstring VIDEO_CHANNEL_NAME(L"Video");
@@ -113,11 +116,11 @@ private:
 
     void initInstanceContext(BB_InstanceContext &context);
 
-	BB_Instance *m_channelVideo;
-	BB_Instance *m_channelSrc;
-	BB_Instance *m_channelDst;
-    BB_Instance *m_channelDummy;
-    BB_Instance *m_channelDstTest;
+    BB_InstanceVideo *m_channelVideo;
+    BB_InstanceAudio *m_channelSrc;
+    BB_InstanceAudio *m_channelDst;
+    BB_InstanceAudio *m_channelDummy;
+    BB_InstanceAudio *m_channelDstTest;
 
 	// Happening list for GUI
 	std::vector<Happening> m_hapList;
