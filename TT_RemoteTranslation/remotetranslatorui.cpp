@@ -358,12 +358,14 @@ void RemoteTranslatorUI::on_MicMuteBut_clicked(bool checked)
 
     if (checked)
     {
+        TRY_FUNC(TRANSLATOR.UpdateMicrophoneGainLevel(SOUND_GAIN_MIN));
         setStatusLabel(ui->MicStatusLbl, "Microphone", "muted", "red", "#5500ff");
         BB_ClientConfigMgr::Instance().SetMicMute(true);
         TRY_FUNC(TRANSLATOR.MuteMicrophone(true));
     }
     else
     {
+        TRY_FUNC(TRANSLATOR.UpdateMicrophoneGainLevel(ConfigUI.m_MicGainLevel));
         setStatusLabel(ui->MicStatusLbl, "Microphone", "active", "green", "white");
         BB_ClientConfigMgr::Instance().SetMicMute(false);
         TRY_FUNC(TRANSLATOR.MuteMicrophone(false));
