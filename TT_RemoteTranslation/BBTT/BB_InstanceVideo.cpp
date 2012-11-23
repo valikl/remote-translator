@@ -176,6 +176,3 @@ bool BB_InstanceVideo::IsFrameDropped(int frameIdx, vector<int>& droppedFrames)
     return it != droppedFrames.end();
 }
 
-void BB_InstanceVideo::UpdateVideoQuality(int videoQuality)
-{
-}
