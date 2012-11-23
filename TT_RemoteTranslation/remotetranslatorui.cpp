@@ -330,7 +330,6 @@ void RemoteTranslatorUI::on_SrcLevelSld_valueChanged(int val)
 void RemoteTranslatorUI::on_VideoLvlSld_valueChanged(int val)
 {
     BB_ClientConfigMgr::Instance().SetVideoQuality(ui->VideoLvlSld->value());
-    TRY_FUNC(TRANSLATOR.UpdateVideoQuality(ConfigUI.m_VideoQuality));
 }
 
 static QString getMuteButtonFormat(QString name, QString status, QString bg_color, QString fg_color)

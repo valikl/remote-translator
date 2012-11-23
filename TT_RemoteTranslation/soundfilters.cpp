@@ -77,6 +77,9 @@ void SoundFilters::on_FiltersOK_accepted()
 
     //To add Noise activation functions
     //Enable all activated filters
+    if (!TRANSLATOR.isConnected())
+        return;
+
     TRY_FUNC(TRANSLATOR.SetAGCEnable(ConfigUI.m_AGC.m_enable, &(ConfigUI.m_AGC)));
     TRY_FUNC(TRANSLATOR.EnableEchoCancellation(ConfigUI.m_echoCancel));
     TRY_FUNC(TRANSLATOR.EnableDenoising(ConfigUI.m_noiseCancel));
