@@ -72,7 +72,7 @@ public:
     void getInstanceContext(BB_InstanceContext &context) { context = m_context; }
 
     // Return users list
-    void getUsers(std::vector<BB_ChannelUser> &userList);
+    virtual void getUsers(std::vector<BB_ChannelUser> &userList);
 
     // Return channels list
     void getChannels(std::vector<BB_Channel> &channels);

@@ -38,7 +38,7 @@ int BB_InstanceVideo::GetVideoUserId()
     }
     catch(BB_Exception excp)
     {
-        THROW_EXCEPT("Video User not found. Cannot open Video window");
+        THROW_EXCEPT("Video stream does not exist");
     }
 
     // Check if Video User exists
@@ -50,7 +50,7 @@ int BB_InstanceVideo::GetVideoUserId()
         }
     }
 
-    THROW_EXCEPT("Video User not found. Cannot open Video window");
+    THROW_EXCEPT("Video stream does not exist");
 }
 
 void BB_InstanceVideo::OpenVideoWindow(HWND hEffectiveWnd)
