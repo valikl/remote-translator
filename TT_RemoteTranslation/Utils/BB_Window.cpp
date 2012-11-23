@@ -101,10 +101,9 @@ void BB_Window::run()
 
 void BB_Window::BBDestroy()
 {
-    if (!DestroyWindow(m_hWnd))
+    if (!SendMessage(m_hWnd, WM_CLOSE, NULL, NULL))
     {
-        int err = GetLastError();
-        cout << "Destroy Window failed with error " << err << endl;
+        cout << "Close Window failed with error " << GetLastError() << endl;
     }
 }
 

@@ -17,6 +17,9 @@ public:
     virtual void init();
     virtual void finalize();
 
+    // Return users list
+    virtual void getUsers(std::vector<BB_ChannelUser> &userList);
+
     void initSoundDevices();
     void closeSoundDevices();
 
@@ -34,6 +37,10 @@ public:
     void EnableVoiceActivation(bool bEnable, int voiceactSlider = 0);
     void SetAGCEnable(bool bEnable, const AGC *agc = NULL);
     void GetMicrophoneLevel(int &level);
+
+private:
+
+    bool m_isMuted;
 };
 
 

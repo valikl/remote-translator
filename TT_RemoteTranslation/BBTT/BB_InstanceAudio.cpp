@@ -11,6 +11,7 @@ using namespace std;
 BB_InstanceAudio::BB_InstanceAudio(const BB_InstanceContext &context) :
     BB_Instance(context)
 {
+    m_isMuted = true;
 }
 
 BB_InstanceAudio::~BB_InstanceAudio(void)
@@ -113,6 +114,7 @@ void BB_InstanceAudio::MuteMicrophone(bool bMute)
     {
         THROW_EXCEPT("Mute Microphone failed");
     }
+    m_isMuted = bMute;
 }
 
 void BB_InstanceAudio::MuteTarget(bool bMute)
@@ -192,3 +194,19 @@ void BB_InstanceAudio::GetMicrophoneLevel(INT32 &level)
     level = TT_GetSoundInputLevel(m_ttInst);
 }
 
+void BB_InstanceAudio::getUsers(std::vector<BB_ChannelUser> &userList)
+{
+    BB_Instance::getUsers(userList);
+    if (!m_isMuted)
+    {
+        // Set local user Active
+        for (unsigned int i = 0; i < userList.size(); i++)
+        {
+            if (userList[i].m_userName == m_context.m_nickName)
+            {
+                userList[i].m_isActive = true;
+                break;
+            }
+        }
+    }
+}
