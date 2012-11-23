@@ -30,6 +30,7 @@ private:
     static bool IsFrameDropped(int frameIdx, std::vector<int>& droppedFrames);
 
     void StopVideoThreads();
+    int GetVideoUserId();
 
     BB_Window *m_videoWin;
     Thread *m_videoWinThread;

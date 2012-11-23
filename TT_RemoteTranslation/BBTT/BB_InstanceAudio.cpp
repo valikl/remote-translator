@@ -26,7 +26,7 @@ void BB_InstanceAudio::init()
 void BB_InstanceAudio::finalize()
 {
     closeSoundDevices();
-    BB_Instance::init();
+    BB_Instance::finalize();
 }
 
 void BB_InstanceAudio::closeSoundDevices()

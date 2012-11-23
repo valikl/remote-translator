@@ -29,8 +29,35 @@ BB_InstanceVideo::~BB_InstanceVideo(void)
     }
 }
 
+int BB_InstanceVideo::GetVideoUserId()
+{
+    std::vector<BB_ChannelUser> userList;
+    try
+    {
+        getUsers(userList);
+    }
+    catch(BB_Exception excp)
+    {
+        THROW_EXCEPT("Video User not found. Cannot open Video window");
+    }
+
+    // Check if Video User exists
+    for (unsigned int i = 0; i < userList.size(); i++)
+    {
+        if (userList[i].m_isVideo)
+        {
+            return userList[i].m_id;
+        }
+    }
+
+    THROW_EXCEPT("Video User not found. Cannot open Video window");
+}
+
 void BB_InstanceVideo::OpenVideoWindow(HWND hEffectiveWnd)
 {
+    // Check if Video User exists. If not exist - exception is thrown
+    GetVideoUserId();
+
     if (m_videoWinThread != NULL)
     {
         if (m_videoWin->IsActive())
@@ -73,26 +100,10 @@ void BB_InstanceVideo::StopVideoThreads()
 
 void BB_InstanceVideo::run()
 {
-    std::vector<BB_ChannelUser> userList;
-
+    int userId;
     TRY_BLOCK_RETURN_ON_ERR(
-        getUsers(userList);
+        userId = GetVideoUserId();
     );
-
-    int userId = -1;
-    for (unsigned int i = 0; i < userList.size(); i++)
-    {
-        if (userList[i].m_isVideo)
-        {
-            userId = userList[i].m_id;
-            break;
-        }
-    }
-
-    if (userId == -1)
-    {
-        return;
-    }
 
     int cmdId = TT_DoSubscribe(m_ttInst, userId, (SUBSCRIBE_VIDEO | SUBSCRIBE_INTERCEPT_VIDEO));
     if(cmdId > 0)
