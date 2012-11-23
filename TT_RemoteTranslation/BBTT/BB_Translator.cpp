@@ -397,17 +397,6 @@ void BB_Translator::MuteTarget(bool bMute)
     m_channelDst->MuteTarget(bMute);
 }
 
-void BB_Translator::UpdateVideoQuality(int videoQuality)
-{
-    Lock lock(m_cs);
-
-    if (!m_isConnected)
-    {
-        THROW_EXCEPT("Cannot update video quality. Translator is not connected");
-    }
-    m_channelVideo->UpdateVideoQuality(videoQuality);
-}
-
 void BB_Translator::UpdateVolumeLevel(int volumeLevel, bool isSource)
 {
     Lock lock(m_cs);

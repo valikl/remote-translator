@@ -23,7 +23,6 @@ public:
 
     // Operations
     void OpenVideoWindow(HWND hWnd);
-    void UpdateVideoQuality(int videoQuality);
 
 private:
 		

@@ -85,7 +85,6 @@ public:
     void MuteTarget(bool bMute);
     void UpdateVolumeLevel(int volumeLevel, bool isSource);
     void UpdateMicrophoneGainLevel(int gainLevel);
-    void UpdateVideoQuality(int videoQuality);
     void EnableDenoising(bool bEnable);
     void EnableEchoCancellation(bool bEnable);
     // Target
