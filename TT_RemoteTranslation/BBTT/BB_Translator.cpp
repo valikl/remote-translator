@@ -113,6 +113,7 @@ void BB_Translator::finalize()
 {
     if (m_channelDummy)
     {
+        m_channelDummy->finalize();
         delete m_channelDummy;
     }
     disconnectHap();
@@ -135,6 +136,7 @@ void BB_Translator::init()
         THROW_EXCEPT("Cannot build happenings list");
 	}
 
+    m_soundDevList.clear();
     m_channelDummy->getSoundDevices(m_soundDevList);
 }
 
