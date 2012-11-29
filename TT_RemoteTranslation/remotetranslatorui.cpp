@@ -65,13 +65,32 @@ void RemoteTranslatorUI::initMainConfig()
 
 void RemoteTranslatorUI::changeMainConfig()
 {
+    ui->SrcUsersList->clear();
+    ui->TrgUsersList->clear();
+
+    TRY_FUNC(TRANSLATOR.finalize());
+
+    // init translator
+    try
+    {
+        TRANSLATOR.init();
+    }
+    catch(BB_Exception excp)
+    {
+        QMessageBox::critical(this, "Error:", QString::fromStdWString(excp.GetInfo()));
+        init();
+        return;
+    }
+
+    // init main configuration
     initMainConfig();
+
+    // activate buttons and devices
+    activateButtons();
 }
 
-void RemoteTranslatorUI::init()
+void RemoteTranslatorUI::initTranslator()
 {
-    TRY_FUNC(BB_ClientConfigMgr::Instance().init(false));
-//    TRY_FUNC(TRANSLATOR.init());
     try
     {
         TRANSLATOR.init();
@@ -80,10 +99,10 @@ void RemoteTranslatorUI::init()
     {
         QMessageBox::critical(this, "Error:", QString::fromStdWString(excp.GetInfo()));
     }
+}
 
-    // init main configuration
-    initMainConfig();
-
+void RemoteTranslatorUI::activateButtons()
+{
     // activate sound devices
     connect(ui->actionConfigure_Audio, SIGNAL(triggered()), this, SLOT(ActivateSoundDevices()));
     connect(ui->actionAudio_Filters, SIGNAL(triggered()), this, SLOT(ActivateAudioFilters()));
@@ -104,6 +123,20 @@ void RemoteTranslatorUI::init()
     user_timer = new QTimer(this);
     connect(user_timer, SIGNAL(timeout()), this, SLOT(on_UserTimeout()));
     user_timer->start(1000);
+}
+
+void RemoteTranslatorUI::init()
+{
+    TRY_FUNC(BB_ClientConfigMgr::Instance().init(false));
+
+    // init translator
+    TRY_FUNC(initTranslator());
+
+    // init main configuration
+    initMainConfig();
+
+    // activate buttons and devices
+    activateButtons();
 }
 
 void RemoteTranslatorUI::enableAudioFilters()

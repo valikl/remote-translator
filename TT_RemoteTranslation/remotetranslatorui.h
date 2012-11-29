@@ -30,9 +30,7 @@ public:
     explicit RemoteTranslatorUI(QWidget *parent = 0);
     ~RemoteTranslatorUI();
 
-    void initMainConfig();
     void init();
-
     void enableAudioFilters();
 
 public slots:
@@ -72,6 +70,10 @@ private slots:
     void on_showVideoButton_clicked(bool clicked);
 
 private:
+
+    void initMainConfig();
+    void initTranslator();
+    void activateButtons();
 
     void initHapsMenu();
     void setSliders();
