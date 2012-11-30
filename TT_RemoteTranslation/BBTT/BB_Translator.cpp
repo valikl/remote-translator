@@ -82,29 +82,38 @@ void BB_Translator::connectHap(wstring hapName, wstring nickName, wstring srcNam
         THROW_EXCEPT("Happening not found");
 	}
 
-	if (!findSrcChannelId(hap, srcName, context.channelId))
-	{
-        THROW_EXCEPT("Source channel not found");
-	}
-	context.m_nickName = SRC_CHANNEL_PREFIX + nickName;
-	context.m_channelName = srcName;
-    m_channelSrc = new BB_InstanceAudio(context);
-	m_channelSrc->init();
+    try
+    {
+        if (!findSrcChannelId(hap, srcName, context.channelId))
+        {
+            THROW_EXCEPT("Source channel not found");
+        }
+        context.m_nickName = SRC_CHANNEL_PREFIX + nickName;
+        context.m_channelName = srcName;
+        m_channelSrc = new BB_InstanceAudio(context);
+        m_channelSrc->init();
 
-	if (!findDstChannelId(hap, dstName, context.channelId))
-	{
-        THROW_EXCEPT("Destination channel not found");
-	}
-	context.m_nickName = DST_CHANNEL_PREFIX + nickName;
-	context.m_channelName = dstName;
-    m_channelDst = new BB_InstanceAudio(context);
-	m_channelDst->init(); 
+        if (!findDstChannelId(hap, dstName, context.channelId))
+        {
+            THROW_EXCEPT("Destination channel not found");
+        }
+        context.m_nickName = DST_CHANNEL_PREFIX + nickName;
+        context.m_channelName = dstName;
+        m_channelDst = new BB_InstanceAudio(context);
+        m_channelDst->init();
 
-	context.channelId = hap.m_videoChannel.m_id;
-	context.m_nickName = VIDEO_CHANNEL_PREFIX + nickName;
-	context.m_channelName = VIDEO_CHANNEL_NAME;
-    m_channelVideo = new BB_InstanceVideo(context);
-    m_channelVideo->init();
+        context.channelId = hap.m_videoChannel.m_id;
+        context.m_nickName = VIDEO_CHANNEL_PREFIX + nickName;
+        context.m_channelName = VIDEO_CHANNEL_NAME;
+        m_channelVideo = new BB_InstanceVideo(context);
+        m_channelVideo->init();
+    }
+    catch(BB_Exception excp)
+    {
+        lock.Unlock();
+        disconnectHap();
+        THROW_EXCEPT(excp.GetInfo());
+    }
 
     m_isConnected = true;
 }
@@ -115,6 +124,7 @@ void BB_Translator::finalize()
     {
         m_channelDummy->finalize();
         delete m_channelDummy;
+        m_channelDummy = NULL;
     }
     disconnectHap();
 }
@@ -126,18 +136,35 @@ void BB_Translator::init()
     initInstanceContext(context);
 
     m_channelDummy = new BB_InstanceAudio(context);
-    m_channelDummy->login();
+    try
+    {
+        m_channelDummy->login();
+    }
+    catch(BB_Exception excp)
+    {
+        delete m_channelDummy;
+        m_channelDummy = NULL;
+        THROW_EXCEPT(excp.GetInfo());
+    }
 
-	std::vector<BB_Channel> channels;
-    m_channelDummy->getChannels(channels);
+    try
+    {
+        std::vector<BB_Channel> channels;
+        m_channelDummy->getChannels(channels);
 
-    if (initHapsList(channels) != EXIT_SUCCESS)
-	{
-        THROW_EXCEPT("Cannot build happenings list");
-	}
+        if (initHapsList(channels) != EXIT_SUCCESS)
+        {
+            THROW_EXCEPT("Cannot build happenings list");
+        }
 
-    m_soundDevList.clear();
-    m_channelDummy->getSoundDevices(m_soundDevList);
+        m_soundDevList.clear();
+        m_channelDummy->getSoundDevices(m_soundDevList);
+    }
+    catch(BB_Exception excp)
+    {
+        finalize();
+        THROW_EXCEPT(excp.GetInfo());
+    }
 }
 
 int BB_Translator::initHapsList(const std::vector<BB_Channel> &channels)
