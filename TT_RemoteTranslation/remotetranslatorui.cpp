@@ -65,12 +65,13 @@ void RemoteTranslatorUI::initMainConfig()
 
 void RemoteTranslatorUI::changeMainConfig()
 {
-    ui->SrcUsersList->clear();
-    ui->TrgUsersList->clear();
+    if (TRANSLATOR.isConnected())
+        disconnectTranslator();
 
+    // stop translator
     TRY_FUNC(TRANSLATOR.finalize());
 
-    // init translator
+    // try to activate translator with new configuration
     try
     {
         TRANSLATOR.init();
@@ -78,15 +79,16 @@ void RemoteTranslatorUI::changeMainConfig()
     catch(BB_Exception excp)
     {
         QMessageBox::critical(this, "Error:", QString::fromStdWString(excp.GetInfo()));
-        init();
-        return;
+
+        // restore default configuration
+        TRY_FUNC_WITH_RETURN(BB_ClientConfigMgr::Instance().init(false));
+
+        // activate translator
+        TRY_FUNC_WITH_RETURN(initTranslator());
     }
 
-    // init main configuration
+    // set configuration
     initMainConfig();
-
-    // activate buttons and devices
-    activateButtons();
 }
 
 void RemoteTranslatorUI::initTranslator()
@@ -127,12 +129,12 @@ void RemoteTranslatorUI::activateButtons()
 
 void RemoteTranslatorUI::init()
 {
-    TRY_FUNC(BB_ClientConfigMgr::Instance().init(false));
+    TRY_FUNC_WITH_RETURN(BB_ClientConfigMgr::Instance().init(false));
 
-    // init translator
-    TRY_FUNC(initTranslator());
+    // activate translator
+    TRY_FUNC_WITH_RETURN(initTranslator());
 
-    // init main configuration
+    // set configuration
     initMainConfig();
 
     // activate buttons and devices
@@ -182,11 +184,20 @@ void RemoteTranslatorUI::ActivateManConnect()
 
 void RemoteTranslatorUI::RestoreDefaultConfig()
 {
-    ui->SrcUsersList->clear();
-    ui->TrgUsersList->clear();
+    if (TRANSLATOR.isConnected())
+        disconnectTranslator();
+
+    // stop translator
     TRY_FUNC(TRANSLATOR.finalize());
+
+    // restore default coinfiguration
     TRY_FUNC(BB_ClientConfigMgr::Instance().init(true));
-    init();
+
+    // activate translator
+    TRY_FUNC(initTranslator());
+
+    // init main configuration
+    initMainConfig();
 }
 
 void RemoteTranslatorUI::setUserItems(bool is_source)
@@ -283,58 +294,66 @@ void RemoteTranslatorUI::on_TrgLangList_currentIndexChanged(const QString &arg1)
     BB_ClientConfigMgr::Instance().SetTrgChannel(hap.m_dstChannels[lang_id]);
 }
 
+// Connect translator
+void RemoteTranslatorUI::connectTranslator()
+{
+    TRY_FUNC(TRANSLATOR.connectHap(HAPPENING_CHANNEL_DEFAULT_NAME, ConfigUI.m_NickName,
+                                   ConfigUI.m_SrcChannel, ConfigUI.m_TrgChannel,
+                                   ConfigUI.m_InputSoundDevId, ConfigUI.m_OutputSoundDevId));
+
+    //Activate Audio filters
+    enableAudioFilters();
+
+    // set slider values
+    setSliders();
+
+    ui->MicMuteBut->setEnabled(true);
+    ui->TrgMuteBut->setEnabled(true);
+    ui->MicMuteBut->setCheckable(true);
+    ui->TrgMuteBut->setCheckable(true);
+
+    if (!ui->MicMuteBut->isChecked())
+        ui->MicMuteBut->click();
+    if (!ui->TrgMuteBut->isChecked())
+        ui->TrgMuteBut->click();
+
+    ui->TrgLangList->setEnabled(false);
+    ui->NickName->setEnabled(false);
+
+    ui->LangConnect->setText("Disconnect");
+}
+
+// Disconnect translator
+void RemoteTranslatorUI::disconnectTranslator()
+{
+    if (ui->MicMuteBut->isChecked())
+        ui->MicMuteBut->click();
+    if (ui->TrgMuteBut->isChecked())
+        ui->TrgMuteBut->click();
+
+    ui->MicMuteBut->setEnabled(false);
+    ui->TrgMuteBut->setEnabled(false);
+
+    TRY_FUNC(TRANSLATOR.disconnectHap());
+
+    ui->SrcUsersList->clear();
+    ui->TrgUsersList->clear();
+
+    ui->TrgLangList->setEnabled(true);
+    ui->NickName->setEnabled(true);
+
+    ui->LangConnect->setText("Connect");
+}
+
 // Connect to choosen languages
 void RemoteTranslatorUI::on_LangConnect_clicked(bool checked)
 {
     if (TRANSLATOR.isConnected())
-    {
-        if (ui->MicMuteBut->isChecked())
-            ui->MicMuteBut->click();
-        if (ui->TrgMuteBut->isChecked())
-            ui->TrgMuteBut->click();
-
-        ui->MicMuteBut->setEnabled(false);
-        ui->TrgMuteBut->setEnabled(false);
-
-        TRY_FUNC(TRANSLATOR.disconnectHap());
-
-        ui->SrcUsersList->clear();
-        ui->TrgUsersList->clear();
-
-        ui->TrgLangList->setEnabled(true);
-        ui->NickName->setEnabled(true);
-
-        ui->LangConnect->setText("Connect");
-    }
+        disconnectTranslator();
     else if (ConfigUI.m_InputSoundDevId.empty() || ConfigUI.m_OutputSoundDevId.empty())
         QMessageBox::critical(this,"Connecting error","Sound devices are not defined");
     else
-    {
-        TRY_FUNC(TRANSLATOR.connectHap(HAPPENING_CHANNEL_DEFAULT_NAME, ConfigUI.m_NickName,
-                                       ConfigUI.m_SrcChannel, ConfigUI.m_TrgChannel,
-                                       ConfigUI.m_InputSoundDevId, ConfigUI.m_OutputSoundDevId));
-
-        //Activate Audio filters
-        enableAudioFilters();
-
-        // set slider values
-        setSliders();
-
-        ui->MicMuteBut->setEnabled(true);
-        ui->TrgMuteBut->setEnabled(true);
-        ui->MicMuteBut->setCheckable(true);
-        ui->TrgMuteBut->setCheckable(true);
-
-        if (!ui->MicMuteBut->isChecked())
-            ui->MicMuteBut->click();
-        if (!ui->TrgMuteBut->isChecked())
-            ui->TrgMuteBut->click();
-
-        ui->TrgLangList->setEnabled(false);
-        ui->NickName->setEnabled(false);
-
-        ui->LangConnect->setText("Disconnect");
-    }
+        connectTranslator();
 
     if (checked)
         ui->LangConnect->setChecked(false);

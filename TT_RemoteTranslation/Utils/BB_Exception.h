@@ -63,6 +63,17 @@ catch(BB_Exception excp) \
     QMessageBox::critical(this, "Error:", QString::fromStdWString(excp.GetInfo())); \
 }
 
+#define TRY_FUNC_WITH_RETURN(func) \
+try \
+{ \
+    (func); \
+} \
+catch(BB_Exception excp) \
+{ \
+    QMessageBox::critical(this, "Error:", QString::fromStdWString(excp.GetInfo())); \
+    return; \
+}
+
 #define TRY_BLOCK(block) \
 try \
 { \

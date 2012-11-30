@@ -79,6 +79,9 @@ private:
     void setSliders();
     void setUserItems(bool is_source);
 
+    void connectTranslator();
+    void disconnectTranslator();
+
     std::vector<Happening> happenings;
 
     Ui::RemoteTranslatorUI *ui;
