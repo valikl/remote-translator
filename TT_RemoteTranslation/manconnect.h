@@ -14,7 +14,10 @@ class ManConnect : public QDialog
 public:
     explicit ManConnect(QWidget *parent = 0);
     ~ManConnect();
-    
+
+signals:
+    void configChanged();
+
 private slots:
 
     void on_ConnectAccept_accepted();

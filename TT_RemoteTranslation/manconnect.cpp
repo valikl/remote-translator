@@ -4,6 +4,13 @@
 #include "manconnect.h"
 #include "ui_manconnect.h"
 
+#define CHANGE_IF_NEEDED(getval, setval, val, is_changed) \
+if ((getval) != (val)) \
+{ \
+    setval(val); \
+    is_changed = true; \
+}
+
 ManConnect::ManConnect(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::ManConnect)
@@ -21,7 +28,7 @@ ManConnect::ManConnect(QWidget *parent) :
     ui->UserPassword->setText(QString::fromStdWString(ConfigUI.m_srvUserPsw));
     ui->NickName->setText(QString::fromStdWString(ConfigUI.m_NickName));
 
-    connect(ui->ConnectAccept, SIGNAL(accepted()), this->parent(), SLOT(changeMainConfig()));
+    connect(this, SIGNAL(configChanged()), this->parent(), SLOT(changeMainConfig()));
 }
 
 ManConnect::~ManConnect()
@@ -31,14 +38,19 @@ ManConnect::~ManConnect()
 
 void ManConnect::on_ConnectAccept_accepted()
 {
+    bool is_changed = false;
+
     // Accept server data
-    BB_ClientConfigMgr::Instance().SetIP(ui->ServerIP->text().toStdWString());
-    BB_ClientConfigMgr::Instance().SetSrvPsw(ui->ServerPassword->text().toStdWString());
-    BB_ClientConfigMgr::Instance().SetTCP(ui->TcpPort->text().toInt());
-    BB_ClientConfigMgr::Instance().SetUDP(ui->UdpPort->text().toInt());
+    CHANGE_IF_NEEDED(ConfigUI.m_IP, BB_ClientConfigMgr::Instance().SetIP, ui->ServerIP->text().toStdWString(), is_changed);
+    CHANGE_IF_NEEDED(ConfigUI.m_srvPsw, BB_ClientConfigMgr::Instance().SetSrvPsw, ui->ServerPassword->text().toStdWString(), is_changed);
+    CHANGE_IF_NEEDED(ConfigUI.m_TCP, BB_ClientConfigMgr::Instance().SetTCP, ui->TcpPort->text().toInt(), is_changed);
+    CHANGE_IF_NEEDED(ConfigUI.m_UDP, BB_ClientConfigMgr::Instance().SetUDP, ui->UdpPort->text().toInt(), is_changed);
 
     // Accept user data
-    BB_ClientConfigMgr::Instance().SetSrvUser(ui->UserName->text().toStdWString());
-    BB_ClientConfigMgr::Instance().SetSrvUserPsw(ui->UserPassword->text().toStdWString());
-    BB_ClientConfigMgr::Instance().SetNickName(ui->NickName->text().toStdWString());
+    CHANGE_IF_NEEDED(ConfigUI.m_srvUser, BB_ClientConfigMgr::Instance().SetSrvUser, ui->UserName->text().toStdWString(), is_changed);
+    CHANGE_IF_NEEDED(ConfigUI.m_srvUserPsw, BB_ClientConfigMgr::Instance().SetSrvUserPsw, ui->UserPassword->text().toStdWString(), is_changed);
+    CHANGE_IF_NEEDED(ConfigUI.m_NickName, BB_ClientConfigMgr::Instance().SetNickName, ui->NickName->text().toStdWString(), is_changed);
+
+    if (is_changed)
+        emit configChanged();
 }
