@@ -17,6 +17,8 @@ RemoteTranslatorUI::RemoteTranslatorUI(QWidget *parent) :
 
 void RemoteTranslatorUI::initHapsMenu()
 {
+    ui->HapList->clear();
+
     // get list of happenings
     TRY_BLOCK(
         happenings = TRANSLATOR.getHappenings();
