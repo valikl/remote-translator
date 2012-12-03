@@ -40,10 +40,10 @@ void RemoteTranslatorUI::setSliders()
     ui->MicGainSld->setRange(SOUND_GAIN_MIN, gainMax);
     ui->MicGainSld->setValue(ConfigUI.m_MicGainLevel);
 
-    ui->TrgLvlSld->setRange(SOUND_VOLUME_MIN, SOUND_VOLUME_MAX*(gainMax/SOUND_GAIN_DEFAULT));
+    ui->TrgLvlSld->setRange(SOUND_VOLUME_MIN, SOUND_VOLUME_MAX);
     ui->TrgLvlSld->setValue(ConfigUI.m_TrgVolumeLevel);
 
-    ui->SrcLevelSld->setRange(SOUND_VOLUME_MIN, SOUND_VOLUME_MAX*(gainMax/SOUND_GAIN_DEFAULT));
+    ui->SrcLevelSld->setRange(SOUND_VOLUME_MIN, SOUND_VOLUME_MAX);
     ui->SrcLevelSld->setValue(ConfigUI.m_SrcVolumeLevel);
 
     ui->VideoLvlSld->setMinimum(50);
@@ -208,7 +208,7 @@ void RemoteTranslatorUI::setUserItems(bool is_source)
         return;
 
     vector<BB_ChannelUser> users;
-    TRY_FUNC(TRANSLATOR.getUsers(users, is_source));
+    TRY_FUNC_WITH_RETURN(TRANSLATOR.getUsers(users, is_source));
 
     QListWidget* users_list = is_source ? ui->SrcUsersList : ui->TrgUsersList;
     users_list->clear();
