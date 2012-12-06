@@ -50,6 +50,12 @@ void BB_InstanceAudio::initSoundDevices()
     {
         THROW_EXCEPT("Cannot initialize Duplex mode");
     }
+
+    // Init volume level to 0
+    if (!TT_SetSoundOutputVolume(m_ttInst, 0))
+    {
+        THROW_EXCEPT("Volume level initialization failed");
+    }
 }
 
 void BB_InstanceAudio::StartSoundLoopbackTest(INT32 inputSoundDevId, INT32 outputSoundDevId)
