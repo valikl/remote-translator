@@ -39,12 +39,15 @@ void RemoteTranslatorUI::setSliders()
 
     ui->MicGainSld->setRange(SOUND_GAIN_MIN, gainMax);
     ui->MicGainSld->setValue(ConfigUI.m_MicGainLevel);
+    TRY_FUNC(TRANSLATOR.UpdateMicrophoneGainLevel(ConfigUI.m_MicGainLevel));
 
     ui->TrgLvlSld->setRange(SOUND_VOLUME_MIN, SOUND_VOLUME_MAX);
     ui->TrgLvlSld->setValue(ConfigUI.m_TrgVolumeLevel);
+    TRY_FUNC(TRANSLATOR.UpdateVolumeLevel(ConfigUI.m_TrgVolumeLevel, false));
 
     ui->SrcLevelSld->setRange(SOUND_VOLUME_MIN, SOUND_VOLUME_MAX);
     ui->SrcLevelSld->setValue(ConfigUI.m_SrcVolumeLevel);
+    TRY_FUNC(TRANSLATOR.UpdateVolumeLevel(ConfigUI.m_SrcVolumeLevel, true));
 
     ui->VideoLvlSld->setMinimum(50);
     ui->VideoLvlSld->setMaximum(100);
