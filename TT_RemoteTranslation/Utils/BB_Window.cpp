@@ -101,10 +101,7 @@ void BB_Window::run()
 
 void BB_Window::BBDestroy()
 {
-    if (!SendMessage(m_hWnd, WM_CLOSE, NULL, NULL))
-    {
-        cout << "Close Window failed with error " << GetLastError() << endl;
-    }
+    SendMessage(m_hWnd, WM_CLOSE, NULL, NULL);
 }
 
 bool BB_Window::IsActive()
