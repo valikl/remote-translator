@@ -456,7 +456,9 @@ void RemoteTranslatorUI::on_LocalSelfTestEn_stateChanged(int checked)
     {
         try
         {
-            TRANSLATOR.StartTargetSoundLoopbackTest(ConfigUI.m_AGC, ConfigUI.m_noiseCancel, -30, ConfigUI.m_echoCancel);
+            TRANSLATOR.StartTargetSoundLoopbackTest(ConfigUI.m_AGC, ConfigUI.m_noiseCancel, -30,
+                                                    ConfigUI.m_echoCancel, ConfigUI.m_InputSoundDevId,
+                                                    ConfigUI.m_OutputSoundDevId, ConfigUI.m_isSoundSystemWin);
         }
         catch(BB_Exception excp)
         {

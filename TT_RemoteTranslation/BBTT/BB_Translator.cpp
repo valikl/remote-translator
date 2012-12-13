@@ -388,17 +388,12 @@ void BB_Translator::StopTargetSoundLoopbackTest()
 {
     Lock lock(m_cs);
 
-    if (!m_isConnected)
-    {
-        THROW_EXCEPT("Target loopback was not started. Translator is not connected");
-    }
-
     if (!m_isTargetLoopbackStarted)
     {
-        THROW_EXCEPT("Target loopback already started");
+        THROW_EXCEPT("Target loopback not started");
     }
     m_isTargetLoopbackStarted = false;
-    m_channelDst->StopTargetSoundLoopbackTest();
+    m_channelDummy->StopTargetSoundLoopbackTest();
 }
 
 void BB_Translator::initInstanceContext(BB_InstanceContext &context)
