@@ -481,7 +481,7 @@ void RemoteTranslatorUI::on_ServerSelfTestEn_stateChanged(int checked)
         catch(BB_Exception excp)
         {
             QMessageBox::critical(this, "Error:", QString::fromStdWString(excp.GetInfo()));
-            ui->LocalSelfTestEn->setChecked(false);
+            ui->ServerSelfTestEn->setChecked(false);
         }
     }
     else
