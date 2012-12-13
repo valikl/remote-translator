@@ -77,7 +77,8 @@ public:
     // Operations
     void StartSoundLoopbackTest(std::wstring inputSoundDevId, std::wstring outputSoundDevId, bool m_isSoundSystemWin);
     void StopSoundLoopbackTest();
-    void StartTargetSoundLoopbackTest(const AGC &agc, bool bEnableDenoise, INT32 maxNoiseSuppress, bool bEchoCancel);
+    void StartTargetSoundLoopbackTest(const AGC &agc, bool bEnableDenoise, INT32 maxNoiseSuppress, bool bEchoCancel,
+        std::wstring inputSoundDevId, std::wstring outputSoundDevId, bool isSoundSystemWin);
     void StopTargetSoundLoopbackTest();
     // Disable/Enable my microphone
     void MuteMicrophone(bool bMute);

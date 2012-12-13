@@ -26,7 +26,8 @@ public:
     // Operations
     void StartSoundLoopbackTest(INT32 inputSoundDevId, INT32 outputSoundDevId);
     void StopSoundLoopbackTest();
-    void StartTargetSoundLoopbackTest(const AGC &agc, bool bEnableDenoise, INT32 maxNoiseSuppress, bool bEchoCancel);
+    void StartTargetSoundLoopbackTest(const AGC &agc, bool bEnableDenoise, INT32 maxNoiseSuppress, bool bEchoCancel,
+        INT32 inputSoundDevId, INT32 outputSoundDevId);
     void StopTargetSoundLoopbackTest();
     void MuteMicrophone(bool bMute);
     void MuteTarget(bool bMute);

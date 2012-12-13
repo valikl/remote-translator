@@ -357,21 +357,30 @@ void BB_Translator::StopSoundLoopbackTest()
     m_channelDummy->StopSoundLoopbackTest();
 }
 
-void BB_Translator::StartTargetSoundLoopbackTest(const AGC &agc, bool bEnableDenoise, INT32 maxNoiseSuppress, bool bEchoCancel)
+void BB_Translator::StartTargetSoundLoopbackTest(const AGC &agc, bool bEnableDenoise, INT32 maxNoiseSuppress, bool bEchoCancel,
+    wstring inputSoundDevId, wstring outputSoundDevId, bool isSoundSystemWin)
 {
     Lock lock(m_cs);
 
-    if (!m_isConnected)
-    {
-        THROW_EXCEPT("Cannot start target sound loopback test. Translator is not connected");
-    }
-
     if (m_isTargetLoopbackStarted)
     {
-        THROW_EXCEPT("Target loopback is already started");
+        THROW_EXCEPT("Target loopback already started");
     }
 
-    m_channelDst->StartTargetSoundLoopbackTest(agc, bEnableDenoise, maxNoiseSuppress, bEchoCancel);
+    BB_SoundDevice inputSoundDev;
+    if (!findSoundDev(inputSoundDevId, isSoundSystemWin, inputSoundDev))
+    {
+        THROW_EXCEPT("Input sound device was not found");
+    }
+
+    BB_SoundDevice outputSoundDev;
+    if (!findSoundDev(outputSoundDevId, isSoundSystemWin, outputSoundDev))
+    {
+        THROW_EXCEPT("Output sound device was not found");
+    }
+
+    m_channelDummy->StartTargetSoundLoopbackTest(agc, bEnableDenoise, maxNoiseSuppress, bEchoCancel,
+        inputSoundDev.m_id, outputSoundDev.m_id);
     m_isTargetLoopbackStarted = true;
 }
 

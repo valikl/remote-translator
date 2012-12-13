@@ -88,8 +88,19 @@ void BB_InstanceAudio::StopSoundLoopbackTest()
     TT_CloseSoundInputDevice(m_ttInst);
 }
 
-void BB_InstanceAudio::StartTargetSoundLoopbackTest(const AGC &agc, bool bEnableDenoise, INT32 maxNoiseSuppress, bool bEchoCancel)
+void BB_InstanceAudio::StartTargetSoundLoopbackTest(const AGC &agc, bool bEnableDenoise, INT32 maxNoiseSuppress, bool bEchoCancel,
+    INT32 inputSoundDevId, INT32 outputSoundDevId)
 {
+    if (!TT_InitSoundInputDevice(m_ttInst, inputSoundDevId))
+    {
+        THROW_EXCEPT("Sound input device initialization failed");
+    }
+
+    if (!TT_InitSoundOutputDevice(m_ttInst, outputSoundDevId))
+    {
+        THROW_EXCEPT("Sound output device initialization failed");
+    }
+
     AudioConfig audioConfig;
     audioConfig.bEnableAGC = agc.m_enable;
     audioConfig.nGainLevel = agc.m_gainLevel;
