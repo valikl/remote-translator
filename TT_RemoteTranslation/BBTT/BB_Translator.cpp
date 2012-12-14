@@ -542,7 +542,12 @@ void BB_Translator::StartDstSoundTest()
     context.m_nickName = DST_SOUND_TEST_CHANNEL_NICKNAME;
     m_channelDstTest = new BB_InstanceAudio(context);
     m_channelDstTest->init();
-    m_channelDstTest->UpdateVolumeLevel(BB_ClientConfigMgr::Instance().getConfig().m_SrcVolumeLevel);
+    int tstv;
+    if (BB_ClientConfigMgr::Instance().getConfig().m_SrcVolumeLevel*2 > SOUND_VOLUME_MAX)
+        tstv = SOUND_VOLUME_MAX;
+    else
+        tstv = BB_ClientConfigMgr::Instance().getConfig().m_SrcVolumeLevel*2;
+    m_channelDstTest->UpdateVolumeLevel(tstv);
 }
 
 void BB_Translator::StopDstSoundTest()
