@@ -39,24 +39,27 @@ void RemoteTranslatorUI::setSliders()
 
     ui->MicGainSld->setRange(SOUND_GAIN_MIN, gainMax);
     ui->MicGainSld->setValue(ConfigUI.m_MicGainLevel);
-    TRY_FUNC(TRANSLATOR.UpdateMicrophoneGainLevel(ConfigUI.m_MicGainLevel));
 
     ui->TrgLvlSld->setRange(SOUND_VOLUME_MIN, SOUND_VOLUME_MAX);
     ui->TrgLvlSld->setValue(ConfigUI.m_TrgVolumeLevel);
-    TRY_FUNC(TRANSLATOR.UpdateVolumeLevel(ConfigUI.m_TrgVolumeLevel, false));
 
     ui->SrcLevelSld->setRange(SOUND_VOLUME_MIN, SOUND_VOLUME_MAX);
     ui->SrcLevelSld->setValue(ConfigUI.m_SrcVolumeLevel);
-    TRY_FUNC(TRANSLATOR.UpdateVolumeLevel(ConfigUI.m_SrcVolumeLevel, true));
 
-    ui->VideoLvlSld->setMinimum(50);
-    ui->VideoLvlSld->setMaximum(100);
+    ui->VideoLvlSld->setRange(50, 100);
     ui->VideoLvlSld->setValue(ConfigUI.m_VideoQuality);
 
     ui->MicLevelInd->setMinimum(0);
     ui->MicLevelInd->setMaximum(20);
     ui->MicLevelInd->setTextVisible(false);
     ui->MicLevelInd->setValue(0);
+}
+
+void RemoteTranslatorUI::activateSliders()
+{
+    TRY_FUNC(TRANSLATOR.UpdateMicrophoneGainLevel(ConfigUI.m_MicGainLevel));
+    TRY_FUNC(TRANSLATOR.UpdateVolumeLevel(ConfigUI.m_TrgVolumeLevel, false));
+    TRY_FUNC(TRANSLATOR.UpdateVolumeLevel(ConfigUI.m_SrcVolumeLevel, true));
 }
 
 void RemoteTranslatorUI::initMainConfig()
@@ -118,8 +121,17 @@ void RemoteTranslatorUI::activateButtons()
 
     // set buttons checkable
     ui->LangConnect->setCheckable(true);
+
+    // disable buttons and sliders until connect
+    ui->MicGainSld->setEnabled(false);
+    ui->MicLevelInd->setEnabled(false);
+    ui->SrcLevelSld->setEnabled(false);
+    ui->TrgLvlSld->setEnabled(false);
     ui->MicMuteBut->setEnabled(false);
     ui->TrgMuteBut->setEnabled(false);
+    ui->showVideoButton->setEnabled(false);
+    ui->VideoLvlSld->setEnabled(false);
+    ui->ServerSelfTestEn->setEnabled(false);
 
     //Timer for progress bar
     timer = new QTimer(this);
@@ -144,6 +156,9 @@ void RemoteTranslatorUI::init()
 
     // activate buttons and devices
     activateButtons();
+
+    // set sliders
+    setSliders();
 }
 
 void RemoteTranslatorUI::enableAudioFilters()
@@ -310,10 +325,19 @@ void RemoteTranslatorUI::connectTranslator()
     enableAudioFilters();
 
     // set slider values
-    setSliders();
+    activateSliders();
 
+    ui->LangConnect->setCheckable(true);
+    ui->MicGainSld->setEnabled(true);
+    ui->MicLevelInd->setEnabled(true);
+    ui->SrcLevelSld->setEnabled(true);
+    ui->TrgLvlSld->setEnabled(true);
     ui->MicMuteBut->setEnabled(true);
     ui->TrgMuteBut->setEnabled(true);
+    ui->showVideoButton->setEnabled(true);
+    ui->VideoLvlSld->setEnabled(true);
+    ui->ServerSelfTestEn->setEnabled(true);
+
     ui->MicMuteBut->setCheckable(true);
     ui->TrgMuteBut->setCheckable(true);
 
@@ -336,8 +360,16 @@ void RemoteTranslatorUI::disconnectTranslator()
     if (ui->TrgMuteBut->isChecked())
         ui->TrgMuteBut->click();
 
+    // disable buttons and sliders until connect
+    ui->MicGainSld->setEnabled(false);
+    ui->MicLevelInd->setEnabled(false);
+    ui->SrcLevelSld->setEnabled(false);
+    ui->TrgLvlSld->setEnabled(false);
     ui->MicMuteBut->setEnabled(false);
     ui->TrgMuteBut->setEnabled(false);
+    ui->showVideoButton->setEnabled(false);
+    ui->VideoLvlSld->setEnabled(false);
+    ui->ServerSelfTestEn->setEnabled(false);
 
     TRY_FUNC(TRANSLATOR.disconnectHap());
 
@@ -369,18 +401,24 @@ void RemoteTranslatorUI::on_LangConnect_clicked(bool checked)
 void RemoteTranslatorUI::on_MicGainSld_valueChanged(int val)
 {
     BB_ClientConfigMgr::Instance().SetMicGainLevel(ui->MicGainSld->value());
+    if (!TRANSLATOR.isConnected())
+        return;
     TRY_FUNC(TRANSLATOR.UpdateMicrophoneGainLevel(ConfigUI.m_MicGainLevel));
 }
 
 void RemoteTranslatorUI::on_TrgLvlSld_valueChanged(int val)
 {
     BB_ClientConfigMgr::Instance().SetTrgVolumeLevel(ui->TrgLvlSld->value());
+    if (!TRANSLATOR.isConnected())
+        return;
     TRY_FUNC(TRANSLATOR.UpdateVolumeLevel(ConfigUI.m_TrgVolumeLevel, false));
 }
 
 void RemoteTranslatorUI::on_SrcLevelSld_valueChanged(int val)
 {
     BB_ClientConfigMgr::Instance().SetSrcVolumeLevel(ui->SrcLevelSld->value());
+    if (!TRANSLATOR.isConnected())
+        return;
     TRY_FUNC(TRANSLATOR.UpdateVolumeLevel(ConfigUI.m_SrcVolumeLevel, true));
 }
 

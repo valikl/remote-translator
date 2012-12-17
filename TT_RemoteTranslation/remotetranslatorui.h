@@ -81,6 +81,7 @@ private:
 
     void connectTranslator();
     void disconnectTranslator();
+    void activateSliders();
 
     std::vector<Happening> happenings;
 
