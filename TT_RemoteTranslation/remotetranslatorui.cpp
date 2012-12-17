@@ -46,7 +46,10 @@ void RemoteTranslatorUI::setSliders()
     ui->SrcLevelSld->setRange(SOUND_VOLUME_MIN, SOUND_VOLUME_MAX);
     ui->SrcLevelSld->setValue(ConfigUI.m_SrcVolumeLevel);
 
+    // some mystical bug, configuration video quality is affected by setRange
+    int video_quality = ConfigUI.m_VideoQuality;
     ui->VideoLvlSld->setRange(50, 100);
+    BB_ClientConfigMgr::Instance().SetVideoQuality(video_quality);
     ui->VideoLvlSld->setValue(ConfigUI.m_VideoQuality);
 
     ui->MicLevelInd->setMinimum(0);
