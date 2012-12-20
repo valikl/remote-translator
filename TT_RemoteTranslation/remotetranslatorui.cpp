@@ -236,16 +236,14 @@ void RemoteTranslatorUI::setUserItems(bool is_source)
     for (unsigned int i = 0; i < users.size(); ++i)
     {
         wstring user = users[i].m_userName;
-        if (!users[i].m_isActive)
-            users_list->addItem(QString::fromStdWString(user));
-        else
+        users_list->addItem(QString::fromStdWString(user));
+        if (users[i].m_isActive)
         {
-            QListWidgetItem* active_item = new QListWidgetItem(QString::fromStdWString(user));
+            QListWidgetItem* active_item = users_list->item(users_list->count()-1);
             active_item->setBackgroundColor("green");
             QFont font;
             font.setBold(true);
             active_item->setFont(font);
-            users_list->addItem(active_item);
         }
     }
 }
@@ -260,6 +258,8 @@ RemoteTranslatorUI::~RemoteTranslatorUI()
 {
     TRY_FUNC(BB_ClientConfigMgr::Instance().saveConfig());
     TRY_FUNC(TRANSLATOR.finalize());
+    delete timer;
+    delete user_timer;
     delete ui;
 }
 
