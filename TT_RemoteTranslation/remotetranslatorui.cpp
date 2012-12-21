@@ -144,7 +144,7 @@ void RemoteTranslatorUI::activateButtons()
     // Timer for user detection
     user_timer = new QTimer(this);
     connect(user_timer, SIGNAL(timeout()), this, SLOT(on_UserTimeout()));
-    user_timer->start(1000);
+    user_timer->start(10000);
 }
 
 void RemoteTranslatorUI::init()
@@ -223,15 +223,18 @@ void RemoteTranslatorUI::RestoreDefaultConfig()
     initMainConfig();
 }
 
-void RemoteTranslatorUI::setUserItems(bool is_source)
+void RemoteTranslatorUI::setUserItems(InstType inst_type)
 {
     if (!TRANSLATOR.isConnected())
         return;
 
     vector<BB_ChannelUser> users;
-    TRY_FUNC_WITH_RETURN(TRANSLATOR.getUsers(users, is_source));
+    TRY_FUNC_WITH_RETURN(TRANSLATOR.getUsers(users, inst_type));
 
-    QListWidget* users_list = is_source ? ui->SrcUsersList : ui->TrgUsersList;
+    if (inst_type == INSTANCE_TYPE_VIDEO)
+        return;
+
+    QListWidget* users_list = inst_type == INSTANCE_TYPE_SRC ? ui->SrcUsersList : ui->TrgUsersList;
     users_list->clear();
     for (unsigned int i = 0; i < users.size(); ++i)
     {
@@ -250,8 +253,8 @@ void RemoteTranslatorUI::setUserItems(bool is_source)
 
 void RemoteTranslatorUI::on_UserTimeout()
 {
-    setUserItems(true);
-    setUserItems(false);
+    setUserItems(INSTANCE_TYPE_SRC);
+    setUserItems(INSTANCE_TYPE_DST);
 }
 
 RemoteTranslatorUI::~RemoteTranslatorUI()

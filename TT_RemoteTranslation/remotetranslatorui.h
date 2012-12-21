@@ -77,7 +77,7 @@ private:
 
     void initHapsMenu();
     void setSliders();
-    void setUserItems(bool is_source);
+    void setUserItems(InstType inst_type);
 
     void connectTranslator();
     void disconnectTranslator();
