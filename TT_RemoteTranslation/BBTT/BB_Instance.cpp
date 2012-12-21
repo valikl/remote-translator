@@ -139,7 +139,7 @@ void BB_Instance::getUsers(std::vector<BB_ChannelUser> &userList)
 
     if (!TT_GetChannelUsers(m_ttInst, m_channelId, userIDs, &size) || size == 0)
     {
-        THROW_EXCEPT("Build channel users list failed");
+        THROW_EXCEPT_WITH_ID("Build channel users list failed", EXCEPTION_ID_CONNECTION_LOST);
     }
 
     if (size == 0)

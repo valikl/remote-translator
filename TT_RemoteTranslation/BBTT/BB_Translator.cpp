@@ -301,7 +301,7 @@ bool BB_Translator::findSoundDev(wstring deviceId, bool isSoundSystemWin, BB_Sou
     return false;
 }
 
-void BB_Translator::getUsers(std::vector<BB_ChannelUser> &userList, bool isSource)
+void BB_Translator::getUsers(std::vector<BB_ChannelUser> &userList, InstType instType)
 {
     Lock lock(m_cs);
 
@@ -310,13 +310,27 @@ void BB_Translator::getUsers(std::vector<BB_ChannelUser> &userList, bool isSourc
         THROW_EXCEPT("Cannot generate Users list. Translator is not connected");
     }
 
-    if (isSource)
+    switch (instType)
     {
-        m_channelSrc->getUsers(userList);
-    }
-    else
-    {
-        m_channelDst->getUsers(userList);
+        case INSTANCE_TYPE_SRC:
+        {
+            m_channelSrc->getUsers(userList);
+            break;
+        }
+        case INSTANCE_TYPE_DST:
+        {
+            m_channelDst->getUsers(userList);
+            break;
+        }
+        case INSTANCE_TYPE_VIDEO:
+        {
+            m_channelVideo->getUsers(userList);
+            break;
+        }
+        default:
+        {
+            break;
+        }
     }
 }
 

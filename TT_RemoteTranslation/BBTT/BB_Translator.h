@@ -24,6 +24,14 @@ const std::wstring DST_SOUND_TEST_CHANNEL_NICKNAME(L"DstSoundTestUser");
 
 const std::wstring HAPPENING_CHANNEL_DEFAULT_NAME(L"");
 
+enum InstType
+{
+    INSTANCE_TYPE_NONE = 0,
+    INSTANCE_TYPE_SRC = 1,
+    INSTANCE_TYPE_DST = 2,
+    INSTANCE_TYPE_VIDEO = 3
+};
+
 struct Happening
 {
 	std::wstring m_hapName;
@@ -68,7 +76,7 @@ public:
     void connectHap(std::wstring hapName, std::wstring nickName, std::wstring srcName, std::wstring dstName,
         std::wstring inputSoundDevId, std::wstring outputSoundDevId);
     void disconnectHap();
-    void getUsers(std::vector<BB_ChannelUser> &userList, bool isSource);
+    void getUsers(std::vector<BB_ChannelUser> &userList, InstType InstType);
 
     void ReconnectSrcChannel(std::wstring hapName, std::wstring srcName);
 

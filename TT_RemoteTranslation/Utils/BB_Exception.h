@@ -9,14 +9,17 @@ using std::wstring;
 using std::exception;
 using std::wostringstream;
 
+const int EXCEPTION_ID_DEFAULT(0);
+const int EXCEPTION_ID_CONNECTION_LOST(1);
+
 /**
  *  Base class for predefined exceptions
  **/
 class BB_Exception : public exception
 {
 public:
-    BB_Exception(const wstring& sInfo) :
-      m_sInfo(sInfo)
+    BB_Exception(const wstring& sInfo, int Id = EXCEPTION_ID_CONNECTION_LOST) :
+        m_sInfo(sInfo), m_Id(EXCEPTION_ID_CONNECTION_LOST)
     {
     }
 
@@ -42,8 +45,14 @@ public:
         return m_sInfo;
     }
 
+    const int GetId() const
+    {
+        return m_Id;
+    }
+
 protected:
     wstring m_sInfo;
+    int m_Id;
 };
 
 #define THROW_EXCEPT(problem) \
@@ -51,6 +60,13 @@ protected:
     wostringstream stream; \
     stream<< problem;\
     throw BB_Exception(stream.str());\
+}
+
+#define THROW_EXCEPT_WITH_ID(problem, id) \
+{\
+    wostringstream stream; \
+    stream<< problem;\
+    throw BB_Exception(stream.str(), id);\
 }
 
 #define TRY_FUNC(func) \
