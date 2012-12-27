@@ -56,8 +56,9 @@ private slots:
     void on_SrcLevelSld_valueChanged(int val);
     void on_VideoLvlSld_valueChanged(int val);
 
-    void on_Timeout();
+    void on_MicrophoneTimeout();
     void on_UserTimeout();
+    void on_ConlostTimeout();
 
     void ActivateSoundDevices();
     void ActivateAudioFilters();
@@ -86,8 +87,9 @@ private:
     std::vector<Happening> happenings;
 
     Ui::RemoteTranslatorUI *ui;
-    QTimer *timer;
+    QTimer *microphone_timer;
     QTimer *user_timer;
+    QTimer *conlost_timer;
 };
 
 #endif // REMOTETRANSLATORUI_H
