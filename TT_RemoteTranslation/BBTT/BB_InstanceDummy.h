@@ -26,6 +26,7 @@ public:
     void closeSoundDevices();
 
     bool isConnectionLost() { return m_isConnectionLost; }
+    void ClearConnectionLostFlag() { m_isConnectionLost = false; }
 
     void StartHandleMessages();
     void StopHandleMessages();

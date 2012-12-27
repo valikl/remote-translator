@@ -43,6 +43,11 @@ void BB_Translator::disconnectHap()
         delete m_channelDst;
     }
 
+    if (m_channelDummy)
+    {
+        m_channelDummy->ClearConnectionLostFlag();
+    }
+
     m_channelVideo = NULL;
     m_channelSrc = NULL;
     m_channelDst = NULL;
