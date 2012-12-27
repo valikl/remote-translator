@@ -144,11 +144,12 @@ void BB_InstanceDummy::run()
     int timeout = MESSAGE_TIMEOUT;
     while(true)
     {
-        TT_GetMessage(m_ttInst, &msg, &timeout);
-
-        if (msg.wmMsg == WM_TEAMTALK_CON_LOST)
+        if (TT_GetMessage(m_ttInst, &msg, &timeout))
         {
-            m_isConnectionLost = true;
+            if (msg.wmMsg == WM_TEAMTALK_CON_LOST)
+            {
+                m_isConnectionLost = true;
+            }
         }
 
         if (m_stopThread)
