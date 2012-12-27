@@ -135,7 +135,7 @@ void BB_Translator::init()
     BB_InstanceContext context;
     initInstanceContext(context);
 
-    m_channelDummy = new BB_InstanceAudio(context);
+    m_channelDummy = new BB_InstanceDummy(context);
     try
     {
         m_channelDummy->login();
@@ -149,6 +149,8 @@ void BB_Translator::init()
 
     try
     {
+        m_channelDummy->StartHandleMessages();
+
         std::vector<BB_Channel> channels;
         m_channelDummy->getChannels(channels);
 
@@ -164,6 +166,20 @@ void BB_Translator::init()
     {
         finalize();
         THROW_EXCEPT(excp.GetInfo());
+    }
+}
+
+bool BB_Translator::isConnectionLost()
+{
+    Lock lock(m_cs);
+
+    if (m_channelDummy)
+    {
+        return m_channelDummy->isConnectionLost();
+    }
+    else
+    {
+        return false;
     }
 }
 

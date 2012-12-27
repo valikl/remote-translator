@@ -9,6 +9,7 @@
 #include "BB_Instance.h"
 #include "BB_ClientConfigMgr.h"
 #include "BB_InstanceAudio.h"
+#include "BB_InstanceDummy.h"
 #include "BB_InstanceVideo.h"
 #include "Utils/CriticalSection.h"
 
@@ -81,13 +82,10 @@ public:
     void ReconnectSrcChannel(std::wstring hapName, std::wstring srcName);
 
     bool isConnected() { return m_isConnected; }
+    bool isConnectionLost();
 
     // Operations
-    void StartSoundLoopbackTest(std::wstring inputSoundDevId, std::wstring outputSoundDevId, bool m_isSoundSystemWin);
-    void StopSoundLoopbackTest();
-    void StartTargetSoundLoopbackTest(const AGC &agc, bool bEnableDenoise, INT32 maxNoiseSuppress, bool bEchoCancel,
-        std::wstring inputSoundDevId, std::wstring outputSoundDevId, bool isSoundSystemWin);
-    void StopTargetSoundLoopbackTest();
+
     // Disable/Enable my microphone
     void MuteMicrophone(bool bMute);
     // Mute other users in my channel
@@ -105,6 +103,12 @@ public:
     // Destination sound test
     void StartDstSoundTest();
     void StopDstSoundTest();
+
+    void StartSoundLoopbackTest(std::wstring inputSoundDevId, std::wstring outputSoundDevId, bool isSoundSystemWin);
+    void StopSoundLoopbackTest();
+    void StartTargetSoundLoopbackTest(const AGC &agc, bool bEnableDenoise, INT32 maxNoiseSuppress, bool bEchoCancel,
+        std::wstring inputSoundDevId, std::wstring outputSoundDevId, bool isSoundSystemWin);
+    void StopTargetSoundLoopbackTest();
 
     // Video
     void OpenVideoWindow(HWND hWnd);
@@ -127,7 +131,7 @@ private:
     BB_InstanceVideo *m_channelVideo;
     BB_InstanceAudio *m_channelSrc;
     BB_InstanceAudio *m_channelDst;
-    BB_InstanceAudio *m_channelDummy;
+    BB_InstanceDummy *m_channelDummy;
     BB_InstanceAudio *m_channelDstTest;
 
 	// Happening list for GUI

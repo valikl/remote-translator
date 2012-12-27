@@ -58,69 +58,7 @@ void BB_InstanceAudio::initSoundDevices()
     }
 }
 
-void BB_InstanceAudio::StartSoundLoopbackTest(INT32 inputSoundDevId, INT32 outputSoundDevId)
-{
-    if (!TT_InitSoundInputDevice(m_ttInst, inputSoundDevId))
-    {
-        THROW_EXCEPT("Sound input device initialization failed");
-    }
 
-    if (!TT_InitSoundOutputDevice(m_ttInst, outputSoundDevId))
-    {
-        THROW_EXCEPT("Sound output device initialization failed");
-    }
-
-    if (!TT_StartSoundLoopbackTest(m_ttInst, inputSoundDevId, outputSoundDevId, 16000, 2))
-    {
-        TT_CloseSoundOutputDevice(m_ttInst);
-        TT_CloseSoundInputDevice(m_ttInst);
-        THROW_EXCEPT("Cannot start sound loopback test");
-    }
-}
-
-void BB_InstanceAudio::StopSoundLoopbackTest()
-{
-    if (!TT_StopSoundLoopbackTest(m_ttInst))
-    {
-        THROW_EXCEPT("Cannot stop sound loopback test");
-    }
-    TT_CloseSoundOutputDevice(m_ttInst);
-    TT_CloseSoundInputDevice(m_ttInst);
-}
-
-void BB_InstanceAudio::StartTargetSoundLoopbackTest(const AGC &agc, bool bEnableDenoise, INT32 maxNoiseSuppress, bool bEchoCancel,
-    INT32 inputSoundDevId, INT32 outputSoundDevId)
-{
-    if (!TT_InitSoundDuplexDevices(m_ttInst, inputSoundDevId, outputSoundDevId))
-    {
-        THROW_EXCEPT("Sound devices initialization failed");
-    }
-
-    AudioConfig audioConfig;
-    audioConfig.bEnableAGC = agc.m_enable;
-    audioConfig.nGainLevel = agc.m_gainLevel;
-    audioConfig.nMaxIncDBSec = agc.m_maxIncrement;
-    audioConfig.nMaxDecDBSec = agc.m_maxDecrement;
-    audioConfig.nMaxGainDB = agc.m_maxGain;
-    audioConfig.bEnableDenoise = bEnableDenoise;
-    audioConfig.nMaxNoiseSuppressDB = maxNoiseSuppress;
-
-    if (!TT_StartSoundLoopbackTestEx(m_ttInst, inputSoundDevId, outputSoundDevId,
-        16000, 2, &audioConfig, bEchoCancel))
-    {
-        TT_CloseSoundDuplexDevices(m_ttInst);
-        THROW_EXCEPT("Cannot start extended sound loopback test");
-    }
-}
-
-void BB_InstanceAudio::StopTargetSoundLoopbackTest()
-{
-    if (!TT_StopSoundLoopbackTest(m_ttInst))
-    {
-        THROW_EXCEPT("Cannot stop sound loopback test");
-    }
-    TT_CloseSoundDuplexDevices(m_ttInst);
-}
 
 void BB_InstanceAudio::MuteMicrophone(bool bMute)
 {

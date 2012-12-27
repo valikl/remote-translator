@@ -29,7 +29,8 @@ SOURCES += main.cpp\
     Utils/CriticalSection.cpp \
     Utils/Lockable.cpp \
     BBTT/BB_InstanceVideo.cpp \
-    BBTT/BB_InstanceAudio.cpp
+    BBTT/BB_InstanceAudio.cpp \
+    BBTT/BB_InstanceDummy.cpp
 
 HEADERS  += \
     common.h \
@@ -55,7 +56,8 @@ HEADERS  += \
     Utils/Lock.h \
     Utils/CriticalSection.h \
     BBTT/BB_InstanceVideo.h \
-    BBTT/BB_InstanceAudio.h
+    BBTT/BB_InstanceAudio.h \
+    BBTT/BB_InstanceDummy.h
 
 FORMS    += remotetranslatorui.ui \
     sounddevices.ui \

@@ -25,8 +25,9 @@ void BB_Instance::init()
 
 void BB_Instance::finalize()
 {
-	TT_DoLogout(m_ttInst);
-	TT_DoQuit(m_ttInst);
+    TT_Disconnect(m_ttInst);
+    //TT_DoLogout(m_ttInst);
+    //TT_DoQuit(m_ttInst);
 }
 
 void BB_Instance::login()
