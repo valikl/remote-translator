@@ -136,15 +136,20 @@ void RemoteTranslatorUI::activateButtons()
     ui->VideoLvlSld->setEnabled(false);
     ui->ServerSelfTestEn->setEnabled(false);
 
-    //Timer for progress bar
-    timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(on_Timeout()));
-    timer->start(100);
+    //Timer for micophone progress bar
+    microphone_timer = new QTimer(this);
+    connect(microphone_timer, SIGNAL(timeout()), this, SLOT(on_MicrophoneTimeout()));
+    microphone_timer->start(100);
 
     // Timer for user detection
     user_timer = new QTimer(this);
     connect(user_timer, SIGNAL(timeout()), this, SLOT(on_UserTimeout()));
     user_timer->start(10000);
+
+    //Timer for micophone progress bar
+    conlost_timer = new QTimer(this);
+    connect(conlost_timer, SIGNAL(timeout()), this, SLOT(on_ConlostTimeout()));
+    conlost_timer->start(100);
 }
 
 void RemoteTranslatorUI::init()
@@ -181,7 +186,7 @@ void RemoteTranslatorUI::ActivateSoundDevices()
     );
 }
 
-void RemoteTranslatorUI::on_Timeout()
+void RemoteTranslatorUI::on_MicrophoneTimeout()
 {
     if (TRANSLATOR.isConnected())
     {
@@ -191,6 +196,17 @@ void RemoteTranslatorUI::on_Timeout()
     }
     else
         ui->MicLevelInd->setValue(0);
+}
+
+void RemoteTranslatorUI::on_ConlostTimeout()
+{
+    if (!TRANSLATOR.isConnected() || !TRANSLATOR.isConnectionLost())
+        return;
+
+    QMessageBox::critical(this,"Connecting error","Internet connection lost");
+
+    // stop translator
+    disconnectTranslator();
 }
 
 void RemoteTranslatorUI::ActivateAudioFilters()
@@ -261,8 +277,9 @@ RemoteTranslatorUI::~RemoteTranslatorUI()
 {
     TRY_FUNC(BB_ClientConfigMgr::Instance().saveConfig());
     TRY_FUNC(TRANSLATOR.finalize());
-    delete timer;
+    delete microphone_timer;
     delete user_timer;
+    delete conlost_timer;
     delete ui;
 }
 
