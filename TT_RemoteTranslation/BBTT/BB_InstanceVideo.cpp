@@ -187,3 +187,16 @@ bool BB_InstanceVideo::IsFrameDropped(int frameIdx, vector<int>& droppedFrames)
     return it != droppedFrames.end();
 }
 
+void BB_InstanceVideo::KeepAlive()
+{
+    int userId;
+    TRY_BLOCK_RETURN_ON_ERR(
+        userId = GetVideoUserId();
+    );
+
+    TT_DoSubscribe(m_ttInst, userId, (SUBSCRIBE_VIDEO | SUBSCRIBE_INTERCEPT_VIDEO));
+    VideoFrame videoFrame;
+    TT_AcquireUserVideoFrame(m_ttInst, userId, &videoFrame);
+    TT_ReleaseUserVideoFrame(m_ttInst, userId);
+}
+

@@ -558,6 +558,15 @@ void BB_Translator::OpenVideoWindow(HWND hWnd)
     m_channelVideo->OpenVideoWindow(hWnd);
 }
 
+void BB_Translator::KeepAlive()
+{
+    if (!m_isConnected)
+    {
+        THROW_EXCEPT("Translator is not connected");
+    }
+    m_channelVideo->KeepAlive();
+}
+
 void BB_Translator::StartDstSoundTest()
 {
     Lock lock(m_cs);
@@ -632,3 +641,5 @@ void BB_Translator::ReconnectSrcChannel(wstring hapName, wstring srcName)
     m_channelSrc = new BB_InstanceAudio(context);
     m_channelSrc->init();
 }
+
+

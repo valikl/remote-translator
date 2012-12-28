@@ -23,6 +23,7 @@ public:
 
     // Operations
     void OpenVideoWindow(HWND hWnd);
+    void KeepAlive();
 
 private:
 		
