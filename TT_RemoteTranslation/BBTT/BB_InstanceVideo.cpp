@@ -195,8 +195,20 @@ void BB_InstanceVideo::KeepAlive()
     );
 
     TT_DoSubscribe(m_ttInst, userId, (SUBSCRIBE_VIDEO | SUBSCRIBE_INTERCEPT_VIDEO));
-    VideoFrame videoFrame;
-    TT_AcquireUserVideoFrame(m_ttInst, userId, &videoFrame);
-    TT_ReleaseUserVideoFrame(m_ttInst, userId);
+
+    TTMessage msg;
+    int wait_ms = 5000;
+    for (int i=0; i<5; i++)
+    {
+        if (TT_GetMessage(m_ttInst, &msg, &wait_ms) &&
+            msg.wmMsg == WM_TEAMTALK_USER_VIDEOFRAME)
+        {
+            VideoFrame videoFrame;
+            TT_AcquireUserVideoFrame(m_ttInst, userId, &videoFrame);
+            TT_ReleaseUserVideoFrame(m_ttInst, userId);
+            return;
+        }
+        Sleep(1000);
+    }
 }
 
