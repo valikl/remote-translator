@@ -29,7 +29,7 @@ void BB_Translator::disconnectHap()
 
     if (m_channelVideo)
     {
-        m_channelVideo->finalize();
+        //m_channelVideo->finalize();
         delete m_channelVideo;
     }
     if (m_channelSrc)
@@ -111,7 +111,7 @@ void BB_Translator::connectHap(wstring hapName, wstring nickName, wstring srcNam
         context.m_nickName = VIDEO_CHANNEL_PREFIX + nickName;
         context.m_channelName = VIDEO_CHANNEL_NAME;
         m_channelVideo = new BB_InstanceVideo(context);
-        m_channelVideo->init();
+        //m_channelVideo->init();
     }
     catch(BB_Exception excp)
     {
@@ -556,15 +556,6 @@ void BB_Translator::OpenVideoWindow(HWND hWnd)
 {
     Lock lock(m_cs);
     m_channelVideo->OpenVideoWindow(hWnd);
-}
-
-void BB_Translator::KeepAlive()
-{
-    if (!m_isConnected)
-    {
-        THROW_EXCEPT("Translator is not connected");
-    }
-    m_channelVideo->KeepAlive();
 }
 
 void BB_Translator::StartDstSoundTest()

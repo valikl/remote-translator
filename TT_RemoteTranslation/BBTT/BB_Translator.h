@@ -112,7 +112,6 @@ public:
 
     // Video
     void OpenVideoWindow(HWND hWnd);
-    void KeepAlive();
 
 private:
     BB_Translator();

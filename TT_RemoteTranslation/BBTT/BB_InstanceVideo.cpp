@@ -55,9 +55,6 @@ int BB_InstanceVideo::GetVideoUserId()
 
 void BB_InstanceVideo::OpenVideoWindow(HWND hEffectiveWnd)
 {
-    // Check if Video User exists. If not exist - exception is thrown
-    GetVideoUserId();
-
     if (m_videoWinThread != NULL)
     {
         if (m_videoWin->IsActive())
@@ -100,10 +97,21 @@ void BB_InstanceVideo::StopVideoThreads()
 
 void BB_InstanceVideo::run()
 {
+    BB_Instance::init();
+
+    // Wait in order to be sure video window was loaded
+    Sleep(5000);
+
     int userId;
-    TRY_BLOCK_RETURN_ON_ERR(
+    try
+    {
         userId = GetVideoUserId();
-    );
+    }
+    catch(BB_Exception excp)
+    {
+        BB_Instance::finalize();
+        return;
+    }
 
     int cmdId = TT_DoSubscribe(m_ttInst, userId, (SUBSCRIBE_VIDEO | SUBSCRIBE_INTERCEPT_VIDEO));
     if(cmdId > 0)
@@ -114,9 +122,6 @@ void BB_InstanceVideo::run()
     {
          cout << "Failed to issue subscribe command" << endl;
     }
-
-    // Wait in order to be sure video window was loaded
-    Sleep(5000);
 
     HDC hDC = GetDC(m_videoWin->BBGetHandle());
 
@@ -170,6 +175,8 @@ void BB_InstanceVideo::run()
     }
 
     ReleaseDC(m_videoWin->BBGetHandle(), hDC);
+
+    BB_Instance::finalize();
 }
 
 void BB_InstanceVideo::GetDroppedFrames(int videoQuality, vector<int>& droppedFrames, int seed)
@@ -185,30 +192,5 @@ bool BB_InstanceVideo::IsFrameDropped(int frameIdx, vector<int>& droppedFrames)
 {
     vector<int>::iterator it = find(droppedFrames.begin(), droppedFrames.end(), frameIdx);
     return it != droppedFrames.end();
-}
-
-void BB_InstanceVideo::KeepAlive()
-{
-    int userId;
-    TRY_BLOCK_RETURN_ON_ERR(
-        userId = GetVideoUserId();
-    );
-
-    TT_DoSubscribe(m_ttInst, userId, (SUBSCRIBE_VIDEO | SUBSCRIBE_INTERCEPT_VIDEO));
-
-    TTMessage msg;
-    int wait_ms = 5000;
-    for (int i=0; i<5; i++)
-    {
-        if (TT_GetMessage(m_ttInst, &msg, &wait_ms) &&
-            msg.wmMsg == WM_TEAMTALK_USER_VIDEOFRAME)
-        {
-            VideoFrame videoFrame;
-            TT_AcquireUserVideoFrame(m_ttInst, userId, &videoFrame);
-            TT_ReleaseUserVideoFrame(m_ttInst, userId);
-            return;
-        }
-        Sleep(1000);
-    }
 }
 
