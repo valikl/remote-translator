@@ -144,7 +144,7 @@ void RemoteTranslatorUI::activateButtons()
     // Timer for user detection
     user_timer = new QTimer(this);
     connect(user_timer, SIGNAL(timeout()), this, SLOT(on_UserTimeout()));
-    user_timer->start(10000);
+    user_timer->start(2000);
 
     //Timer for micophone progress bar
     conlost_timer = new QTimer(this);
