@@ -324,7 +324,11 @@ void RemoteTranslatorUI::on_SrcLangList_currentIndexChanged(const QString &arg1)
     BB_ClientConfigMgr::Instance().SetSrcChannel(hap.m_srcChannels[lang_id]);
 
     if (TRANSLATOR.isConnected())
-        TRANSLATOR.ReconnectSrcChannel(hap.m_hapName, hap.m_srcChannels[lang_id]);
+    {
+        TRY_FUNC(TRANSLATOR.ReconnectSrcChannel(hap.m_hapName, hap.m_srcChannels[lang_id]));
+        TRY_FUNC(TRANSLATOR.UpdateVolumeLevel(ConfigUI.m_SrcVolumeLevel, true));
+    }
+
 }
 
 // Change target language
