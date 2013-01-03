@@ -126,6 +126,7 @@ void RemoteTranslatorUI::activateButtons()
     ui->LangConnect->setCheckable(true);
 
     // disable buttons and sliders until connect
+    ui->HapList->setEnabled(false);
     ui->MicGainSld->setEnabled(false);
     ui->MicLevelInd->setEnabled(false);
     ui->SrcLevelSld->setEnabled(false);
@@ -223,6 +224,15 @@ void RemoteTranslatorUI::ActivateManConnect()
 
 void RemoteTranslatorUI::RestoreDefaultConfig()
 {
+    QMessageBox msgBox;
+    msgBox.addButton("OK", QMessageBox::AcceptRole);
+    msgBox.addButton("Cancel", QMessageBox::RejectRole);
+    msgBox.setText("Your configuration will be changed to default. Are you sure?");
+    int ret = msgBox.exec();
+
+    if (ret != QMessageBox::AcceptRole)
+        return;
+
     if (TRANSLATOR.isConnected())
         disconnectTranslator();
 
@@ -504,12 +514,12 @@ void RemoteTranslatorUI::on_TrgMuteBut_clicked(bool checked)
 
     if (checked)
     {
-        setStatusLabel(ui->TrgStatusLbl, "Target", "muted", "red", "#5500ff");
+        setStatusLabel(ui->TrgStatusLbl, "Mute", "translators", "red", "#5500ff");
         BB_ClientConfigMgr::Instance().SetTrgMute(true);
     }
     else
     {
-        setStatusLabel(ui->TrgStatusLbl, "Target", "active", "green", "white");
+        setStatusLabel(ui->TrgStatusLbl, "Listen", "translators", "green", "white");
         BB_ClientConfigMgr::Instance().SetTrgMute(false);
     }
     TRY_FUNC(TRANSLATOR.MuteTarget(ConfigUI.m_TrgMute));

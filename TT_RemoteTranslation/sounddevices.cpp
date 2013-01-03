@@ -39,6 +39,8 @@ void SoundDevices::setSystemDevice()
         ui->WindowsStandardButton->setChecked(true);
     else
         ui->DirectSoundButton->setChecked(true);
+
+    drawDevices();
 }
 
 void SoundDevices::drawDevices()

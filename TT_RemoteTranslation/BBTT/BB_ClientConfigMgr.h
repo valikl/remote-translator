@@ -158,7 +158,7 @@ public:
         m_config.m_AGC.m_maxIncrement = agc.m_maxIncrement; m_config.m_AGC.m_maxDecrement = agc.m_maxDecrement;
         m_config.m_AGC.m_maxGain = agc.m_maxGain;}
     void SetEnableVoiceActivation(bool enable) { m_config.m_EnableVoiceActivation = enable; }
-    void SetVoiceActivationLevel(bool level) { m_config.m_VoiceActivationLevel = level; }
+    void SetVoiceActivationLevel(int level) { m_config.m_VoiceActivationLevel = level; }
     void SetNoiseCancel(int noiseCancel) {m_config.m_noiseCancel = noiseCancel;}
     void SetEchoCancel(bool echoCancel) {m_config.m_echoCancel = echoCancel;}
     void SetFramesPerSec(int framesPerSec) {m_config.m_framesPerSec = framesPerSec;}

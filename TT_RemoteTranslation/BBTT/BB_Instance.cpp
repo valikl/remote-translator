@@ -50,8 +50,6 @@ void BB_Instance::login()
         THROW_EXCEPT("Connection to the server failed");
     }
 
-    assert(msg.wmMsg == WM_TEAMTALK_CON_SUCCESS);
-    assert(TT_GetFlags(m_ttInst) & CLIENT_CONNECTED);
     cout << "Now Connected..." << endl;
 
     //now that we're connected log on
@@ -82,10 +80,6 @@ void BB_Instance::login()
     {
         processTTMessage(msg);
     }
-    assert(msg.lParam == TRUE); //command processing complete
-    assert(TT_GetFlags(m_ttInst) & CLIENT_AUTHORIZED); //we're authorized
-    //ensure account we used is administrator
-    assert(TT_GetMyUserType(m_ttInst) & USERTYPE_ADMIN);
 }
 
 void BB_Instance::joinChannel()
