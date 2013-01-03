@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'soundfilters.ui'
 **
-** Created: Fri Oct 12 04:06:30 2012
+** Created: Thu Jan 3 04:55:05 2013
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -84,16 +84,16 @@ public:
         AGCEn->setGeometry(QRect(300, 160, 81, 18));
         label_5 = new QLabel(SoundFilters);
         label_5->setObjectName(QString::fromUtf8("label_5"));
-        label_5->setGeometry(QRect(220, 10, 121, 20));
+        label_5->setGeometry(QRect(210, 10, 121, 20));
         VoiceActLvl = new QSpinBox(SoundFilters);
         VoiceActLvl->setObjectName(QString::fromUtf8("VoiceActLvl"));
-        VoiceActLvl->setGeometry(QRect(120, 40, 46, 22));
+        VoiceActLvl->setGeometry(QRect(140, 40, 46, 22));
         label_6 = new QLabel(SoundFilters);
         label_6->setObjectName(QString::fromUtf8("label_6"));
-        label_6->setGeometry(QRect(50, 40, 71, 20));
+        label_6->setGeometry(QRect(20, 40, 111, 20));
         VoiceActEn = new QCheckBox(SoundFilters);
         VoiceActEn->setObjectName(QString::fromUtf8("VoiceActEn"));
-        VoiceActEn->setGeometry(QRect(120, 70, 81, 18));
+        VoiceActEn->setGeometry(QRect(140, 70, 81, 18));
         EchoEn = new QCheckBox(SoundFilters);
         EchoEn->setObjectName(QString::fromUtf8("EchoEn"));
         EchoEn->setGeometry(QRect(60, 200, 91, 18));
@@ -102,7 +102,7 @@ public:
         DenoiseEn->setGeometry(QRect(60, 170, 71, 18));
         label_7 = new QLabel(SoundFilters);
         label_7->setObjectName(QString::fromUtf8("label_7"));
-        label_7->setGeometry(QRect(50, 10, 121, 20));
+        label_7->setGeometry(QRect(30, 10, 161, 20));
         label_8 = new QLabel(SoundFilters);
         label_8->setObjectName(QString::fromUtf8("label_8"));
         label_8->setGeometry(QRect(50, 130, 121, 20));
@@ -127,7 +127,7 @@ public:
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
 "<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-weight:600;\">AGC levels</span></p></body></html>", 0, QApplication::UnicodeUTF8));
-        label_6->setText(QApplication::translate("SoundFilters", "  Voice level", 0, QApplication::UnicodeUTF8));
+        label_6->setText(QApplication::translate("SoundFilters", "  Voice activation level", 0, QApplication::UnicodeUTF8));
         VoiceActEn->setText(QApplication::translate("SoundFilters", "enable", 0, QApplication::UnicodeUTF8));
         EchoEn->setText(QApplication::translate("SoundFilters", "Cancel echo", 0, QApplication::UnicodeUTF8));
         DenoiseEn->setText(QApplication::translate("SoundFilters", "Denoise", 0, QApplication::UnicodeUTF8));
@@ -135,7 +135,7 @@ public:
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
-"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt; font-weight:600;\">Voice control</span></p></body></html>", 0, QApplication::UnicodeUTF8));
+"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt; font-weight:600;\">Voice activation control</span></p></body></html>", 0, QApplication::UnicodeUTF8));
         label_8->setText(QApplication::translate("SoundFilters", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
