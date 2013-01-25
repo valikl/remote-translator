@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'sounddevices.ui'
 **
-** Created: Fri Oct 12 04:06:30 2012
+** Created: Fri Jan 25 04:55:05 2013
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -50,9 +50,11 @@ public:
         InputDevicesBox = new QComboBox(SoundDevices);
         InputDevicesBox->setObjectName(QString::fromUtf8("InputDevicesBox"));
         InputDevicesBox->setGeometry(QRect(150, 80, 211, 22));
+        InputDevicesBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
         OutputDevicesBox = new QComboBox(SoundDevices);
         OutputDevicesBox->setObjectName(QString::fromUtf8("OutputDevicesBox"));
         OutputDevicesBox->setGeometry(QRect(150, 160, 211, 22));
+        OutputDevicesBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
         DirectSoundButton = new QRadioButton(SoundDevices);
         DirectSoundButton->setObjectName(QString::fromUtf8("DirectSoundButton"));
         DirectSoundButton->setGeometry(QRect(150, 30, 82, 18));

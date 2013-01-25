@@ -10,7 +10,8 @@
 
 RemoteTranslatorUI::RemoteTranslatorUI(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::RemoteTranslatorUI)
+    ui(new Ui::RemoteTranslatorUI),
+    first_connect(true)
 {
     ui->setupUi(this);
 }
@@ -60,7 +61,6 @@ void RemoteTranslatorUI::setSliders()
 
 void RemoteTranslatorUI::activateSliders()
 {
-    TRY_FUNC(TRANSLATOR.UpdateMicrophoneGainLevel(ConfigUI.m_MicGainLevel));
     TRY_FUNC(TRANSLATOR.UpdateVolumeLevel(ConfigUI.m_TrgVolumeLevel, false));
     TRY_FUNC(TRANSLATOR.UpdateVolumeLevel(ConfigUI.m_SrcVolumeLevel, true));
 }
@@ -379,23 +379,40 @@ void RemoteTranslatorUI::connectTranslator()
     ui->TrgMuteBut->setCheckable(true);
 
     if (!ui->MicMuteBut->isChecked())
-        ui->MicMuteBut->click();
+    {
+        if (first_connect)
+            ui->MicMuteBut->click();
+        else
+            TRY_FUNC(TRANSLATOR.MuteMicrophone(false));
+    }
+    else
+    {
+        TRY_FUNC(TRANSLATOR.UpdateMicrophoneGainLevel(SOUND_GAIN_MIN));
+    }
+
     if (!ui->TrgMuteBut->isChecked())
-        ui->TrgMuteBut->click();
+    {
+        if (first_connect)
+            ui->TrgMuteBut->click();
+    }
+    else
+    {
+        TRY_FUNC(TRANSLATOR.MuteTarget(ConfigUI.m_TrgMute));
+    }
 
     ui->TrgLangList->setEnabled(false);
     ui->NickName->setEnabled(false);
 
     ui->LangConnect->setText("Disconnect");
+
+    first_connect = false;
 }
 
 // Disconnect translator
 void RemoteTranslatorUI::disconnectTranslator()
 {
-    if (ui->MicMuteBut->isChecked())
-        ui->MicMuteBut->click();
-    if (ui->TrgMuteBut->isChecked())
-        ui->TrgMuteBut->click();
+    if (ui->ServerSelfTestEn->isChecked())
+        ui->ServerSelfTestEn->click();
 
     // disable buttons and sliders until connect
     ui->MicGainSld->setEnabled(false);

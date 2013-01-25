@@ -38,6 +38,9 @@
      <height>22</height>
     </rect>
    </property>
+   <property name="sizeAdjustPolicy">
+    <enum>QComboBox::AdjustToContents</enum>
+   </property>
   </widget>
   <widget class="QComboBox" name="OutputDevicesBox">
    <property name="geometry">
@@ -47,6 +50,9 @@
      <width>211</width>
      <height>22</height>
     </rect>
+   </property>
+   <property name="sizeAdjustPolicy">
+    <enum>QComboBox::AdjustToContents</enum>
    </property>
   </widget>
   <widget class="QRadioButton" name="DirectSoundButton">

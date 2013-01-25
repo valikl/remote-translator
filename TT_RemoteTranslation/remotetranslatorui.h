@@ -90,6 +90,8 @@ private:
     QTimer *microphone_timer;
     QTimer *user_timer;
     QTimer *conlost_timer;
+
+    bool first_connect;
 };
 
 #endif // REMOTETRANSLATORUI_H
