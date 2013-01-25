@@ -30,7 +30,8 @@ enum InstType
     INSTANCE_TYPE_NONE = 0,
     INSTANCE_TYPE_SRC = 1,
     INSTANCE_TYPE_DST = 2,
-    INSTANCE_TYPE_VIDEO = 3
+    INSTANCE_TYPE_DST_LOCAL = 3,
+    INSTANCE_TYPE_VIDEO = 4
 };
 
 struct Happening
@@ -84,12 +85,14 @@ public:
     bool isConnected() { return m_isConnected; }
     bool isConnectionLost();
 
+    bool isLocalDstConnected() { return (m_channelDstLocal == NULL); }
+
     // Operations
 
     // Disable/Enable my microphone
     void MuteMicrophone(bool bMute);
     // Mute other users in my channel
-    void MuteTarget(bool bMute);
+    void MuteTarget(bool bMute, InstType type = INSTANCE_TYPE_DST);
     void UpdateVolumeLevel(int volumeLevel, bool isSource);
     void UpdateMicrophoneGainLevel(int gainLevel);
     void EnableDenoising(bool bEnable);
@@ -131,6 +134,7 @@ private:
     BB_InstanceVideo *m_channelVideo;
     BB_InstanceAudio *m_channelSrc;
     BB_InstanceAudio *m_channelDst;
+    BB_InstanceAudio *m_channelDstLocal;
     BB_InstanceDummy *m_channelDummy;
     BB_InstanceAudio *m_channelDstTest;
 

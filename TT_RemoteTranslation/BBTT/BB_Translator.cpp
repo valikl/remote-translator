@@ -5,7 +5,7 @@
 
 using namespace std;
 
-BB_Translator::BB_Translator() : m_channelVideo(NULL), m_channelSrc(NULL), m_channelDst(NULL),
+BB_Translator::BB_Translator() : m_channelVideo(NULL), m_channelSrc(NULL), m_channelDst(NULL), m_channelDstLocal(NULL),
     m_channelDummy(NULL), m_channelDstTest(NULL), m_isLoopbackStarted(false), m_isTargetLoopbackStarted(false),
     m_isConnected(false)
 {
@@ -42,6 +42,11 @@ void BB_Translator::disconnectHap()
         m_channelDst->finalize();
         delete m_channelDst;
     }
+    if (m_channelDstLocal)
+    {
+        m_channelDstLocal->finalize();
+        delete m_channelDstLocal;
+    }
 
     if (m_channelDummy)
     {
@@ -51,6 +56,7 @@ void BB_Translator::disconnectHap()
     m_channelVideo = NULL;
     m_channelSrc = NULL;
     m_channelDst = NULL;
+    m_channelDstLocal = NULL;
 }
 
 void BB_Translator::connectHap(wstring hapName, wstring nickName, wstring srcName, wstring dstName,
@@ -106,6 +112,19 @@ void BB_Translator::connectHap(wstring hapName, wstring nickName, wstring srcNam
         context.m_channelName = dstName;
         m_channelDst = new BB_InstanceAudio(context);
         m_channelDst->init();
+
+        // Local Dst
+        if (!findSrcChannelId(hap, dstName, context.channelId))
+        {
+            //THROW_EXCEPT("Local Destination channel not found");
+        }
+        else
+        {
+            context.m_nickName = DST_CHANNEL_PREFIX + nickName;
+            context.m_channelName = dstName;
+            m_channelDstLocal = new BB_InstanceAudio(context);
+            m_channelDstLocal->init();
+        }
 
         context.channelId = hap.m_videoChannel.m_id;
         context.m_nickName = VIDEO_CHANNEL_PREFIX + nickName;
@@ -343,6 +362,18 @@ void BB_Translator::getUsers(std::vector<BB_ChannelUser> &userList, InstType ins
             m_channelDst->getUsers(userList);
             break;
         }
+        case INSTANCE_TYPE_DST_LOCAL:
+        {
+            if (m_channelDstLocal)
+            {
+                m_channelDstLocal->getUsers(userList);
+            }
+            else
+            {
+                THROW_EXCEPT("Cannot generate Users list. No local translator.");
+            }
+            break;
+        }
         case INSTANCE_TYPE_VIDEO:
         {
             m_channelVideo->getUsers(userList);
@@ -454,7 +485,7 @@ void BB_Translator::MuteMicrophone(bool bMute)
     m_channelDst->MuteMicrophone(bMute);
 }
 
-void BB_Translator::MuteTarget(bool bMute)
+void BB_Translator::MuteTarget(bool bMute, InstType type)
 {
     Lock lock(m_cs);
 
@@ -462,7 +493,20 @@ void BB_Translator::MuteTarget(bool bMute)
     {
         THROW_EXCEPT("Cannot mute target. Translator is not connected");
     }
-    m_channelDst->MuteTarget(bMute);
+
+    if (type == INSTANCE_TYPE_DST_LOCAL && m_channelDstLocal == NULL)
+    {
+        THROW_EXCEPT("Cannot mute target. No Local Translator.");
+    }
+
+    if (type == INSTANCE_TYPE_DST)
+    {
+        m_channelDst->MuteTarget(bMute);
+    }
+    else // INSTANCE_TYPE_DST_LOCAL
+    {
+        m_channelDstLocal->MuteTarget(bMute);
+    }
 }
 
 void BB_Translator::UpdateVolumeLevel(int volumeLevel, bool isSource)
