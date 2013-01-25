@@ -73,9 +73,17 @@ void BB_InstanceVideo::OpenVideoWindow(HWND hEffectiveWnd)
     // Create window in thread
     m_videoWin = new BB_Window(BB_VIDEO_WINDOW_CLASS, BB_VIDEO_WINDOW_CHANNEL, hEffectiveWnd);
     m_videoWinThread = new Thread(m_videoWin);
+    if (!SetThreadPriority(m_videoWinThread->GetThreadHandle(), THREAD_PRIORITY_LOWEST))
+    {
+        cout << "SetThreadPriority failed with error " <<  GetLastError() << endl;
+    }
 
     // Create video loop thread
     m_videoLoopThread = new Thread(this);
+    if (!SetThreadPriority(m_videoLoopThread->GetThreadHandle(), THREAD_PRIORITY_LOWEST))
+    {
+        cout << "SetThreadPriority failed with error " <<  GetLastError() << endl;
+    }
 }
 
 void BB_InstanceVideo::StopVideoThreads()

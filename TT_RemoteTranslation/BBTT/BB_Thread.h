@@ -17,6 +17,8 @@ public:
     // returned status is WAIT_TIMEOUT
     BOOL Join(DWORD dwMilliseconds = INFINITE);
 
+    HANDLE GetThreadHandle() { return m_hThread; }
+
 protected:
     static DWORD WINAPI ThreadProc(LPVOID lpParameter);
 
