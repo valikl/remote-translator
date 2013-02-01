@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'remotetranslatorui.ui'
 **
-** Created: Thu Jan 3 05:44:08 2013
+** Created: Fri Feb 1 03:24:31 2013
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -87,6 +87,7 @@ public:
     QCheckBox *ServerSelfTestEn;
     QFrame *line_4;
     QLabel *label_19;
+    QPushButton *chooseTransButton;
     QMenuBar *menuBar;
     QMenu *menuSound_Settings;
     QMenu *menuManual_TT_connection;
@@ -218,7 +219,7 @@ public:
         line_3->setFrameShadow(QFrame::Sunken);
         label_18 = new QLabel(centralWidget);
         label_18->setObjectName(QString::fromUtf8("label_18"));
-        label_18->setGeometry(QRect(400, 370, 291, 41));
+        label_18->setGeometry(QRect(350, 370, 261, 41));
         TrgStatusLbl = new QLabel(centralWidget);
         TrgStatusLbl->setObjectName(QString::fromUtf8("TrgStatusLbl"));
         TrgStatusLbl->setGeometry(QRect(500, 450, 101, 61));
@@ -256,6 +257,9 @@ public:
         label_19 = new QLabel(centralWidget);
         label_19->setObjectName(QString::fromUtf8("label_19"));
         label_19->setGeometry(QRect(410, 530, 291, 41));
+        chooseTransButton = new QPushButton(centralWidget);
+        chooseTransButton->setObjectName(QString::fromUtf8("chooseTransButton"));
+        chooseTransButton->setGeometry(QRect(660, 380, 91, 23));
         RemoteTranslatorUI->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(RemoteTranslatorUI);
         menuBar->setObjectName(QString::fromUtf8("menuBar"));
@@ -382,7 +386,7 @@ public:
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
-"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:16pt; font-weight:600;\">&quot;To&quot; channel settings</span></p></body></html>", 0, QApplication::UnicodeUTF8));
+"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:16pt; font-weight:600;\">Other translators:</span></p></body></html>", 0, QApplication::UnicodeUTF8));
         TrgStatusLbl->setText(QApplication::translate("RemoteTranslatorUI", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
@@ -413,6 +417,7 @@ public:
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
 "<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:16pt; font-weight:600;\">Video control</span></p></body></html>", 0, QApplication::UnicodeUTF8));
+        chooseTransButton->setText(QApplication::translate("RemoteTranslatorUI", "Choose local", 0, QApplication::UnicodeUTF8));
         menuSound_Settings->setTitle(QApplication::translate("RemoteTranslatorUI", "Sound Settings", 0, QApplication::UnicodeUTF8));
         menuManual_TT_connection->setTitle(QApplication::translate("RemoteTranslatorUI", "Manual connection", 0, QApplication::UnicodeUTF8));
     } // retranslateUi

@@ -136,6 +136,7 @@ void RemoteTranslatorUI::activateButtons()
     ui->showVideoButton->setEnabled(false);
     ui->VideoLvlSld->setEnabled(false);
     ui->ServerSelfTestEn->setEnabled(false);
+    ui->chooseTransButton->setEnabled(false);
 
     //Timer for micophone progress bar
     microphone_timer = new QTimer(this);
@@ -378,6 +379,14 @@ void RemoteTranslatorUI::connectTranslator()
     ui->MicMuteBut->setCheckable(true);
     ui->TrgMuteBut->setCheckable(true);
 
+    if (TRANSLATOR.isLocalDstConnected())
+    {
+        ui->chooseTransButton->setEnabled(true);
+        ui->chooseTransButton->setCheckable(true);
+    }
+    else
+        ui->chooseTransButton->setEnabled(false);
+
     if (!ui->MicMuteBut->isChecked())
     {
         if (first_connect)
@@ -397,7 +406,8 @@ void RemoteTranslatorUI::connectTranslator()
     }
     else
     {
-        TRY_FUNC(TRANSLATOR.MuteTarget(ConfigUI.m_TrgMute));
+        InstType inst_type = ui->chooseTransButton->isChecked() ? INSTANCE_TYPE_DST_LOCAL : INSTANCE_TYPE_DST;
+        TRY_FUNC(TRANSLATOR.MuteTarget(ConfigUI.m_TrgMute, inst_type));
     }
 
     ui->TrgLangList->setEnabled(false);
@@ -424,6 +434,7 @@ void RemoteTranslatorUI::disconnectTranslator()
     ui->showVideoButton->setEnabled(false);
     ui->VideoLvlSld->setEnabled(false);
     ui->ServerSelfTestEn->setEnabled(false);
+    ui->chooseTransButton->setEnabled(false);
 
     TRY_FUNC(TRANSLATOR.disconnectHap());
 
@@ -539,7 +550,27 @@ void RemoteTranslatorUI::on_TrgMuteBut_clicked(bool checked)
         setStatusLabel(ui->TrgStatusLbl, "Listen", "translators", "green", "white");
         BB_ClientConfigMgr::Instance().SetTrgMute(false);
     }
-    TRY_FUNC(TRANSLATOR.MuteTarget(ConfigUI.m_TrgMute));
+    InstType inst_type = ui->chooseTransButton->isChecked() ? INSTANCE_TYPE_DST_LOCAL : INSTANCE_TYPE_DST;
+    TRY_FUNC(TRANSLATOR.MuteTarget(ConfigUI.m_TrgMute, inst_type));
+}
+
+// Choose translator: local or remote
+void RemoteTranslatorUI::on_chooseTransButton_clicked(bool checked)
+{
+    if (ui->chooseTransButton->isChecked())
+    {
+        ui->chooseTransButton->setChecked(true);
+        ui->chooseTransButton->setText("Local");
+        TRY_FUNC(TRANSLATOR.MuteTarget(true, INSTANCE_TYPE_DST));
+        TRY_FUNC(TRANSLATOR.MuteTarget(ConfigUI.m_TrgMute, INSTANCE_TYPE_DST_LOCAL));
+    }
+    else
+    {
+        ui->chooseTransButton->setChecked(false);
+        ui->chooseTransButton->setText("Choose local");
+        TRY_FUNC(TRANSLATOR.MuteTarget(true, INSTANCE_TYPE_DST_LOCAL));
+        TRY_FUNC(TRANSLATOR.MuteTarget(ConfigUI.m_TrgMute, INSTANCE_TYPE_DST));
+    }
 }
 
 void RemoteTranslatorUI::on_LocalSelfTestEn_stateChanged(int checked)

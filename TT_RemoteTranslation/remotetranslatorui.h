@@ -41,7 +41,7 @@ private slots:
 
     void on_NickName_editingFinished();
 
-    // happa\ening slots
+    // happening slots
     void on_HapList_currentIndexChanged(const QString &arg1);
 
     // source/target language slots
@@ -69,6 +69,8 @@ private slots:
     void on_ServerSelfTestEn_stateChanged(int checked);
 
     void on_showVideoButton_clicked(bool clicked);
+
+    void on_chooseTransButton_clicked(bool checked);
 
 private:
 
