@@ -61,7 +61,8 @@ void RemoteTranslatorUI::setSliders()
 
 void RemoteTranslatorUI::activateSliders()
 {
-    TRY_FUNC(TRANSLATOR.UpdateVolumeLevel(ConfigUI.m_TrgVolumeLevel, false));
+    InstType inst_type = ui->chooseTransButton->isChecked() ? INSTANCE_TYPE_DST_LOCAL : INSTANCE_TYPE_DST;
+    TRY_FUNC(TRANSLATOR.UpdateVolumeLevel(ConfigUI.m_TrgVolumeLevel, false, inst_type));
     TRY_FUNC(TRANSLATOR.UpdateVolumeLevel(ConfigUI.m_SrcVolumeLevel, true));
 }
 
@@ -476,7 +477,8 @@ void RemoteTranslatorUI::on_TrgLvlSld_valueChanged(int val)
     BB_ClientConfigMgr::Instance().SetTrgVolumeLevel(ui->TrgLvlSld->value());
     if (!TRANSLATOR.isConnected())
         return;
-    TRY_FUNC(TRANSLATOR.UpdateVolumeLevel(ConfigUI.m_TrgVolumeLevel, false));
+    InstType inst_type = ui->chooseTransButton->isChecked() ? INSTANCE_TYPE_DST_LOCAL : INSTANCE_TYPE_DST;
+    TRY_FUNC(TRANSLATOR.UpdateVolumeLevel(ConfigUI.m_TrgVolumeLevel, false, inst_type));
 }
 
 void RemoteTranslatorUI::on_SrcLevelSld_valueChanged(int val)
@@ -563,6 +565,7 @@ void RemoteTranslatorUI::on_chooseTransButton_clicked(bool checked)
         ui->chooseTransButton->setText("Local");
         TRY_FUNC(TRANSLATOR.MuteTarget(true, INSTANCE_TYPE_DST));
         TRY_FUNC(TRANSLATOR.MuteTarget(ConfigUI.m_TrgMute, INSTANCE_TYPE_DST_LOCAL));
+        TRY_FUNC(TRANSLATOR.UpdateVolumeLevel(ConfigUI.m_TrgVolumeLevel, false, INSTANCE_TYPE_DST_LOCAL));
     }
     else
     {
@@ -570,6 +573,7 @@ void RemoteTranslatorUI::on_chooseTransButton_clicked(bool checked)
         ui->chooseTransButton->setText("Choose local");
         TRY_FUNC(TRANSLATOR.MuteTarget(true, INSTANCE_TYPE_DST_LOCAL));
         TRY_FUNC(TRANSLATOR.MuteTarget(ConfigUI.m_TrgMute, INSTANCE_TYPE_DST));
+        TRY_FUNC(TRANSLATOR.UpdateVolumeLevel(ConfigUI.m_TrgVolumeLevel, false, INSTANCE_TYPE_DST));
     }
 }
 
