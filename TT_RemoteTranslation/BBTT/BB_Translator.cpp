@@ -120,7 +120,7 @@ void BB_Translator::connectHap(wstring hapName, wstring nickName, wstring srcNam
         }
         else
         {
-            context.m_nickName = DST_CHANNEL_PREFIX + nickName;
+            context.m_nickName = LCL_CHANNEL_PREFIX + nickName;
             context.m_channelName = dstName;
             m_channelDstLocal = new BB_InstanceAudio(context);
             m_channelDstLocal->init();
@@ -509,7 +509,7 @@ void BB_Translator::MuteTarget(bool bMute, InstType type)
     }
 }
 
-void BB_Translator::UpdateVolumeLevel(int volumeLevel, bool isSource)
+void BB_Translator::UpdateVolumeLevel(int volumeLevel, bool isSource, InstType type)
 {
     Lock lock(m_cs);
 
@@ -523,7 +523,14 @@ void BB_Translator::UpdateVolumeLevel(int volumeLevel, bool isSource)
     }
     else
     {
-        m_channelDst->UpdateVolumeLevel(volumeLevel);
+        if (type == INSTANCE_TYPE_DST)
+        {
+             m_channelDst->UpdateVolumeLevel(volumeLevel);
+        }
+        else // INSTANCE_TYPE_DST_LOCAL
+        {
+            m_channelDstLocal->UpdateVolumeLevel(volumeLevel);
+        }
     }
 }
 

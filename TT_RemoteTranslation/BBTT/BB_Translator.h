@@ -19,6 +19,7 @@ const std::wstring SOUND_CHECK_CHANNEL_NAME(L"Sound Check");
 
 const std::wstring SRC_CHANNEL_PREFIX(L"SRC_");
 const std::wstring DST_CHANNEL_PREFIX(L"DST_");
+const std::wstring LCL_CHANNEL_PREFIX(L"LCL_");
 const std::wstring VIDEO_CHANNEL_PREFIX(L"VIDEO_");
 
 const std::wstring DST_SOUND_TEST_CHANNEL_NICKNAME(L"DstSoundTestUser");
@@ -93,7 +94,7 @@ public:
     void MuteMicrophone(bool bMute);
     // Mute other users in my channel
     void MuteTarget(bool bMute, InstType type = INSTANCE_TYPE_DST);
-    void UpdateVolumeLevel(int volumeLevel, bool isSource);
+    void UpdateVolumeLevel(int volumeLevel, bool isSource, InstType type = INSTANCE_TYPE_DST);
     void UpdateMicrophoneGainLevel(int gainLevel);
     void EnableDenoising(bool bEnable);
     void EnableEchoCancellation(bool bEnable);
