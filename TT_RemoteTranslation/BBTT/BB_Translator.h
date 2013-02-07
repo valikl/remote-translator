@@ -86,7 +86,7 @@ public:
     bool isConnected() { return m_isConnected; }
     bool isConnectionLost();
 
-    bool isLocalDstConnected() { return (m_channelDstLocal == NULL); }
+    bool isLocalDstConnected() { return (m_channelDstLocal != NULL); }
 
     // Operations
 
