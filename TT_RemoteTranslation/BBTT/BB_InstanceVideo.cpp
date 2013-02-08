@@ -70,6 +70,11 @@ void BB_InstanceVideo::OpenVideoWindow(HWND hEffectiveWnd)
     }
     m_stopThread = false;
 
+    if (!SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS))
+    {
+        cout << "SetPriorityClass failed with error " <<  GetLastError() << endl;
+    }
+
     // Create window in thread
     m_videoWin = new BB_Window(BB_VIDEO_WINDOW_CLASS, BB_VIDEO_WINDOW_CHANNEL, hEffectiveWnd);
     m_videoWinThread = new Thread(m_videoWin);
