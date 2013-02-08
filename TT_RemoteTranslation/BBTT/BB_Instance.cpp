@@ -241,9 +241,26 @@ void BB_Instance::getSoundDevices(vector<BB_SoundDevice> &soundDevs)
     for (int i = 0; i < size; ++i)
     {
         BB_SoundDevice soundDev;
+        switch (soundDevices[i].nSoundSystem)
+        {
+            case SOUNDSYSTEM_WINMM:
+            {
+                soundDev.m_isSoundSystemWin = true;
+                break;
+            }
+            case SOUNDSYSTEM_DSOUND:
+            {
+                soundDev.m_isSoundSystemWin = false;
+                break;
+            }
+            default: // SOUNDSYSTEM_ALSA etc.
+            {
+                // We don't support other types
+                continue;
+            }
+        }
         soundDev.m_id = soundDevices[i].nDeviceID;
         soundDev.m_isOutputDevice = false;
-        soundDev.m_isSoundSystemWin = (soundDevices[i].nSoundSystem == SOUNDSYSTEM_WINMM);
         soundDev.m_deviceName = soundDevices[i].szDeviceName;
         soundDev.m_deviceId = soundDevices[i].szDeviceName;
         soundDev.m_isDefault = (soundDevices[i].nDeviceID == inputDeviceId);
@@ -270,9 +287,26 @@ void BB_Instance::getSoundDevices(vector<BB_SoundDevice> &soundDevs)
     for (int i = 0; i < size; ++i)
     {
         BB_SoundDevice soundDev;
+        switch (soundDevices[i].nSoundSystem)
+        {
+            case SOUNDSYSTEM_WINMM:
+            {
+                soundDev.m_isSoundSystemWin = true;
+                break;
+            }
+            case SOUNDSYSTEM_DSOUND:
+            {
+                soundDev.m_isSoundSystemWin = false;
+                break;
+            }
+            default: // SOUNDSYSTEM_ALSA etc.
+            {
+                // We don't support other types
+                continue;
+            }
+        }
         soundDev.m_id = soundDevices[i].nDeviceID;
         soundDev.m_isOutputDevice = true;
-        soundDev.m_isSoundSystemWin = (soundDevices[i].nSoundSystem == SOUNDSYSTEM_WINMM);
         soundDev.m_deviceName = soundDevices[i].szDeviceName;
         soundDev.m_deviceId = soundDevices[i].szDeviceName;
         soundDev.m_isDefault = (soundDevices[i].nDeviceID == outputDeviceId);
