@@ -77,12 +77,41 @@ void BB_InstanceAudio::MuteTarget(bool bMute)
     }
 }
 
+int gainLevel(int ref_volume)
+{
+    if(ref_volume <= SOUND_VOLUME_MAX)
+        return SOUND_GAIN_DEFAULT;
+
+    float gain = ref_volume/(float)SOUND_VOLUME_MAX;
+    gain *= SOUND_GAIN_DEFAULT;
+    return gain;
+}
+
+void BB_InstanceAudio::updateUserGainLevel(int volume)
+{
+    int gain = gainLevel(volume);
+
+    std::vector<BB_ChannelUser> users;
+    getUsers(users);
+
+    for(int i=0;i<users.size();i++)
+    {
+        BB_ChannelUser user = users[i];
+        if(volume <= SOUND_VOLUME_MAX)
+            //disable soft gain
+            TT_SetUserGainLevel(m_ttInst, user.m_id, SOUND_GAIN_DEFAULT);
+        else
+            TT_SetUserGainLevel(m_ttInst, user.m_id, gain);
+    }
+}
+
 void BB_InstanceAudio::UpdateVolumeLevel(int volumeLevel)
 {
     if (!TT_SetSoundOutputVolume(m_ttInst, volumeLevel))
     {
         THROW_EXCEPT("Update volume level failed");
     }
+    updateUserGainLevel(volumeLevel);
 }
 
 void BB_InstanceAudio::UpdateMicrophoneGainLevel(int gainLevel)

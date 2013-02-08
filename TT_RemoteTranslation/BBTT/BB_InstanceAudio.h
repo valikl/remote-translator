@@ -37,6 +37,8 @@ public:
 private:
 
     bool m_isMuted;
+
+    void updateUserGainLevel(int volume);
 };
 
 

@@ -41,10 +41,10 @@ void RemoteTranslatorUI::setSliders()
     ui->MicGainSld->setRange(SOUND_GAIN_MIN, gainMax);
     ui->MicGainSld->setValue(ConfigUI.m_MicGainLevel);
 
-    ui->TrgLvlSld->setRange(SOUND_VOLUME_MIN, SOUND_VOLUME_MAX);
+    ui->TrgLvlSld->setRange(SOUND_VOLUME_MIN, SOUND_VOLUME_MAX*(gainMax/SOUND_GAIN_DEFAULT));
     ui->TrgLvlSld->setValue(ConfigUI.m_TrgVolumeLevel);
 
-    ui->SrcLevelSld->setRange(SOUND_VOLUME_MIN, SOUND_VOLUME_MAX);
+    ui->SrcLevelSld->setRange(SOUND_VOLUME_MIN, SOUND_VOLUME_MAX*(gainMax/SOUND_GAIN_DEFAULT));
     ui->SrcLevelSld->setValue(ConfigUI.m_SrcVolumeLevel);
 
     // some mystical bug, configuration video quality is affected by setRange
