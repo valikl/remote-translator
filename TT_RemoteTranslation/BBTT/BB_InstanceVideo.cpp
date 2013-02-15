@@ -112,15 +112,23 @@ void BB_InstanceVideo::run()
 {
     BB_Instance::init();
 
-    // Wait in order to be sure video window was loaded
-    Sleep(5000);
-
-    int userId;
-    try
+    // Wait 10 seconds for video user
+    int userId = -1;
+    for (int retry = 0; retry < 10; retry++)
     {
-        userId = GetVideoUserId();
+        Sleep(1000);
+        try
+        {
+            userId = GetVideoUserId();
+            break;
+        }
+        catch(BB_Exception excp)
+        {
+            continue;
+        }
     }
-    catch(BB_Exception excp)
+
+    if (userId == -1)
     {
         BB_Instance::finalize();
         return;
@@ -136,7 +144,23 @@ void BB_InstanceVideo::run()
          cout << "Failed to issue subscribe command" << endl;
     }
 
-    HDC hDC = GetDC(m_videoWin->BBGetHandle());
+    // Wait 10 seconds for video window
+    HDC hDC;
+    for (int retry = 0; retry < 10; retry++)
+    {
+        Sleep(1000);
+        hDC = GetDC(m_videoWin->BBGetHandle());
+        if (hDC != NULL)
+        {
+            break;
+        }
+    }
+
+    if (hDC == NULL)
+    {
+        BB_Instance::finalize();
+        return;
+    }
 
     TTMessage msg;
     int wait_ms = 10000;
