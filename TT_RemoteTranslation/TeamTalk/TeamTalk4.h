@@ -15,7 +15,7 @@
  * get the version of the loaded DLL call TT_GetVersion(). A remote
  * client's version can be seen in the @a szVersion member of the
  * #User-struct. */
-#define TEAMTALK4_VERSION "4.3.0.1901"
+#define TEAMTALK4_VERSION "4.4.0.2069"
 
 
 #if defined(WIN32)
@@ -1233,27 +1233,49 @@ extern "C" {
      * @see #UserAccount */
 #define TT_CHANNELS_OPERATOR_MAX 16
 
+    /** @ingroup sounddevices
+     * The maximum number of sample rates supported by a #SoundDevice. */
+#define TT_SAMPLERATES_MAX 16
+
     /** @addtogroup sounddevices
      * @{ */
 
     /**
      * @brief The supported sound systems.
      *
-     * DirectSound is highly recommended on Windows 2K/XP/Vista.
-     *
      * @see SoundDevice
-     * @see TT_InitSoundInputDevice
-     * @see TT_InitSoundOutputDevice */
+     * @see TT_InitSoundInputDevice()
+     * @see TT_InitSoundOutputDevice()
+     * @see TT_InitSoundDuplexDevices() */
     typedef enum SoundSystem
     {
-        /** @brief Should be used on Windows CE. */
+        /** @brief Sound system denoting invalid or not found. */
+        SOUNDSYSTEM_NONE = 0,
+        /** @brief Windows legacy audio system. Should be used on Windows Mobile. */
         SOUNDSYSTEM_WINMM = 1,
-        /** @brief Should be used on Windows 2K/XP/Vista/7. */
+        /** @brief DirectSound audio system. Should be used on Windows 2K/XP. */
         SOUNDSYSTEM_DSOUND = 2,
-        /** @brief Should be used on Linux. */
+        /**
+         * @brief Advanced Linux Sound Architecture (ALSA). Should be used on Linux.
+         *
+         * Often ALSA sound devices only support a limited number of
+         * sample rates so TeamTalk internally use software filters to
+         * resample the audio to the sample rate used by the selected
+         * audio codecs. */
         SOUNDSYSTEM_ALSA = 3,
-        /** @brief Should be used on MacOS. */
-        SOUNDSYSTEM_COREAUDIO = 4
+        /** @brief Core Audio. Should be used on MacOS. */
+        SOUNDSYSTEM_COREAUDIO = 4,
+        /** @brief Windows Audio Session API (WASAPI). Should be used
+         * on Windows Vista/7.
+         *
+         * WASAPI audio devices typically only support a single sample
+         * rate so internally TeamTalk uses software filters to
+         * resample audio to the sample rate used by the selected
+         * audio codecs.
+         * 
+         * Check @c supportedSampleRates and @c nDefaultSampleRate of
+         * #SoundDevice to see which sample rates are supported. */
+        SOUNDSYSTEM_WASAPI = 5
     } SoundSystem;
 
     /** 
@@ -1282,8 +1304,8 @@ extern "C" {
         /** @brief The name of the sound device */
         TTCHAR szDeviceName[TT_STRLEN];
         /** @brief An identifier uniquely identifying the sound device
-         * even when new sound devices are being added and removed.  In
-         * DirectSound and WinMM it would be the GUID of the sound
+         * even when new sound devices are being added and removed. In
+         * DirectSound, WASAPI and WinMM it would be the GUID of the sound
          * device. Note that it may not always be available. */
         TTCHAR szDeviceID[TT_STRLEN];
 #ifdef WIN32
@@ -1312,7 +1334,9 @@ extern "C" {
          * the list of supported sample rates or its maximum size of 16. 
          * Investigating the support sample rates is usually only required
          * on Linux since sound devices often don't numerous sample rates. */
-        INT32 supportedSampleRates[16];
+        INT32 supportedSampleRates[TT_SAMPLERATES_MAX];
+        /** @brief The default sample rate for the sound device. */
+        INT32 nDefaultSampleRate;
     } SoundDevice;
     
     /**
@@ -1994,6 +2018,11 @@ extern "C" {
         /** @brief Users are allowed to forward desktop packets through
          * server. Requires server version 4.3.0.1490 or later.*/
         USERRIGHT_FORWARD_DESKTOP    = 0x0400,
+        /** @brief Users are only allowed to use valid UTF-8 strings.
+         * If a non-UTF-8 string is passed in a command the server will
+         * respond with the command error #CMDERR_SYNTAX_ERROR.
+         * @note Requires server version 4.3.1.1940 or later. */
+        USERRIGHT_STRICT_UTF8        = 0x0800,
     } UserRight;
 
     /** 
@@ -2448,7 +2477,12 @@ extern "C" {
         CHANNEL_ECHO_VIDEO          = 0x0010,
         /** @brief Desktop session sent to the channel should also be
          * sent back to the local client instance. */
-        CHANNEL_ECHO_DESKTOP        = 0x0020
+        CHANNEL_ECHO_DESKTOP        = 0x0020,
+        /** @brief Only channel operators (and administrators) will receive 
+         * audio/video/desktop transmissions. Default channel users 
+         * will only see transmissions from operators and/or 
+         * administrators. */
+        CHANNEL_OPERATOR_RECVONLY   = 0x0040,
     } ChannelType;
 
     /** 
@@ -3140,6 +3174,13 @@ extern "C" {
     TEAMTALKDLL_API BOOL TT_GetDefaultSoundDevices(IN TTInstance* lpTTInstance, 
                                                    OUT INT32* lpnInputDeviceID, 
                                                    OUT INT32* lpnOutputDeviceID);
+    /**
+     * @brief Get the default sound devices for the specified sound system.
+     *
+     * @see TT_GetDefaultSoundDevices() */
+    TEAMTALKDLL_API BOOL TT_GetDefaultSoundDevicesEx(IN SoundSystem nSndSystem, 
+                                                     OUT INT32* lpnInputDeviceID, 
+                                                     OUT INT32* lpnOutputDeviceID);
 
     /**
      * @brief Get information about input devices for audio recording. 
@@ -3225,17 +3266,23 @@ extern "C" {
      * @brief Enable duplex mode where multiple audio streams are
      * mixed into a single stream using software.
      *
+     * Duplex mode can @b ONLY be enabled on sound devices which
+     * support the same sample rate. Sound systems #SOUNDSYSTEM_WASAPI
+     * and #SOUNDSYSTEM_ALSA typically only support a single sample
+     * rate.  Check @c supportedSampleRates in #SoundDevice to see
+     * which sample rates are supported.
+     *
+     * Sound duplex mode is required for echo cancellation since sound
+     * input and output device must be synchronized. Also sound cards
+     * which does not support multiple output streams should use
+     * duplex mode.
+     *
      * If TT_InitSoundDuplexDevices() is successful the following
      * flags will be set:
      *
      * - #CLIENT_SNDINOUTPUT_DUPLEX
      * - #CLIENT_SNDOUTPUT_READY
      * - #CLIENT_SNDINPUT_READY
-     *
-     * Sound duplex mode is required for echo cancellation since sound
-     * input and output device must be synchronized. Also sound cards
-     * which does not support multiple output stream should use
-     * duplex mode.
      *
      * Call TT_CloseSoundDuplexDevices() to shut down duplex mode.
      *
@@ -3255,7 +3302,8 @@ extern "C" {
      * through #TT_GetSoundOutputDevices.
      * @see TT_InitSoundInputDevice()
      * @see TT_InitSoundOutputDevice()
-     * @see TT_EnableEchoCancellation */
+     * @see TT_EnableEchoCancellation()
+     * @see TT_CloseSoundDuplexDevices() */
     TEAMTALKDLL_API BOOL TT_InitSoundDuplexDevices(IN TTInstance* lpTTInstance, 
                                                    IN INT32 nInputDeviceID,
                                                    IN INT32 nOutputDeviceID);
@@ -3311,6 +3359,23 @@ extern "C" {
     TEAMTALKDLL_API BOOL TT_CloseSoundDuplexDevices(IN TTInstance* lpTTInstance);
 
     /**
+     * @brief Reinitialize sound system (in order to detect
+     * new/removed devices).
+     *
+     * When the TeamTalk client is first initialized all the sound
+     * devices are detected and stored in a list inside the client
+     * instance. If a user adds or removes e.g. a USB sound device
+     * then it's not picked up automatically by the client
+     * instance. TT_RestartSoundSystem() can be used to reinitialize
+     * the sound system and thereby detect if sound devices have been
+     * removed or added.
+     *
+     * In order to restart the sound system all sound devices in all
+     * client instances must be closed using TT_CloseSoundInputDevice(),
+     * TT_CloseSoundoutputDevice() and TT_CloseSoundDuplexDevices(). */
+    TEAMTALKDLL_API BOOL TT_RestartSoundSystem();
+
+    /**
      * @brief Perform a record and playback test of specified sound
      * devices.
      *
@@ -3342,12 +3407,19 @@ extern "C" {
      * devices along with an audio configuration and ability to try
      * echo cancellation.
      *
-     * This function is almost like TT_StartSoundLoopbackTest() except
-     * that it allows the use of #AudioConfig to enable AGC, denoising
-     * and AGC.
+     * Both input and output devices MUST support the specified sample 
+     * rate since this loop back test uses duplex mode 
+     * ( @see TT_InitSoundDuplexDevices() ). Check out @c 
+     * supportedSampleRates of #SoundDevice to see which sample rates
+     * are supported.
      *
      * Call TT_StopSoundLoopbackTest() to stop the loopback
      * test.
+     *
+     * This function is almost like TT_StartSoundLoopbackTest() except
+     * that it allows the use of #AudioConfig to enable AGC and echo
+     * cancellation. Note that AGC and echo cancellation can only be
+     * used in mono, i.e. @c nChannels = 1.
      *
      * @param lpTTInstance Pointer to client instance created by 
      * #TT_InitTeamTalk.
@@ -4458,6 +4530,22 @@ extern "C" {
                                       IN const TTCHAR* szBindIPAddr,
                                       IN INT32 nLocalTcpPort,
                                       IN INT32 nLocalUdpPort);
+
+    /**
+     * @brief Connect to non-encrypted TeamTalk server.
+     *
+     * This function is only useful in the Professional edition of the
+     * TeamTalk SDK. It enabled the encrypted TeamTalk client to
+     * connect to non-encrypted TeamTalk servers. The default
+     * behaviour of TT_Connect() and TT_ConnectEx() in the
+     * Professional SDK is to connect to encrypted servers.  */
+    TEAMTALKDLL_API BOOL TT_ConnectNonEncrypted(IN TTInstance* lpTTInstance,
+                                                IN const TTCHAR* szHostAddress,
+                                                IN INT32 nTcpPort,
+                                                IN INT32 nUdpPort,
+                                                IN const TTCHAR* szBindIPAddr,
+                                                IN INT32 nLocalTcpPort,
+                                                IN INT32 nLocalUdpPort);
 
     /**
      * @brief Disconnect from the server.
