@@ -91,6 +91,8 @@ void BB_InstanceDummy::StopSoundLoopbackTest()
 void BB_InstanceDummy::StartTargetSoundLoopbackTest(const AGC &agc, bool bEnableDenoise, INT32 maxNoiseSuppress, bool bEchoCancel,
     INT32 inputSoundDevId, INT32 outputSoundDevId)
 {
+    StartSoundLoopbackTest(inputSoundDevId, outputSoundDevId);
+/*
     if (!TT_InitSoundDuplexDevices(m_ttInst, inputSoundDevId, outputSoundDevId))
     {
         THROW_EXCEPT("Sound devices initialization failed");
@@ -111,15 +113,19 @@ void BB_InstanceDummy::StartTargetSoundLoopbackTest(const AGC &agc, bool bEnable
         TT_CloseSoundDuplexDevices(m_ttInst);
         THROW_EXCEPT("Cannot start extended sound loopback test");
     }
+*/
 }
 
 void BB_InstanceDummy::StopTargetSoundLoopbackTest()
 {
+    StopSoundLoopbackTest();
+    /*
     if (!TT_StopSoundLoopbackTest(m_ttInst))
     {
         THROW_EXCEPT("Cannot stop sound loopback test");
     }
     TT_CloseSoundDuplexDevices(m_ttInst);
+    */
 }
 
 void BB_InstanceDummy::StartHandleMessages()
