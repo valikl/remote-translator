@@ -2,7 +2,7 @@
 
 #include <windows.h>
 #include <string>
-#include "../BBTT/IRunnable.h"
+#include "IRunnable.h"
 
 class BB_Window : public IRunnable
 {
