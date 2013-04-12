@@ -1,11 +1,15 @@
 #include <QtGui/QApplication>
-#include "broadcastcontroller.h"
+#include <QMainWindow>
+#include "GUI/controlpanel.h"
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    BroadcastController w;
-    w.show();
-    
+    QMainWindow window;
+    ControlPanel panel;
+
+    window.setCentralWidget(&panel);
+    window.show();
+
     return a.exec();
 }
