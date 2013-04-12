@@ -11,7 +11,6 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-    broadcastcontroller.cpp \
     BBTT/BB_InstanceSource.cpp \
     BBTT/BB_InstanceReceiver.cpp \
     BBTT/BB_ConfigMgr.cpp \
@@ -28,10 +27,11 @@ SOURCES += main.cpp\
     ../Ticpp/tinyxmlerror.cpp \
     ../Ticpp/tinyxml.cpp \
     ../Ticpp/tinystr.cpp \
-    ../Ticpp/ticpp.cpp
+    ../Ticpp/ticpp.cpp \
+    GUI/ttinstview.cpp \
+    GUI/controlpanel.cpp
 
 HEADERS  += \
-    broadcastcontroller.h \
     common.h \
     BBTT/targetver.h \
     BBTT/BB_InstanceSource.h \
@@ -53,9 +53,9 @@ HEADERS  += \
     ../Utils/CriticalSection.h \
     ../Utils/BB_Window.h \
     ../Utils/BB_Thread.h \
-    ../Utils/BB_Exception.h
-
-FORMS    += broadcastcontroller.ui
+    ../Utils/BB_Exception.h \
+    GUI/controlpanel.h \
+    GUI/ttinstview.h
 
 
 
