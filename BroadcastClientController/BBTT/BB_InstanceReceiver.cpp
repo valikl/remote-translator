@@ -28,7 +28,7 @@ void BB_InstanceReceiver::init()
 
 void BB_InstanceReceiver::finalize()
 {
-    if (m_stopThread != NULL)
+    if (m_stopThread)
     {
         m_stopThread = true;
         m_thread->Join();

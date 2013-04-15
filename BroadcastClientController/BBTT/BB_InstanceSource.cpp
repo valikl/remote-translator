@@ -28,7 +28,7 @@ void BB_InstanceSource::init()
 
 void BB_InstanceSource::finalize()
 {
-    if (m_stopThread != NULL)
+    if (m_stopThread)
     {
         m_stopThread = true;
         m_thread->Join();

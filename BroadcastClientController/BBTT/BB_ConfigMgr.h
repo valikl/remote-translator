@@ -125,6 +125,7 @@ public:
 	int saveConfig();
 	
     ConnectionConfig GetConnectionConfig(GroupType groupType);
+    BB_GroupConfig GetGroupConfig(GroupType groupType);
     BB_GroupElementConfig GetGroupElementConfig(GroupType groupType, const std::wstring name);
 
     void AddGroupElement(GroupType groupType, const std::wstring name, const std::wstring nickName, const std::wstring channel);
@@ -176,7 +177,7 @@ private:
 
     std::string buildGroupConfig(BB_GroupConfig &groupConfig, const std::string &nodeGroupsName, const std::string &nodeGroupName, GroupType groupType);
 
-    BB_GroupConfig *GetGroupConfig(GroupType groupType);
+    BB_GroupConfig *_GetGroupConfig(GroupType groupType);
     BB_GroupElementConfig *_GetGroupElementConfig(GroupType groupType, const std::wstring name);
 
     BB_GroupConfig m_sources;

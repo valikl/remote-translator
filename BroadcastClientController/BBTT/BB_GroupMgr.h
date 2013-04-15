@@ -1,6 +1,7 @@
 #pragma once
 
 #include <list>
+#include <map>
 #include <string>
 
 #include "BB_Instance.h"
@@ -30,12 +31,10 @@ protected:
 
     T *FindInstance(const std::wstring name)
     {
-        for (unsigned int i=0; i < m_elements.size(); i++)
+        typename std::map<std::wstring, T *>::iterator it = m_elements.find(name);
+        if (it != m_elements.end())
         {
-            //if (m_elements[i].GetName() == name)
-            {
-                return m_elements[i];
-            }
+            return (*it).second;
         }
         return NULL;
     }
@@ -44,7 +43,7 @@ protected:
     std::vector<BB_SoundDevice> m_soundDevList;
 
     GroupType m_groupType;
-    std::vector<T *> m_elements;
+    std::map<std::wstring, T *> m_elements;
 
     BB_CriticalSection m_cs;
 };

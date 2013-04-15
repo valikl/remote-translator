@@ -30,12 +30,13 @@ void BB_GroupMgr<T>::finalize()
 {
     Lock lock(m_cs);
 
-    for (unsigned int i = m_elements.size() - 1; i >= 0 ; i--)
+    typename map<wstring, T *>::iterator it;
+    for (it = m_elements.begin(); it != m_elements.end(); ++it)
     {
-        T *inst = m_elements[i];
-        m_elements.pop_back();
+        T *inst = (*it).second;
         inst->finalize();
         delete inst;
+        m_elements.erase(it);
     }
 }
 
@@ -44,16 +45,12 @@ void BB_GroupMgr<T>::RemoveInstance(const std::wstring name)
 {
     Lock lock(m_cs);
 
-    for (unsigned int i=0; i < m_elements.size(); i++)
+    typename std::map<wstring, T *>::const_iterator it = m_elements.find(name);
     {
-        if (m_elements[i].GetName() == name)
-        {
-            T *inst = m_elements[i];
-            m_elements.erase(m_elements.begin() + i);
-            inst->finalize();
-            delete inst;
-            return;
-        }
+        T *inst = (*it).second;
+        inst->finalize();
+        delete inst;
+        m_elements.erase(it);
     }
 }
 
@@ -92,7 +89,7 @@ void BB_GroupMgr<T>::AddInstance(const wstring name, const wstring inputSoundDev
     {
         T inst = new T(context);
         inst->init();
-        m_elements.push_back(inst);
+        m_elements.insert(name, inst);
     }
     catch(BB_Exception excp)
     {
