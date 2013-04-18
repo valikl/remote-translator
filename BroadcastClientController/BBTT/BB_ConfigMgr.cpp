@@ -432,12 +432,17 @@ int BB_ConfigMgr::saveConfig()
 
 ConnectionConfig BB_ConfigMgr::GetConnectionConfig(GroupType groupType)
 {
-    return GetGroupConfig(groupType)->m_ConnectionConfig;
+    return _GetGroupConfig(groupType)->m_ConnectionConfig;
+}
+
+BB_GroupConfig BB_ConfigMgr::GetGroupConfig(GroupType groupType)
+{
+    return *(_GetGroupConfig(groupType));
 }
 
 void BB_ConfigMgr::AddGroupElement(GroupType groupType, const std::wstring name, const std::wstring nickName, const std::wstring channel)
 {
-    BB_GroupConfig *groups = GetGroupConfig(groupType);
+    BB_GroupConfig *groups = _GetGroupConfig(groupType);
     if (groups == NULL)
     {
         return;
@@ -452,7 +457,7 @@ void BB_ConfigMgr::AddGroupElement(GroupType groupType, const std::wstring name,
 
 void BB_ConfigMgr::RemoveGroupElement(GroupType groupType, const std::wstring name)
 {
-    BB_GroupConfig *groups = GetGroupConfig(groupType);
+    BB_GroupConfig *groups = _GetGroupConfig(groupType);
     if (groups == NULL)
     {
         return;
@@ -469,7 +474,7 @@ void BB_ConfigMgr::RemoveGroupElement(GroupType groupType, const std::wstring na
 }
 
 
-BB_GroupConfig *BB_ConfigMgr::GetGroupConfig(GroupType groupType)
+BB_GroupConfig *BB_ConfigMgr::_GetGroupConfig(GroupType groupType)
 {
     switch (groupType)
     {
@@ -494,7 +499,7 @@ BB_GroupConfig *BB_ConfigMgr::GetGroupConfig(GroupType groupType)
 
 BB_GroupElementConfig *BB_ConfigMgr::_GetGroupElementConfig(GroupType groupType, const wstring name)
 {
-    BB_GroupConfig *group = GetGroupConfig(groupType);
+    BB_GroupConfig *group = _GetGroupConfig(groupType);
     if (group == NULL)
     {
         return NULL;
@@ -513,7 +518,7 @@ BB_GroupElementConfig *BB_ConfigMgr::_GetGroupElementConfig(GroupType groupType,
 
 BB_GroupElementConfig BB_ConfigMgr::GetGroupElementConfig(GroupType groupType, const wstring name)
 {
-    BB_GroupConfig *group = GetGroupConfig(groupType);
+    BB_GroupConfig *group = _GetGroupConfig(groupType);
     if (group == NULL)
     {
         THROW_EXCEPT("No Group Element found");
@@ -530,13 +535,13 @@ BB_GroupElementConfig BB_ConfigMgr::GetGroupElementConfig(GroupType groupType, c
     THROW_EXCEPT("No Group Element found");
 }
 
-void BB_ConfigMgr::SetIP(GroupType groupType, const wstring ip) { GetGroupConfig(groupType)->m_ConnectionConfig.m_IP = ip; }
-void BB_ConfigMgr::SetTCP(GroupType groupType, int tcp) { GetGroupConfig(groupType)->m_ConnectionConfig.m_TCP = tcp; }
-void BB_ConfigMgr::SetUDP(GroupType groupType, int udp) { GetGroupConfig(groupType)->m_ConnectionConfig.m_UDP = udp; }
-void BB_ConfigMgr::SetSrvUser(GroupType groupType, const wstring srvUser) { GetGroupConfig(groupType)->m_ConnectionConfig.m_srvUser = srvUser; }
-void BB_ConfigMgr::SetSrvUserPsw(GroupType groupType, const wstring srvUserPsw) { GetGroupConfig(groupType)->m_ConnectionConfig.m_srvUserPsw = srvUserPsw; }
-void BB_ConfigMgr::SetSrvPsw(GroupType groupType, const wstring srvPsw) { GetGroupConfig(groupType)->m_ConnectionConfig.m_srvPsw = srvPsw; }
-void BB_ConfigMgr::SetPath(GroupType groupType, const wstring path) { GetGroupConfig(groupType)->m_ConnectionConfig.m_srvPsw = path; }
+void BB_ConfigMgr::SetIP(GroupType groupType, const wstring ip) { _GetGroupConfig(groupType)->m_ConnectionConfig.m_IP = ip; }
+void BB_ConfigMgr::SetTCP(GroupType groupType, int tcp) { _GetGroupConfig(groupType)->m_ConnectionConfig.m_TCP = tcp; }
+void BB_ConfigMgr::SetUDP(GroupType groupType, int udp) { _GetGroupConfig(groupType)->m_ConnectionConfig.m_UDP = udp; }
+void BB_ConfigMgr::SetSrvUser(GroupType groupType, const wstring srvUser) { _GetGroupConfig(groupType)->m_ConnectionConfig.m_srvUser = srvUser; }
+void BB_ConfigMgr::SetSrvUserPsw(GroupType groupType, const wstring srvUserPsw) { _GetGroupConfig(groupType)->m_ConnectionConfig.m_srvUserPsw = srvUserPsw; }
+void BB_ConfigMgr::SetSrvPsw(GroupType groupType, const wstring srvPsw) { _GetGroupConfig(groupType)->m_ConnectionConfig.m_srvPsw = srvPsw; }
+void BB_ConfigMgr::SetPath(GroupType groupType, const wstring path) { _GetGroupConfig(groupType)->m_ConnectionConfig.m_srvPsw = path; }
 
 void BB_ConfigMgr::SetGroupName(GroupType groupType, const wstring name)
 {
