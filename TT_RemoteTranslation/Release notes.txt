@@ -1,0 +1,32 @@
+1.02
+
+1. Added "Local" button near "To channel" settings. This button will toggle channel where you are 
+   hearing your counterparts (others translators at same language).
+    a. If not pressed "To channel" settings will applied for destination channel i.e. if 2     
+       translators are remote, than you will hear second translator (This is what previous versions 
+       are providing)
+    b. If pressed "To channel" settings will applied for destination channel located under source 
+       folder. This option is suitable when 1 person translating locally from BB, and the other one 
+       is remote. Case Julio provided us. The obstacle to always use this options is that you will 
+       hear yourself as well with some delay (~1-2 sec) so it is very unpleasant to use it constantly. 
+       Use Target mute button when you are translating :) 
+
+2. We've increased priority of our "audio" threads and decreased priority to our "video" thread. 
+   Hopefully this should solve or minimize problems Julio reporting with audio cut offs during translations.
+
+-----------------------------------------------------------------------------------------------------
+
+1.03
+
+1. Moved to new Team Talk SDK version - tt4sdk_v4.4a
+2. Bug fix - video did not start at the beginning of class 
+3. Bug fix - Sound devices appeared twice in the list of devices
+4. Bug fix - failure in sound test, when pressing “Test selected” button
+
+-----------------------------------------------------------------------------------------------------
+
+1.04
+
+1. Local self test bug fixed
+2. Process priority changes removed. Hopefully, it will improve video quality
+3. Microphone Active Annotation was changed to On/Off
