@@ -30,3 +30,10 @@
 1. Local self test bug fixed
 2. Process priority changes removed. Hopefully, it will improve video quality
 3. Microphone Active Annotation was changed to On/Off
+
+---------------------------------------------------------------
+
+1.05
+
+1. Process priority change returned to process at high priority, video thread at low priority
+2. Added license key. No more trials 
