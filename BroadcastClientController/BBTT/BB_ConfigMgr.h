@@ -6,7 +6,8 @@
 #include "Ticpp/ticpp.h"
 
 #include <string>
-#include <vector>
+#include <map>
+#include "Utils/CriticalSection.h"
 
 const std::string NODE_GROUPS("Groups");
 const std::string NODE_SOURCES("Sources");
@@ -108,7 +109,7 @@ struct ConnectionConfig
 struct BB_GroupConfig
 {
     ConnectionConfig m_ConnectionConfig;
-    std::vector<BB_GroupElementConfig> m_groupList;
+    std::map<std::wstring, BB_GroupElementConfig> m_groupList;
 };
 
 
@@ -121,7 +122,7 @@ public:
 	// Returns the instance of the singleton
     static BB_ConfigMgr &Instance();
 
-    void init(bool bRestore);
+    void init(bool bRestore = false);
 	int saveConfig();
 	
     ConnectionConfig GetConnectionConfig(GroupType groupType);
@@ -185,6 +186,8 @@ private:
     BB_GroupConfig m_restrictedServers;
 
 	std::string m_fileName;
+
+    BB_CriticalSection m_cs;
 };
 
 

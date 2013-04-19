@@ -12,7 +12,7 @@ void BB_GroupMgr<T>::init()
     try
     {
         BB_InstanceContext context;
-        InitInstanceContext(m_groupType, context);
+        InitInstanceContext(context);
         BB_Instance inst(context);
         inst.init();
         m_soundDevList.clear();
@@ -36,8 +36,8 @@ void BB_GroupMgr<T>::finalize()
         T *inst = (*it).second;
         inst->finalize();
         delete inst;
-        m_elements.erase(it);
     }
+    m_elements.clear();
 }
 
 template<class T>
@@ -46,11 +46,12 @@ void BB_GroupMgr<T>::RemoveInstance(const std::wstring name)
     Lock lock(m_cs);
 
     typename std::map<wstring, T *>::const_iterator it = m_elements.find(name);
+    if (it != m_elements.end())
     {
         T *inst = (*it).second;
         inst->finalize();
         delete inst;
-        m_elements.erase(it);
+        m_elements.erase(name);
     }
 }
 
@@ -89,7 +90,7 @@ void BB_GroupMgr<T>::AddInstance(const wstring name, const wstring inputSoundDev
     {
         T inst = new T(context);
         inst->init();
-        m_elements.insert(name, inst);
+        m_elements.insert(pair<wstring, T *>(name, inst));
     }
     catch(BB_Exception excp)
     {

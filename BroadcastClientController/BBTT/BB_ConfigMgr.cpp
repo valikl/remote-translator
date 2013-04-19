@@ -1,5 +1,6 @@
 #include "BB_ConfigMgr.h"
 #include "Ticpp/tinyxml.h"
+#include "Utils/Lock.h"
 #include "Utils/BB_Exception.h"
 
 using namespace std;
@@ -147,7 +148,7 @@ void BB_ConfigMgr::loadGroupsConfig(const ticpp::Document &doc, BB_GroupConfig &
                 {
                     BB_GroupElementConfig groupElement;
                     loadGroupConfig(node.Get(), groupElement);
-                    groupConfig.m_groupList.push_back(groupElement);
+                    groupConfig.m_groupList.insert(pair<wstring, BB_GroupElementConfig>(groupElement.m_name, groupElement));
                 }
             }
 		}
@@ -365,38 +366,40 @@ string BB_ConfigMgr::buildGroupConfig(BB_GroupConfig &groupConfig, const string 
         ATTR_SRV_USER_PASSWORD + "=\"" + string(groupConfig.m_ConnectionConfig.m_srvUserPsw.begin(), groupConfig.m_ConnectionConfig.m_srvUserPsw.end()) + "\" " +
         ATTR_SOURCE_PATH + "=\"" + string(groupConfig.m_ConnectionConfig.m_srcPath.begin(), groupConfig.m_ConnectionConfig.m_srcPath.end()) + "\" " + ">\n";
 
+    std::map<wstring, BB_GroupElementConfig>::iterator it;
+    for (it = groupConfig.m_groupList.begin(); it != groupConfig.m_groupList.end(); ++it)
     for (unsigned int i=0; i < groupConfig.m_groupList.size(); i++)
     {
         xml += "<" + nodeGroupName + " " +
-            ATTR_NAME + "=\"" + string(groupConfig.m_groupList[i].m_name.begin(), groupConfig.m_groupList[i].m_name.end()) + "\" " +
-            ATTR_NICK_NAME + "=\"" + string(groupConfig.m_groupList[i].m_nickName.begin(), groupConfig.m_groupList[i].m_nickName.end()) + "\" " +
-            ATTR_CHANNEL_NAME + "=\"" + string(groupConfig.m_groupList[i].m_channelName.begin(), groupConfig.m_groupList[i].m_channelName.end()) + "\" " + ">\n";
+            ATTR_NAME + "=\"" + string(it->second.m_name.begin(), it->second.m_name.end()) + "\" " +
+            ATTR_NICK_NAME + "=\"" + string(it->second.m_nickName.begin(), it->second.m_nickName.end()) + "\" " +
+            ATTR_CHANNEL_NAME + "=\"" + string(it->second.m_channelName.begin(), it->second.m_channelName.end()) + "\" " + ">\n";
 
         xml += "<" + NODE_AUDIO_SETTINGS + " " +
-            ATTR_DENOISE_LEVEL + "=\"" + string(itoa(groupConfig.m_groupList[i].m_noiseCancel, buffer, 10)) + "\" " +
-            ATTR_ECHO_CANCEL + "=\"" + string(itoa(groupConfig.m_groupList[i].m_echoCancel, buffer, 10)) + "\" ";
+            ATTR_DENOISE_LEVEL + "=\"" + string(itoa(it->second.m_noiseCancel, buffer, 10)) + "\" " +
+            ATTR_ECHO_CANCEL + "=\"" + string(itoa(it->second.m_echoCancel, buffer, 10)) + "\" ";
             if (groupType == GROUP_TYPE_RECEIVERS)
             {
-                xml += ATTR_SRC_VOLUME_LEVEL + "=\"" + string(itoa(groupConfig.m_groupList[i].m_SrcVolumeLevel, buffer, 10)) + "\" ";
+                xml += ATTR_SRC_VOLUME_LEVEL + "=\"" + string(itoa(it->second.m_SrcVolumeLevel, buffer, 10)) + "\" ";
             }
             else
             {
-                xml += ATTR_MIC_GAIN_LEVEL + "=\"" + string(itoa(groupConfig.m_groupList[i].m_MicGainLevel, buffer, 10)) + "\" ";
+                xml += ATTR_MIC_GAIN_LEVEL + "=\"" + string(itoa(it->second.m_MicGainLevel, buffer, 10)) + "\" ";
             }
-            xml += ATTR_SOUND_SYS_WIN + "=\"" + string(itoa(groupConfig.m_groupList[i].m_isSoundSystemWin, buffer, 10)) + "\" " +
-            ATTR_INPUT_SOUND_DEV_ID + "=\"" + string(groupConfig.m_groupList[i].m_InputSoundDevId.begin(), groupConfig.m_groupList[i].m_InputSoundDevId.end()) + "\" " +
-            ATTR_OUTPUT_SOUND_DEV_ID + "=\"" + string(groupConfig.m_groupList[i].m_OutputSoundDevId.begin(), groupConfig.m_groupList[i].m_OutputSoundDevId.end()) + "\" " + ">\n";
+            xml += ATTR_SOUND_SYS_WIN + "=\"" + string(itoa(it->second.m_isSoundSystemWin, buffer, 10)) + "\" " +
+            ATTR_INPUT_SOUND_DEV_ID + "=\"" + string(it->second.m_InputSoundDevId.begin(), it->second.m_InputSoundDevId.end()) + "\" " +
+            ATTR_OUTPUT_SOUND_DEV_ID + "=\"" + string(it->second.m_OutputSoundDevId.begin(), it->second.m_OutputSoundDevId.end()) + "\" " + ">\n";
 
         xml += "<" + NODE_AGC + " " +
-            ATTR_ENABLE + "=\"" + string(itoa(groupConfig.m_groupList[i].m_AGC.m_enable, buffer, 10)) + "\" " +
-            ATTR_GAIN_LEVEL + "=\"" + string(itoa(groupConfig.m_groupList[i].m_AGC.m_gainLevel, buffer, 10)) + "\" " +
-            ATTR_MAX_INC + "=\"" + string(itoa(groupConfig.m_groupList[i].m_AGC.m_maxIncrement, buffer, 10)) + "\" " +
-            ATTR_MAX_DEC + "=\"" + string(itoa(groupConfig.m_groupList[i].m_AGC.m_maxDecrement, buffer, 10)) + "\" " +
-            ATTR_MAX_GAIN + "=\"" + string(itoa(groupConfig.m_groupList[i].m_AGC.m_maxGain, buffer, 10)) + "\" " + "/>\n";
+            ATTR_ENABLE + "=\"" + string(itoa(it->second.m_AGC.m_enable, buffer, 10)) + "\" " +
+            ATTR_GAIN_LEVEL + "=\"" + string(itoa(it->second.m_AGC.m_gainLevel, buffer, 10)) + "\" " +
+            ATTR_MAX_INC + "=\"" + string(itoa(it->second.m_AGC.m_maxIncrement, buffer, 10)) + "\" " +
+            ATTR_MAX_DEC + "=\"" + string(itoa(it->second.m_AGC.m_maxDecrement, buffer, 10)) + "\" " +
+            ATTR_MAX_GAIN + "=\"" + string(itoa(it->second.m_AGC.m_maxGain, buffer, 10)) + "\" " + "/>\n";
 
         xml += "<" + NODE_VOICE_ACTIVATION + " " +
-            ATTR_VOICE_ACTIVATION_ENABLE + "=\"" + string(itoa(groupConfig.m_groupList[i].m_EnableVoiceActivation, buffer, 10)) + "\" " +
-            ATTR_VOICE_ACTIVATION_LEVEL + "=\"" + string(itoa(groupConfig.m_groupList[i].m_VoiceActivationLevel, buffer, 10)) + "\" " + "/>\n";
+            ATTR_VOICE_ACTIVATION_ENABLE + "=\"" + string(itoa(it->second.m_EnableVoiceActivation, buffer, 10)) + "\" " +
+            ATTR_VOICE_ACTIVATION_LEVEL + "=\"" + string(itoa(it->second.m_VoiceActivationLevel, buffer, 10)) + "\" " + "/>\n";
 
         xml += "</" + NODE_AUDIO_SETTINGS + ">\n";
 
@@ -410,7 +413,9 @@ string BB_ConfigMgr::buildGroupConfig(BB_GroupConfig &groupConfig, const string 
 
 int BB_ConfigMgr::saveConfig()
 {
-	string xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n";
+    Lock lock(m_cs);
+
+    string xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n";
     xml += "<" + NODE_GROUPS + ">\n";
 	
     xml += buildGroupConfig(m_sources, NODE_SOURCES, NODE_SOURCE, GROUP_TYPE_SOURCES);
@@ -442,6 +447,8 @@ BB_GroupConfig BB_ConfigMgr::GetGroupConfig(GroupType groupType)
 
 void BB_ConfigMgr::AddGroupElement(GroupType groupType, const std::wstring name, const std::wstring nickName, const std::wstring channel)
 {
+    Lock lock(m_cs);
+
     BB_GroupConfig *groups = _GetGroupConfig(groupType);
     if (groups == NULL)
     {
@@ -452,25 +459,20 @@ void BB_ConfigMgr::AddGroupElement(GroupType groupType, const std::wstring name,
     config.m_name = name;
     config.m_nickName = nickName;
     config.m_channelName = channel;
-    groups->m_groupList.push_back(config);
+    groups->m_groupList.insert(pair<wstring, BB_GroupElementConfig>(name, config));
 }
 
 void BB_ConfigMgr::RemoveGroupElement(GroupType groupType, const std::wstring name)
 {
+    Lock lock(m_cs);
+
     BB_GroupConfig *groups = _GetGroupConfig(groupType);
     if (groups == NULL)
     {
         return;
     }
 
-    for (unsigned int i=0; i < groups->m_groupList.size(); i++)
-    {
-        if (groups->m_groupList[i].m_name == name)
-        {
-            groups->m_groupList.erase(groups->m_groupList.begin() + i);
-            return;
-        }
-    }
+    groups->m_groupList.erase(name);
 }
 
 
@@ -505,12 +507,10 @@ BB_GroupElementConfig *BB_ConfigMgr::_GetGroupElementConfig(GroupType groupType,
         return NULL;
     }
 
-    for (unsigned int i=0; i < group->m_groupList.size(); i++)
+    map<wstring, BB_GroupElementConfig>::iterator it = group->m_groupList.find(name);
+    if (it != group->m_groupList.end())
     {
-        if (group->m_groupList[i].m_name == name)
-        {
-            return &(group->m_groupList[i]);
-        }
+        return &((*it).second);
     }
 
     return NULL;
@@ -518,33 +518,71 @@ BB_GroupElementConfig *BB_ConfigMgr::_GetGroupElementConfig(GroupType groupType,
 
 BB_GroupElementConfig BB_ConfigMgr::GetGroupElementConfig(GroupType groupType, const wstring name)
 {
+    Lock lock(m_cs);
+
     BB_GroupConfig *group = _GetGroupConfig(groupType);
     if (group == NULL)
     {
+        lock.Unlock();
         THROW_EXCEPT("No Group Element found");
     }
 
-    for (unsigned int i=0; i < group->m_groupList.size(); i++)
+    map<wstring, BB_GroupElementConfig>::iterator it = group->m_groupList.find(name);
+    if (it != group->m_groupList.end())
     {
-        if (group->m_groupList[i].m_name == name)
-        {
-            return group->m_groupList[i];
-        }
+        return (*it).second;
     }
 
+    lock.Unlock();
     THROW_EXCEPT("No Group Element found");
 }
 
-void BB_ConfigMgr::SetIP(GroupType groupType, const wstring ip) { _GetGroupConfig(groupType)->m_ConnectionConfig.m_IP = ip; }
-void BB_ConfigMgr::SetTCP(GroupType groupType, int tcp) { _GetGroupConfig(groupType)->m_ConnectionConfig.m_TCP = tcp; }
-void BB_ConfigMgr::SetUDP(GroupType groupType, int udp) { _GetGroupConfig(groupType)->m_ConnectionConfig.m_UDP = udp; }
-void BB_ConfigMgr::SetSrvUser(GroupType groupType, const wstring srvUser) { _GetGroupConfig(groupType)->m_ConnectionConfig.m_srvUser = srvUser; }
-void BB_ConfigMgr::SetSrvUserPsw(GroupType groupType, const wstring srvUserPsw) { _GetGroupConfig(groupType)->m_ConnectionConfig.m_srvUserPsw = srvUserPsw; }
-void BB_ConfigMgr::SetSrvPsw(GroupType groupType, const wstring srvPsw) { _GetGroupConfig(groupType)->m_ConnectionConfig.m_srvPsw = srvPsw; }
-void BB_ConfigMgr::SetPath(GroupType groupType, const wstring path) { _GetGroupConfig(groupType)->m_ConnectionConfig.m_srvPsw = path; }
+void BB_ConfigMgr::SetIP(GroupType groupType, const wstring ip)
+{
+    Lock lock(m_cs);
+    _GetGroupConfig(groupType)->m_ConnectionConfig.m_IP = ip;
+}
+
+void BB_ConfigMgr::SetTCP(GroupType groupType, int tcp)
+{
+    Lock lock(m_cs);
+    _GetGroupConfig(groupType)->m_ConnectionConfig.m_TCP = tcp;
+}
+
+void BB_ConfigMgr::SetUDP(GroupType groupType, int udp)
+{
+    Lock lock(m_cs);
+    _GetGroupConfig(groupType)->m_ConnectionConfig.m_UDP = udp;
+}
+
+void BB_ConfigMgr::SetSrvUser(GroupType groupType, const wstring srvUser)
+{
+    Lock lock(m_cs);
+    _GetGroupConfig(groupType)->m_ConnectionConfig.m_srvUser = srvUser;
+}
+
+void BB_ConfigMgr::SetSrvUserPsw(GroupType groupType, const wstring srvUserPsw)
+{
+    Lock lock(m_cs);
+    _GetGroupConfig(groupType)->m_ConnectionConfig.m_srvUserPsw = srvUserPsw;
+}
+
+void BB_ConfigMgr::SetSrvPsw(GroupType groupType, const wstring srvPsw)
+{
+    Lock lock(m_cs);
+    _GetGroupConfig(groupType)->m_ConnectionConfig.m_srvPsw = srvPsw;
+}
+
+void BB_ConfigMgr::SetPath(GroupType groupType, const wstring path)
+{
+    Lock lock(m_cs);
+    _GetGroupConfig(groupType)->m_ConnectionConfig.m_srvPsw = path;
+}
 
 void BB_ConfigMgr::SetGroupName(GroupType groupType, const wstring name)
 {
+    Lock lock(m_cs);
+
     BB_GroupElementConfig *groupElement = _GetGroupElementConfig(groupType, name);
     if (groupElement == NULL)
     {
@@ -555,6 +593,8 @@ void BB_ConfigMgr::SetGroupName(GroupType groupType, const wstring name)
 
 void BB_ConfigMgr::SetGroupNickName(GroupType groupType, const wstring name, const wstring nickName)
 {
+    Lock lock(m_cs);
+
     BB_GroupElementConfig *groupElement = _GetGroupElementConfig(groupType, name);
     if (groupElement == NULL)
     {
@@ -565,6 +605,8 @@ void BB_ConfigMgr::SetGroupNickName(GroupType groupType, const wstring name, con
 
 void BB_ConfigMgr::SetGroupChannel(GroupType groupType, const wstring name, const wstring channel)
 {
+    Lock lock(m_cs);
+
     BB_GroupElementConfig *groupElement = _GetGroupElementConfig(groupType, name);
     if (groupElement == NULL)
     {
@@ -575,6 +617,8 @@ void BB_ConfigMgr::SetGroupChannel(GroupType groupType, const wstring name, cons
 
 void BB_ConfigMgr::SetGroupAGC(GroupType groupType, const wstring name, AGC agc)
 {
+    Lock lock(m_cs);
+
     BB_GroupElementConfig *groupElement = _GetGroupElementConfig(groupType, name);
     if (groupElement == NULL)
     {
@@ -585,6 +629,8 @@ void BB_ConfigMgr::SetGroupAGC(GroupType groupType, const wstring name, AGC agc)
 
 void BB_ConfigMgr::SetGroupEnableVoiceActivation(GroupType groupType, const wstring name, bool enable)
 {
+    Lock lock(m_cs);
+
     BB_GroupElementConfig *groupElement = _GetGroupElementConfig(groupType, name);
     if (groupElement == NULL)
     {
@@ -595,6 +641,8 @@ void BB_ConfigMgr::SetGroupEnableVoiceActivation(GroupType groupType, const wstr
 
 void BB_ConfigMgr::SetGroupVoiceActivationLevel(GroupType groupType, const wstring name, int level)
 {
+    Lock lock(m_cs);
+
     BB_GroupElementConfig *groupElement = _GetGroupElementConfig(groupType, name);
     if (groupElement == NULL)
     {
@@ -605,6 +653,8 @@ void BB_ConfigMgr::SetGroupVoiceActivationLevel(GroupType groupType, const wstri
 
 void BB_ConfigMgr::SetGroupNoiseCancel(GroupType groupType, const wstring name, int noiseCancel)
 {
+    Lock lock(m_cs);
+
     BB_GroupElementConfig *groupElement = _GetGroupElementConfig(groupType, name);
     if (groupElement == NULL)
     {
@@ -615,6 +665,8 @@ void BB_ConfigMgr::SetGroupNoiseCancel(GroupType groupType, const wstring name, 
 
 void BB_ConfigMgr::SetGroupEchoCancel(GroupType groupType, const wstring name, bool echoCancel)
 {
+    Lock lock(m_cs);
+
     BB_GroupElementConfig *groupElement = _GetGroupElementConfig(groupType, name);
     if (groupElement == NULL)
     {
@@ -625,6 +677,8 @@ void BB_ConfigMgr::SetGroupEchoCancel(GroupType groupType, const wstring name, b
 
 void BB_ConfigMgr::SetGroupMicGainLevel(GroupType groupType, const wstring name, int micGainLevel)
 {
+    Lock lock(m_cs);
+
     BB_GroupElementConfig *groupElement = _GetGroupElementConfig(groupType, name);
     if (groupElement == NULL)
     {
@@ -635,6 +689,8 @@ void BB_ConfigMgr::SetGroupMicGainLevel(GroupType groupType, const wstring name,
 
 void BB_ConfigMgr::SetGroupSrcVolumeLevel(GroupType groupType, const wstring name, int srcVolumeLevel)
 {
+    Lock lock(m_cs);
+
     BB_GroupElementConfig *groupElement = _GetGroupElementConfig(groupType, name);
     if (groupElement == NULL)
     {
@@ -645,6 +701,8 @@ void BB_ConfigMgr::SetGroupSrcVolumeLevel(GroupType groupType, const wstring nam
 
 void BB_ConfigMgr::SetGroupSoundSystemWin(GroupType groupType, const wstring name, bool isSoundSystemWin)
 {
+    Lock lock(m_cs);
+
     BB_GroupElementConfig *groupElement = _GetGroupElementConfig(groupType, name);
     if (groupElement == NULL)
     {
@@ -655,6 +713,8 @@ void BB_ConfigMgr::SetGroupSoundSystemWin(GroupType groupType, const wstring nam
 
 void BB_ConfigMgr::SetGroupInputSoundDevId(GroupType groupType, const wstring name, const wstring inputSoundDevId)
 {
+    Lock lock(m_cs);
+
     BB_GroupElementConfig *groupElement = _GetGroupElementConfig(groupType, name);
     if (groupElement == NULL)
     {
@@ -665,6 +725,8 @@ void BB_ConfigMgr::SetGroupInputSoundDevId(GroupType groupType, const wstring na
 
 void BB_ConfigMgr::SetGroupOutputSoundDevId(GroupType groupType, const wstring name, const wstring outputSoundDevId)
 {
+    Lock lock(m_cs);
+
     BB_GroupElementConfig *groupElement = _GetGroupElementConfig(groupType, name);
     if (groupElement == NULL)
     {
