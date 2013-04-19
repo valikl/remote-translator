@@ -9,6 +9,7 @@ BB_Translator::BB_Translator() : m_channelVideo(NULL), m_channelSrc(NULL), m_cha
     m_channelDummy(NULL), m_channelDstTest(NULL), m_isLoopbackStarted(false), m_isTargetLoopbackStarted(false),
     m_isConnected(false)
 {
+    TT_SetLicenseInformation(L"Bnei Baruch", 1600664704);
 }
 
 BB_Translator::~BB_Translator(void)
