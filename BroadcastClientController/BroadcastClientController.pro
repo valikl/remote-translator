@@ -55,7 +55,8 @@ HEADERS  += \
     ../Utils/BB_Thread.h \
     ../Utils/BB_Exception.h \
     GUI/controlpanel.h \
-    GUI/ttinstview.h
+    GUI/ttinstview.h \
+    GUI/common_gui.h
 
 
 

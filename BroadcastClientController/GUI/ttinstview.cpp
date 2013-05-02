@@ -6,15 +6,15 @@
 TTInstView::TTInstView(QString iname, QWidget *parent) :
     QWidget(parent)
 {
-    createNameLabel(iname);
-    createStatus();
-    createSoundBar();
-    createChangeButton();
+    drawNameLabel(iname);
+    drawStatus();
+    drawSoundBar();
+    drawChangeButton();
 
     setLayout();
 }
 
-void TTInstView::createNameLabel(QString name)
+void TTInstView::drawNameLabel(QString name)
 {
     nameLabel = new QLabel;
     nameLabel->setText(name);
@@ -24,7 +24,7 @@ void TTInstView::createNameLabel(QString name)
     nameLabel->setFont(font);
 }
 
-void TTInstView::createStatus()
+void TTInstView::drawStatus()
 {
     statusLabel = new QLabel;
     statusLabel->setText("Status:");
@@ -37,7 +37,7 @@ void TTInstView::createStatus()
     statusResolve->setText("Resolve");
 }
 
-void TTInstView::createChangeButton()
+void TTInstView::drawChangeButton()
 {
     changeButton = new QPushButton;
 
@@ -45,7 +45,7 @@ void TTInstView::createChangeButton()
     changeButton->setText("Change settings");
 }
 
-void TTInstView::createSoundBar()
+void TTInstView::drawSoundBar()
 {
     soundLabel = new QLabel;
     soundLabel->setText("Sound Level");
@@ -100,6 +100,11 @@ void TTInstView::setLayout()
     GRID(layout)->addWidget(sound_box, 2, 0);
 
     GRID(layout)->addWidget(changeButton, 3, 0);
+
+    QFrame *line = new QFrame();
+    line->setFrameShape(QFrame::HLine);
+
+    GRID(layout)->addWidget(line);
 
     QWidget::setLayout(layout);
 }

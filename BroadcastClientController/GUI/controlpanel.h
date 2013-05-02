@@ -1,26 +1,30 @@
 #ifndef CONTROLPANEL_H
 #define CONTROLPANEL_H
 
+#include "BBTT/BB_ConfigMgr.h"
 #include <QWidget>
 
 class QMenuBar;
 class QGroupBox;
 class QLayout;
+class QPlainTextEdit;
 
 class ControlPanel : public QWidget
 {
     Q_OBJECT
 public:
     explicit ControlPanel(QWidget *parent = 0);
+    void init();
 
 
 private:
-    void createInstanceBox(int num, QGroupBox*& inst_group, QString box_name);
+    void drawInstancesBox(GroupType type, QString box_name, QGroupBox*& inst_group);
 
-    void createMenuBar();
-    void createSources();
-    void createReceivers();
-    void createRestricted();
+    void drawMenuBar();
+    void drawSources();
+    void drawReceivers();
+    void drawRestricted();
+    void drawMsgConsole();
 
     void setLayout();
 
@@ -28,6 +32,8 @@ private:
     QGroupBox *sourcesGroup;
     QGroupBox *receiversGroup;
     QGroupBox *restrictedGroup;
+
+    QPlainTextEdit* msgConsole;
 
     QLayout *layout;
 

@@ -6,8 +6,8 @@
 class QLabel;
 class QPushButton;
 class QProgressBar;
-class QGroupBox;
 class QLayout;
+class QGroupBox;
 
 class TTInstView : public QWidget
 {
@@ -20,10 +20,10 @@ signals:
 public slots:
 
 private:
-    void createNameLabel(QString name);
-    void createChangeButton();
-    void createStatus();
-    void createSoundBar();
+    void drawNameLabel(QString name);
+    void drawChangeButton();
+    void drawStatus();
+    void drawSoundBar();
 
     QGroupBox* getStatusWidget();
     QGroupBox* getSoundBarWidget();
