@@ -8,6 +8,8 @@ int main(int argc, char *argv[])
     QMainWindow window;
     ControlPanel panel;
 
+    panel.init();
+
     window.setCentralWidget(&panel);
     window.show();
 
