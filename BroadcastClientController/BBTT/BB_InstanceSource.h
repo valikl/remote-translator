@@ -3,6 +3,7 @@
 #ifdef WIN32
 #include <windows.h>
 #endif
+#include <string>
 #include "TT_Include/TeamTalk4.h"
 #include "BB_ConfigMgr.h"
 #include "BB_Instance.h"
@@ -12,7 +13,7 @@
 class BB_InstanceSource : public BB_Instance, public IRunnable
 {
 public:
-    BB_InstanceSource(GroupType groupType, const BB_InstanceContext &context);
+    BB_InstanceSource(GroupType groupType, const BB_InstanceContext &context, const std::wstring name);
     ~BB_InstanceSource(void);
 
     // We don't want to call TT functions in Ctor & Dtor
@@ -39,6 +40,7 @@ private:
     // test sound card, get line-in signal, watchdog for configuration parameters, change instance language, change instance channel
 
     GroupType m_groupType;
+    std::wstring m_name;
 
     Thread *m_thread;
     bool m_stopThread;
