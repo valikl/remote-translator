@@ -8,8 +8,8 @@
 
 using namespace std;
 
-BB_InstanceReceiver::BB_InstanceReceiver(const BB_InstanceContext &context) :
-    m_groupType(GROUP_TYPE_RECEIVERS), BB_Instance(context)
+BB_InstanceReceiver::BB_InstanceReceiver(const BB_InstanceContext &context, const wstring name) :
+    m_groupType(GROUP_TYPE_RECEIVERS), m_name(name), BB_Instance(context)
 {
 }
 
@@ -85,14 +85,18 @@ void BB_InstanceReceiver::updateUserGainLevel(int volume)
     std::vector<BB_ChannelUser> users;
     getUsers(users);
 
-    for(int i=0;i<users.size();i++)
+    for(unsigned int i=0; i < users.size(); i++)
     {
         BB_ChannelUser user = users[i];
         if(volume <= SOUND_VOLUME_MAX)
+        {
             //disable soft gain
             TT_SetUserGainLevel(m_ttInst, user.m_id, SOUND_GAIN_DEFAULT);
+        }
         else
+        {
             TT_SetUserGainLevel(m_ttInst, user.m_id, gain);
+        }
     }
 }
 
@@ -115,7 +119,7 @@ void BB_InstanceReceiver::run()
         try
         {
             // Read config
-            //BB_GroupElementConfig config = BB_ConfigMgr::Instance().GetGroupElementConfig(m_groupType, m_name);
+            BB_GroupElementConfig config = BB_ConfigMgr::Instance().GetGroupElementConfig(m_groupType, m_name);
 
         }
         catch(BB_Exception excp)

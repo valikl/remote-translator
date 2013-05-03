@@ -7,6 +7,14 @@ using namespace std;
 BB_GroupMgrSource::BB_GroupMgrSource(GroupType groupType)
 {
     m_groupType = groupType;
+    if (groupType == GROUP_TYPE_SOURCES)
+    {
+        m_channelPrefix = SRC_CHANNEL_PREFIX;
+    }
+    else
+    {
+        m_channelPrefix = RESTRICTED_CHANNEL_PREFIX;
+    }
 }
 
 BB_GroupMgrSource::~BB_GroupMgrSource(void)

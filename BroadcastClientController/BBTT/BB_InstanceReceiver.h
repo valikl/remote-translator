@@ -3,6 +3,7 @@
 #ifdef WIN32
 #include <windows.h>
 #endif
+#include <string>
 #include "TT_Include/TeamTalk4.h"
 #include "BB_ConfigMgr.h"
 #include "BB_Instance.h"
@@ -13,7 +14,7 @@
 class BB_InstanceReceiver : public BB_Instance, public IRunnable
 {
 public:
-    BB_InstanceReceiver(const BB_InstanceContext &context);
+    BB_InstanceReceiver(const BB_InstanceContext &context, const std::wstring name);
     ~BB_InstanceReceiver(void);
 
     // We don't want to call TT functions in Ctor & Dtor
@@ -38,6 +39,7 @@ private:
     int gainLevel(int refVolume);
 
     GroupType m_groupType;
+    std::wstring m_name;
 
     Thread *m_thread;
     bool m_stopThread;

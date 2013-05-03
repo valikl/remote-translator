@@ -8,8 +8,8 @@
 
 using namespace std;
 
-BB_InstanceSource::BB_InstanceSource(GroupType groupType, const BB_InstanceContext &context) :
-    m_groupType(groupType), BB_Instance(context)
+BB_InstanceSource::BB_InstanceSource(GroupType groupType, const BB_InstanceContext &context, const wstring name) :
+    m_groupType(groupType), m_name(name), BB_Instance(context)
 {
 }
 
@@ -137,7 +137,7 @@ void BB_InstanceSource::run()
         try
         {
             // Read config
-            BB_GroupElementConfig config = BB_ConfigMgr::Instance().GetGroupElementConfig(m_groupType, L"TODO"/*m_name*/);
+            BB_GroupElementConfig config = BB_ConfigMgr::Instance().GetGroupElementConfig(m_groupType, m_name);
 
             if (!TT_SetSoundInputGainLevel(m_ttInst, config.m_MicGainLevel))
             {

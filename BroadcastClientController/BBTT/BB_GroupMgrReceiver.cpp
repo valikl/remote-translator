@@ -8,6 +8,7 @@ using namespace std;
 BB_GroupMgrReceiver::BB_GroupMgrReceiver()
 {
     m_groupType = GROUP_TYPE_RECEIVERS;
+    m_channelPrefix = RECEIVER_CHANNEL_PREFIX;
 }
 
 BB_GroupMgrReceiver::~BB_GroupMgrReceiver(void)

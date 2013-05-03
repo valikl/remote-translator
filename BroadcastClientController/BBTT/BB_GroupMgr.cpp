@@ -51,7 +51,7 @@ void BB_GroupMgr<T>::RemoveInstance(const std::wstring name)
         T *inst = (*it).second;
         inst->finalize();
         delete inst;
-        m_elements.erase(name);
+        m_elements.erase(it);
     }
 }
 
@@ -82,9 +82,8 @@ void BB_GroupMgr<T>::AddInstance(const wstring name, const wstring inputSoundDev
     }
     context.m_outputSoundDevId = soundDevice.m_id;
 
-    //TODO
-    //context.m_nickName = SRC_CHANNEL_PREFIX + nickName;
-    //context.m_channelName = srcName;
+    context.m_nickName = m_channelPrefix + BB_ConfigMgr::Instance().GetGroupElementConfig(m_groupType, name).m_nickName;
+    context.m_channelName = BB_ConfigMgr::Instance().GetGroupElementConfig(m_groupType, name).m_channelName;
 
     try
     {

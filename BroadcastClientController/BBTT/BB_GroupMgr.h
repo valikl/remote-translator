@@ -45,6 +45,8 @@ protected:
     GroupType m_groupType;
     std::map<std::wstring, T *> m_elements;
 
+    std::wstring m_channelPrefix;
+
     BB_CriticalSection m_cs;
 };
 
