@@ -14,7 +14,7 @@
 class BB_InstanceReceiver : public BB_Instance, public IRunnable
 {
 public:
-    BB_InstanceReceiver(const BB_InstanceContext &context, const std::wstring name);
+    BB_InstanceReceiver(GroupType groupType, const BB_InstanceContext &context, const std::wstring name);
     ~BB_InstanceReceiver(void);
 
     // We don't want to call TT functions in Ctor & Dtor

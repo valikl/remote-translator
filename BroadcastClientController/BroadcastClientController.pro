@@ -14,7 +14,6 @@ SOURCES += main.cpp\
     BBTT/BB_InstanceSource.cpp \
     BBTT/BB_InstanceReceiver.cpp \
     BBTT/BB_ConfigMgr.cpp \
-    BBTT/BB_GroupMgr.cpp \
     BBTT/BB_GroupMgrSource.cpp \
     BBTT/BB_GroupMgrReceiver.cpp \
     ../Utils/Lockable.cpp \

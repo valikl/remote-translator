@@ -11,7 +11,7 @@
 const std::wstring SRC_CHANNEL_PREFIX(L"SRC_");
 const std::wstring RESTRICTED_CHANNEL_PREFIX(L"RST_");
 
-class BB_GroupMgrSource : BB_GroupMgr<BB_InstanceSource>
+class BB_GroupMgrSource : public BB_GroupMgr<BB_InstanceSource>
 {
 public:
     ~BB_GroupMgrSource(void);
