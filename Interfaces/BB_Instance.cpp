@@ -200,6 +200,13 @@ void BB_Instance::getChannels(std::vector<BB_Channel> &channels)
         }
         channelToList.name = channel.szName;
         channelToList.parentId = channel.nParentID;
+
+        TTCHAR szChannelPath[TT_STRLEN];
+        if (TT_GetChannelPath(m_ttInst, channelIDs[i], szChannelPath))
+        {
+            channelToList.path = szChannelPath;
+        }
+
         channels.push_back(channelToList);
     }
 

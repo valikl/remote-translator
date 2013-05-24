@@ -31,9 +31,10 @@ const std::wstring DEFAULT_AUDIO_STORAGE(L"");
 
 struct BB_Channel
 {
-	std::wstring name;
-	INT32 id;
-	INT32 parentId;
+    std::wstring name;
+    std::wstring path;
+    INT32 id;
+    INT32 parentId;
 };
 
 struct BB_SoundDevice
