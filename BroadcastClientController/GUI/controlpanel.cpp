@@ -1,12 +1,11 @@
 #include "controlpanel.h"
 #include "ttinstview.h"
+#include "groupsettings.h"
+#include "instsettings.h"
 #include "common_gui.h"
-#include <QtGui>
 #include <vector>
 
 using namespace std;
-
-#define GRID(layout) ((QGridLayout*)(layout))
 
 ControlPanel::ControlPanel(QWidget *parent) :
     QWidget(parent)
@@ -15,6 +14,10 @@ ControlPanel::ControlPanel(QWidget *parent) :
 void ControlPanel::init()
 {
     ConfigMgr.init(false);
+
+    SourcesMgr.init();
+    RestrictedMgr.init();
+    ReceiversMgr.init();
 
     drawMenuBar();
 
@@ -31,17 +34,15 @@ void ControlPanel::drawMenuBar()
 {
     menuBar = new QMenuBar(this);
 
-    QMenu* menu1 = new QMenu("MENU1");
-    menu1->addMenu(new QMenu("menu1_SubMenu1"));
-    menu1->addMenu(new QMenu("menu1_SubMenu2"));
+    QMenu* menu = new QMenu("Settings");
+    QAction* groupAct = menu->addAction("Groups settings");
+    QAction* instAct = menu->addAction("Instances settings");
 
-    QMenu* menu2 = new QMenu("MENU2");
-    menu2->addMenu(new QMenu("menu2_SubMenu"));
-
-    menuBar->addMenu(menu1);
-    menuBar->addMenu(menu2);
-
+    menuBar->addMenu(menu);
     menuBar->setMaximumHeight(20);
+
+    QObject::connect(groupAct, SIGNAL(triggered()), this, SLOT(callGroupSettings()));
+    QObject::connect(instAct, SIGNAL(triggered()), this, SLOT(callInstSettings()));
 }
 
 void ControlPanel::drawSources()
@@ -114,4 +115,16 @@ void ControlPanel::setLayout()
     GRID(layout)->addWidget(msgConsole, 2, 0);
 
     QWidget::setLayout(layout);
+}
+
+void ControlPanel::callGroupSettings()
+{
+    GroupSettings group_settings(this);
+    group_settings.exec();
+}
+
+void ControlPanel::callInstSettings()
+{
+    InstSettings inst_settings(this);
+    inst_settings.exec();
 }

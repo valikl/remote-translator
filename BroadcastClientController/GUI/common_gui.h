@@ -3,8 +3,13 @@
 
 #include <QtGui>
 #include "BBTT/BB_ConfigMgr.h"
+#include "BBTT/BB_GroupMgrSource.h"
+#include "BBTT/BB_GroupMgrReceiver.h"
 
 #define GRID(layout) ((QGridLayout*)(layout))
 #define ConfigMgr (BB_ConfigMgr::Instance())
+#define SourcesMgr (BB_GroupMgrSource::Instance(GROUP_TYPE_SOURCES))
+#define RestrictedMgr (BB_GroupMgrSource::Instance(GROUP_TYPE_RESTRICTED_SERVERS))
+#define ReceiversMgr (BB_GroupMgrReceiver::Instance())
 
 #endif

@@ -40,7 +40,9 @@ private:
 signals:
     
 public slots:
-    
+    void callGroupSettings();
+    void callInstSettings();
+
 };
 
 #endif // CONTROLPANEL_H
