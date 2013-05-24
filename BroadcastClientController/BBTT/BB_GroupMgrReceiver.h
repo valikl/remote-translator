@@ -10,7 +10,7 @@
 
 const std::wstring RECEIVER_CHANNEL_PREFIX(L"RCV_");
 
-class BB_GroupMgrReceiver : BB_GroupMgr<BB_InstanceReceiver>
+class BB_GroupMgrReceiver : public BB_GroupMgr<BB_InstanceReceiver>
 {
 public:
     ~BB_GroupMgrReceiver(void);

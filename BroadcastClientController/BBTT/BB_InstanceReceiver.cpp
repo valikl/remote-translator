@@ -8,7 +8,7 @@
 
 using namespace std;
 
-BB_InstanceReceiver::BB_InstanceReceiver(const BB_InstanceContext &context, const wstring name) :
+BB_InstanceReceiver::BB_InstanceReceiver(GroupType groupType, const BB_InstanceContext &context, const wstring name) :
     m_groupType(GROUP_TYPE_RECEIVERS), m_name(name), BB_Instance(context)
 {
 }
@@ -28,11 +28,8 @@ void BB_InstanceReceiver::init()
 
 void BB_InstanceReceiver::finalize()
 {
-    if (m_stopThread)
-    {
-        m_stopThread = true;
-        m_thread->Join();
-    }
+    m_stopThread = true;
+    m_thread->Join();
 
     closeSoundDevices();
     BB_Instance::finalize();

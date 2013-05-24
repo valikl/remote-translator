@@ -28,11 +28,8 @@ void BB_InstanceSource::init()
 
 void BB_InstanceSource::finalize()
 {
-    if (m_stopThread)
-    {
-        m_stopThread = true;
-        m_thread->Join();
-    }
+    m_stopThread = true;
+    m_thread->Join();
 
     closeSoundDevices();
     BB_Instance::finalize();
