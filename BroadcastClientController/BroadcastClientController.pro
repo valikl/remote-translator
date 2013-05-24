@@ -28,7 +28,10 @@ SOURCES += main.cpp\
     ../Ticpp/tinystr.cpp \
     ../Ticpp/ticpp.cpp \
     GUI/ttinstview.cpp \
-    GUI/controlpanel.cpp
+    GUI/controlpanel.cpp \
+    GUI/audiosettings.cpp \
+    GUI/groupsettings.cpp \
+    GUI/instsettings.cpp
 
 HEADERS  += \
     common.h \
@@ -55,7 +58,10 @@ HEADERS  += \
     ../Utils/BB_Exception.h \
     GUI/controlpanel.h \
     GUI/ttinstview.h \
-    GUI/common_gui.h
+    GUI/common_gui.h \
+    GUI/audiosettings.h \
+    GUI/groupsettings.h \
+    GUI/instsettings.h
 
 
 
