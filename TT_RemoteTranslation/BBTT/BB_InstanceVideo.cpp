@@ -168,6 +168,9 @@ void BB_InstanceVideo::run()
     int loopCnt = 0;
     vector<int> droppedFrames;
 
+    LONG lastWidth = 320;
+    LONG lastHeight = 240;
+
     while(!m_stopThread           &&
           m_videoWin->IsActive()  &&
           TT_GetMessage(m_ttInst, &msg, &wait_ms))
@@ -198,15 +201,40 @@ void BB_InstanceVideo::run()
 
             // Calculate coordinates
             RECT rect;
-            LONG width = 600;
-            LONG height = 400;
+            LONG width = 320;
+            LONG height = 240;
+            LONG x, y, scaledX, scaledY, startX, startY;
             if (GetWindowRect(m_videoWin->BBGetHandle(), &rect))
             {
-                width = rect.right - rect.left;
-                height = rect.bottom - rect.top;
+                x = rect.right - rect.left;
+                y = rect.bottom - rect.top;
+
+                scaledX = y * videoFrame.nWidth / videoFrame.nHeight;
+                scaledY = x * videoFrame.nHeight / videoFrame.nWidth;
+
+                if (scaledX < x)
+                {
+                    startY = 0;
+                    startX = (x - scaledX) / 2;
+                    height = y;
+                    width = scaledX;
+                }
+                else
+                {
+                    startY = (y - scaledY) / 2;
+                    startX = 0;
+                    width = x;
+                    height = scaledY;
+                }
             }
 
-            TT_PaintVideoFrame(m_ttInst, userId, hDC, 0, 0, width, height);
+            if ((rect.right - rect.left != lastWidth) || (rect.bottom - rect.top != lastHeight))
+            {
+                lastWidth = rect.right - rect.left;
+                lastHeight = rect.bottom - rect.top;
+                RedrawWindow(m_videoWin->BBGetHandle(), NULL, NULL, RDW_ERASE | RDW_INVALIDATE);
+            }
+            TT_PaintVideoFrame(m_ttInst, userId, hDC, startX, startY, width, height);
             TT_ReleaseUserVideoFrame(m_ttInst, userId);
         }
     }

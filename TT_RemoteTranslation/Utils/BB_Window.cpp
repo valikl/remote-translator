@@ -64,7 +64,7 @@ void BB_Window::BBCreateWindow()
         m_windowClassName.c_str(),
         m_title.c_str(),
         WS_OVERLAPPEDWINDOW | WS_THICKFRAME,
-        CW_USEDEFAULT, CW_USEDEFAULT, 600, 400,
+        CW_USEDEFAULT, CW_USEDEFAULT, 320, 240,
         NULL, NULL, hInstance, NULL);
 
     if(m_hWnd == NULL)
