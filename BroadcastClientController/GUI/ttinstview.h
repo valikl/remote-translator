@@ -18,6 +18,7 @@ public:
 signals:
     
 public slots:
+    void changeSettings();
 
 private:
     void drawNameLabel(QString name);
@@ -42,6 +43,8 @@ private:
     QPushButton* changeButton;  // change settings
 
     QLayout *layout;
+
+private slots:
 
 };
 

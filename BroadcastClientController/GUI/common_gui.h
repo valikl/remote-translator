@@ -12,4 +12,11 @@
 #define RestrictedMgr (BB_GroupMgrSource::Instance(GROUP_TYPE_RESTRICTED_SERVERS))
 #define ReceiversMgr (BB_GroupMgrReceiver::Instance())
 
+#define CHANGE_IF_NEEDED(getval, setval, val) \
+if ((getval) != (val)) \
+{ \
+    setval(type, val); \
+    is_changed = true; \
+}
+
 #endif

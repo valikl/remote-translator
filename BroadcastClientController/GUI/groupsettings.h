@@ -5,7 +5,11 @@
 #include <QDialog>
 
 class QGroupBox;
+class QDialogButtonBox;
+class QLineEdit;
 class QLayout;
+
+typedef std::map<QString, QLineEdit*> GroupDetailMap;
 
 class GroupSettings : public QDialog
 {
@@ -16,17 +20,23 @@ public:
 private:
     void createGroupsSettings();
     void createGroupSettings(GroupType type, QString box_name, QGroupBox*& inst_group);
+    void createSaveButton();
     void setLayout();
+    bool saveGroupDetails(GroupType type);
 
-    QGroupBox *sourcesGroup;
-    QGroupBox *receiversGroup;
-    QGroupBox *restrictedGroup;
-    QLayout *layout;
+    QGroupBox* sourcesGroup;
+    QGroupBox* receiversGroup;
+    QGroupBox* restrictedGroup;
+    QDialogButtonBox* saveButton;
+    QLayout* layout;
+
+    std::map<GroupType, GroupDetailMap> detail_map;
 
 signals:
     
 public slots:
-    
+
+    void saveDetails();
 };
 
 #endif // GROUPSETTINGS_H

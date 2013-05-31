@@ -1,7 +1,6 @@
 #include "ttinstview.h"
-#include <QtGui>
-
-#define GRID(layout) ((QGridLayout*)(layout))
+#include "audiosettings.h"
+#include "common_gui.h"
 
 TTInstView::TTInstView(QString iname, QWidget *parent) :
     QWidget(parent)
@@ -43,6 +42,8 @@ void TTInstView::drawChangeButton()
 
     changeButton->setFixedSize(90, 45);
     changeButton->setText("Change settings");
+
+    QObject::connect(changeButton, SIGNAL(clicked()), this, SLOT(changeSettings()));
 }
 
 void TTInstView::drawSoundBar()
@@ -107,4 +108,10 @@ void TTInstView::setLayout()
     GRID(layout)->addWidget(line);
 
     QWidget::setLayout(layout);
+}
+
+void TTInstView::changeSettings()
+{
+    AudioSettings audio_settings(this);
+    audio_settings.exec();
 }

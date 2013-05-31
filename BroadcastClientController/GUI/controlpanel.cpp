@@ -13,11 +13,18 @@ ControlPanel::ControlPanel(QWidget *parent) :
 
 void ControlPanel::init()
 {
-    ConfigMgr.init(false);
+    try
+    {
+        ConfigMgr.init(false);
 
-    SourcesMgr.init();
-    RestrictedMgr.init();
-    ReceiversMgr.init();
+        SourcesMgr.init();
+        RestrictedMgr.init();
+        ReceiversMgr.init();
+    }
+    catch(BB_Exception excp)
+    {
+        QMessageBox::critical(this, "Error:", QString::fromStdWString(excp.GetInfo()));
+    }
 
     drawMenuBar();
 
