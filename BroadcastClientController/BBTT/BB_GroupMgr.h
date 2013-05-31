@@ -23,16 +23,22 @@ public:
     ~BB_GroupMgr() {};
 
     void init()
-    {
-        // Build Sound device list
+    {        
         try
         {
             BB_InstanceContext context;
             InitInstanceContext(context);
             BB_Instance inst(context);
             inst.init();
+
+            // Build Sound device list
             m_soundDevList.clear();
             inst.getSoundDevices(m_soundDevList);
+
+            // Build Channels list
+            m_channels.clear();
+            inst.getChannels(m_channels);
+
             inst.finalize();
         }
         catch(BB_Exception excp)
@@ -58,8 +64,6 @@ public:
 
     void AddInstance(const std::wstring name, const std::wstring inputSoundDevId, const std::wstring outputSoundDevId)
     {
-        Lock lock(m_cs);
-
         if (FindInstance(name) != NULL)
         {
             // Already connected
@@ -83,37 +87,26 @@ public:
         context.m_outputSoundDevId = soundDevice.m_id;
 
         context.m_nickName = m_channelPrefix + BB_ConfigMgr::Instance().GetGroupElementConfig(m_groupType, name).m_nickName;
-        context.m_channelName = BB_ConfigMgr::Instance().GetGroupElementConfig(m_groupType, name).m_channelName;
+        context.m_channelName = L"/" + BB_ConfigMgr::Instance().GetConnectionConfig(m_groupType).m_srcPath +
+                                L"/" + BB_ConfigMgr::Instance().GetGroupElementConfig(m_groupType, name).m_channelName +
+                                L"/";
 
         // Get channel id
-        std::vector<BB_Channel> channels;
-        BB_Instance *tempInst = new BB_Instance(context);
-        tempInst->login();
-        tempInst->getChannels(channels);
-        tempInst->finalize();
-        delete tempInst;
-
-        for (unsigned int i=0; i < channels.size(); i++)
+        for (unsigned int i=0; i < m_channels.size(); i++)
         {
-            if (channels[i].path == context.m_channelName)
+            if (m_channels[i].path == context.m_channelName)
             {
-                context.channelId = channels[i].id;
+                context.channelId = m_channels[i].id;
                 break;
             }
         }
 
-        //try
-        {
-            T *inst = new T(m_groupType, context, name);
-            inst->init();
-            m_elements.insert(pair<wstring, T *>(name, inst));
-        }
-        //catch(BB_Exception excp)
-        //{
-        //    lock.Unlock();
-        //    RemoveInstance(name);
-        //     THROW_EXCEPT(excp.GetInfo());
-        //}
+        Lock lock(m_cs);
+
+        // Add new instance
+        T *inst = new T(m_groupType, context, name);
+        inst->init();
+        m_elements.insert(pair<wstring, T *>(name, inst));
     }
 
     void RemoveInstance(const std::wstring name)
@@ -171,6 +164,9 @@ protected:
 
     // Sound Devices List
     std::vector<BB_SoundDevice> m_soundDevList;
+
+    // Channels list
+    std::vector<BB_Channel> m_channels;
 
     GroupType m_groupType;
     std::map<std::wstring, T *> m_elements;
