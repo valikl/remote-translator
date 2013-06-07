@@ -140,20 +140,20 @@ public:
     void SetSrvPsw(GroupType groupType, const std::wstring srvPsw);
     void SetPath(GroupType groupType, const std::wstring path);
 
-    void SetGroupName(GroupType groupType, const std::wstring name, const std::wstring newName);
-    void SetGroupNickName(GroupType groupType, const std::wstring name, const std::wstring nickName);
-    void SetGroupChannel(GroupType groupType, const std::wstring name, const std::wstring channel);
-    void SetGroupAGC(GroupType groupType, const std::wstring name, AGC agc);
-    void SetGroupEnableVoiceActivation(GroupType groupType, const std::wstring name, bool enable);
-    void SetGroupVoiceActivationLevel(GroupType groupType, const std::wstring name, int level);
+    void SetGroupElementName(GroupType groupType, const std::wstring name, const std::wstring newName);
+    void SetGroupElementNickName(GroupType groupType, const std::wstring name, const std::wstring nickName);
+    void SetGroupElementChannel(GroupType groupType, const std::wstring name, const std::wstring channel);
+    void SetGroupElementAGC(GroupType groupType, const std::wstring name, AGC agc);
+    void SetGroupElementEnableVoiceActivation(GroupType groupType, const std::wstring name, bool enable);
+    void SetGroupElementVoiceActivationLevel(GroupType groupType, const std::wstring name, int level);
 
-    void SetGroupNoiseCancel(GroupType groupType, const std::wstring name, int noiseCancel);
-    void SetGroupEchoCancel(GroupType groupType, const std::wstring name, bool echoCancel);
-    void SetGroupMicGainLevel(GroupType groupType, const std::wstring name, int micGainLevel);
-    void SetGroupSrcVolumeLevel(GroupType groupType, const std::wstring name, int srcVolumeLevel);
-    void SetGroupSoundSystemWin(GroupType groupType, const std::wstring name, bool isSoundSystemWin);
-    void SetGroupInputSoundDevId(GroupType groupType, const std::wstring name, const std::wstring inputSoundDevId);
-    void SetGroupOutputSoundDevId(GroupType groupType, const std::wstring name, const std::wstring outputSoundDevId);
+    void SetGroupElementNoiseCancel(GroupType groupType, const std::wstring name, int noiseCancel);
+    void SetGroupElementEchoCancel(GroupType groupType, const std::wstring name, bool echoCancel);
+    void SetGroupElementMicGainLevel(GroupType groupType, const std::wstring name, int micGainLevel);
+    void SetGroupElementSrcVolumeLevel(GroupType groupType, const std::wstring name, int srcVolumeLevel);
+    void SetGroupElementSoundSystemWin(GroupType groupType, const std::wstring name, bool isSoundSystemWin);
+    void SetGroupElementInputSoundDevId(GroupType groupType, const std::wstring name, const std::wstring inputSoundDevId);
+    void SetGroupElementOutputSoundDevId(GroupType groupType, const std::wstring name, const std::wstring outputSoundDevId);
 
 private:
 

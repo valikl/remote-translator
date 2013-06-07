@@ -579,7 +579,7 @@ void BB_ConfigMgr::SetPath(GroupType groupType, const wstring path)
     _GetGroupConfig(groupType)->m_ConnectionConfig.m_srvPsw = path;
 }
 
-void BB_ConfigMgr::SetGroupName(GroupType groupType, const wstring name, const std::wstring newName)
+void BB_ConfigMgr::SetGroupElementName(GroupType groupType, const wstring name, const std::wstring newName)
 {
     Lock lock(m_cs);
 
@@ -591,7 +591,7 @@ void BB_ConfigMgr::SetGroupName(GroupType groupType, const wstring name, const s
     groupElement->m_name = newName;
 }
 
-void BB_ConfigMgr::SetGroupNickName(GroupType groupType, const wstring name, const wstring nickName)
+void BB_ConfigMgr::SetGroupElementNickName(GroupType groupType, const wstring name, const wstring nickName)
 {
     Lock lock(m_cs);
 
@@ -603,7 +603,7 @@ void BB_ConfigMgr::SetGroupNickName(GroupType groupType, const wstring name, con
     groupElement->m_nickName = nickName;
 }
 
-void BB_ConfigMgr::SetGroupChannel(GroupType groupType, const wstring name, const wstring channel)
+void BB_ConfigMgr::SetGroupElementChannel(GroupType groupType, const wstring name, const wstring channel)
 {
     Lock lock(m_cs);
 
@@ -615,7 +615,7 @@ void BB_ConfigMgr::SetGroupChannel(GroupType groupType, const wstring name, cons
     groupElement->m_channelName = channel;
 }
 
-void BB_ConfigMgr::SetGroupAGC(GroupType groupType, const wstring name, AGC agc)
+void BB_ConfigMgr::SetGroupElementAGC(GroupType groupType, const wstring name, AGC agc)
 {
     Lock lock(m_cs);
 
@@ -627,7 +627,7 @@ void BB_ConfigMgr::SetGroupAGC(GroupType groupType, const wstring name, AGC agc)
     groupElement->m_AGC = agc;
 }
 
-void BB_ConfigMgr::SetGroupEnableVoiceActivation(GroupType groupType, const wstring name, bool enable)
+void BB_ConfigMgr::SetGroupElementEnableVoiceActivation(GroupType groupType, const wstring name, bool enable)
 {
     Lock lock(m_cs);
 
@@ -639,7 +639,7 @@ void BB_ConfigMgr::SetGroupEnableVoiceActivation(GroupType groupType, const wstr
     groupElement->m_EnableVoiceActivation = enable;
 }
 
-void BB_ConfigMgr::SetGroupVoiceActivationLevel(GroupType groupType, const wstring name, int level)
+void BB_ConfigMgr::SetGroupElementVoiceActivationLevel(GroupType groupType, const wstring name, int level)
 {
     Lock lock(m_cs);
 
@@ -651,7 +651,7 @@ void BB_ConfigMgr::SetGroupVoiceActivationLevel(GroupType groupType, const wstri
     groupElement->m_VoiceActivationLevel = level;
 }
 
-void BB_ConfigMgr::SetGroupNoiseCancel(GroupType groupType, const wstring name, int noiseCancel)
+void BB_ConfigMgr::SetGroupElementNoiseCancel(GroupType groupType, const wstring name, int noiseCancel)
 {
     Lock lock(m_cs);
 
@@ -663,7 +663,7 @@ void BB_ConfigMgr::SetGroupNoiseCancel(GroupType groupType, const wstring name, 
     groupElement->m_noiseCancel = noiseCancel;
 }
 
-void BB_ConfigMgr::SetGroupEchoCancel(GroupType groupType, const wstring name, bool echoCancel)
+void BB_ConfigMgr::SetGroupElementEchoCancel(GroupType groupType, const wstring name, bool echoCancel)
 {
     Lock lock(m_cs);
 
@@ -675,7 +675,7 @@ void BB_ConfigMgr::SetGroupEchoCancel(GroupType groupType, const wstring name, b
     groupElement->m_echoCancel = echoCancel;
 }
 
-void BB_ConfigMgr::SetGroupMicGainLevel(GroupType groupType, const wstring name, int micGainLevel)
+void BB_ConfigMgr::SetGroupElementMicGainLevel(GroupType groupType, const wstring name, int micGainLevel)
 {
     Lock lock(m_cs);
 
@@ -687,7 +687,7 @@ void BB_ConfigMgr::SetGroupMicGainLevel(GroupType groupType, const wstring name,
     groupElement->m_MicGainLevel = micGainLevel;
 }
 
-void BB_ConfigMgr::SetGroupSrcVolumeLevel(GroupType groupType, const wstring name, int srcVolumeLevel)
+void BB_ConfigMgr::SetGroupElementSrcVolumeLevel(GroupType groupType, const wstring name, int srcVolumeLevel)
 {
     Lock lock(m_cs);
 
@@ -699,7 +699,7 @@ void BB_ConfigMgr::SetGroupSrcVolumeLevel(GroupType groupType, const wstring nam
     groupElement->m_SrcVolumeLevel = srcVolumeLevel;
 }
 
-void BB_ConfigMgr::SetGroupSoundSystemWin(GroupType groupType, const wstring name, bool isSoundSystemWin)
+void BB_ConfigMgr::SetGroupElementSoundSystemWin(GroupType groupType, const wstring name, bool isSoundSystemWin)
 {
     Lock lock(m_cs);
 
@@ -711,7 +711,7 @@ void BB_ConfigMgr::SetGroupSoundSystemWin(GroupType groupType, const wstring nam
     groupElement->m_isSoundSystemWin = isSoundSystemWin;
 }
 
-void BB_ConfigMgr::SetGroupInputSoundDevId(GroupType groupType, const wstring name, const wstring inputSoundDevId)
+void BB_ConfigMgr::SetGroupElementInputSoundDevId(GroupType groupType, const wstring name, const wstring inputSoundDevId)
 {
     Lock lock(m_cs);
 
@@ -723,7 +723,7 @@ void BB_ConfigMgr::SetGroupInputSoundDevId(GroupType groupType, const wstring na
     groupElement->m_InputSoundDevId = inputSoundDevId;
 }
 
-void BB_ConfigMgr::SetGroupOutputSoundDevId(GroupType groupType, const wstring name, const wstring outputSoundDevId)
+void BB_ConfigMgr::SetGroupElementOutputSoundDevId(GroupType groupType, const wstring name, const wstring outputSoundDevId)
 {
     Lock lock(m_cs);
 

@@ -124,11 +124,30 @@ void BB_InstanceSource::GetMicrophoneLevel(INT32 &level)
     level = TT_GetSoundInputLevel(m_ttInst);
 }
 
+
+INT32 BB_InstanceSource::GetUserId()
+{
+    // Read config
+    BB_GroupElementConfig config = BB_ConfigMgr::Instance().GetGroupElementConfig(m_groupType, m_name);
+
+    INT32 userId = 0;
+    std::vector<BB_ChannelUser> users;
+    getUsers(users);
+    for(unsigned int i=0; i < users.size(); i++)
+    {
+        if (users[i].m_userName == config.m_nickName)
+        {
+            userId = users[i].m_id;
+            break;
+        }
+    }
+
+    return userId;
+}
+
 void BB_InstanceSource::run()
 {
     int cnt = 0;
-
-    // TODO Classroom enable audio transmission
     while(!m_stopThread)
     {
         // Every 1 sec.
@@ -177,6 +196,29 @@ void BB_InstanceSource::run()
                 if (!TT_SetVoiceActivationLevel(m_ttInst, config.m_VoiceActivationLevel))
                 {
                 }
+            }
+
+            Channel channel;
+            if (!TT_GetChannel(m_ttInst, m_channelId, &channel))
+            {
+                continue;
+            }
+
+            int i = 0;
+            while ((channel.voiceUsers[i] != 0) && (i < TT_VOICEUSERS_MAX))
+            {
+                channel.voiceUsers[i++] = 0;
+            }
+
+           channel.voiceUsers[0] = GetUserId();
+           if (channel.voiceUsers[0] == 0)
+           {
+               // User not found
+           }
+
+            if (TT_DoUpdateChannel(m_ttInst, &channel) == -1)
+            {
+                continue;
             }
         }
         catch(BB_Exception excp)
