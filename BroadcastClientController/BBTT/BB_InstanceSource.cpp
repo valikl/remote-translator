@@ -126,10 +126,18 @@ void BB_InstanceSource::GetMicrophoneLevel(INT32 &level)
 
 void BB_InstanceSource::run()
 {
+    int cnt = 0;
+
+    // TODO Classroom enable audio transmission
     while(!m_stopThread)
     {
-        // Every 10 sec.
-        Sleep(10000);
+        // Every 1 sec.
+        Sleep(1000);
+        if (++cnt < 10)
+        {
+            continue;
+        }
+        cnt = 0;
 
         try
         {

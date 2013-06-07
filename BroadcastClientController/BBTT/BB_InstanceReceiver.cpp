@@ -108,10 +108,17 @@ void BB_InstanceReceiver::UpdateVolumeLevel(int volumeLevel)
 
 void BB_InstanceReceiver::run()
 {
+    int cnt = 0;
+
     while(!m_stopThread)
     {
-        // Every 10 sec.
-        Sleep(10000);
+        // Every 1 sec.
+        Sleep(1000);
+        if (++cnt < 10)
+        {
+            continue;
+        }
+        cnt = 0;
 
         try
         {
