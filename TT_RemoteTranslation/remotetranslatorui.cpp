@@ -157,6 +157,9 @@ void RemoteTranslatorUI::activateButtons()
 
 void RemoteTranslatorUI::init()
 {
+    ui->ControlTabs->setTabText(0, "Connection");
+    ui->ControlTabs->setTabText(1, "Translation");
+
     TRY_FUNC_WITH_RETURN(BB_ClientConfigMgr::Instance().init(false));
 
     // activate translator
