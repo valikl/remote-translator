@@ -579,7 +579,7 @@ void BB_ConfigMgr::SetPath(GroupType groupType, const wstring path)
     _GetGroupConfig(groupType)->m_ConnectionConfig.m_srvPsw = path;
 }
 
-void BB_ConfigMgr::SetGroupName(GroupType groupType, const wstring name)
+void BB_ConfigMgr::SetGroupName(GroupType groupType, const wstring name, const std::wstring newName)
 {
     Lock lock(m_cs);
 
@@ -588,7 +588,7 @@ void BB_ConfigMgr::SetGroupName(GroupType groupType, const wstring name)
     {
         return;
     }
-    groupElement->m_name = name;
+    groupElement->m_name = newName;
 }
 
 void BB_ConfigMgr::SetGroupNickName(GroupType groupType, const wstring name, const wstring nickName)

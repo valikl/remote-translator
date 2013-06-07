@@ -140,7 +140,7 @@ public:
     void SetSrvPsw(GroupType groupType, const std::wstring srvPsw);
     void SetPath(GroupType groupType, const std::wstring path);
 
-    void SetGroupName(GroupType groupType, const std::wstring name);
+    void SetGroupName(GroupType groupType, const std::wstring name, const std::wstring newName);
     void SetGroupNickName(GroupType groupType, const std::wstring name, const std::wstring nickName);
     void SetGroupChannel(GroupType groupType, const std::wstring name, const std::wstring channel);
     void SetGroupAGC(GroupType groupType, const std::wstring name, AGC agc);
