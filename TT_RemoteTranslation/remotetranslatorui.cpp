@@ -452,6 +452,9 @@ void RemoteTranslatorUI::disconnectTranslator()
     ui->ServerSelfTestEn->setEnabled(false);
     ui->chooseTransButton->setEnabled(false);
 
+    ///disable btn chat
+    ui->btnBtartTranslatorsChat->setEnabled(false);
+    ///
     TRY_FUNC(TRANSLATOR.disconnectHap());
 
     ui->SrcUsersList->clear();
