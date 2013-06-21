@@ -52,6 +52,7 @@ struct BB_ChannelUser
     INT32 m_id;
     bool m_isActive;
     bool m_isVideo;
+    bool m_PacketsLost;
 };
 
 class BB_Instance
