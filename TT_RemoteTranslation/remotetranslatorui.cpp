@@ -277,7 +277,10 @@ void RemoteTranslatorUI::setUserItems(InstType inst_type)
         if (users[i].m_isActive)
         {
             QListWidgetItem* active_item = users_list->item(users_list->count()-1);
-            active_item->setBackgroundColor("green");
+            if (users[i].m_PacketsLost)
+                active_item->setBackgroundColor("red");
+            else
+                active_item->setBackgroundColor("green");
             QFont font;
             font.setBold(true);
             active_item->setFont(font);
