@@ -3,7 +3,7 @@
 #include "common_gui.h"
 
 TTInstView::TTInstView(QString iname, QWidget *parent) :
-    QWidget(parent)
+    QWidget(parent), name(iname)
 {
     drawNameLabel(iname);
     drawStatus();
@@ -114,4 +114,25 @@ void TTInstView::changeSettings()
 {
     AudioSettings audio_settings(this);
     audio_settings.exec();
+}
+
+void TTInstViewSource::init()
+{
+    wstring wname = getName().toStdWString();
+    BB_GroupElementConfig config = ConfigMgr.GetGroupElementConfig(getType(), wname);
+
+    BB_GroupMgrSource& mgr = getType() == GROUP_TYPE_SOURCES ? SourcesMgr : RestrictedMgr;
+
+    mgr.EnableDenoising(wname, config.m_noiseCancel);
+    mgr.EnableEchoCancellation(wname, config.m_echoCancel);
+    mgr.EnableVoiceActivation(wname, config.m_EnableVoiceActivation);
+    mgr.SetAGCEnable(wname, config.m_AGC.m_enable, &(config.m_AGC));
+}
+
+void TTInstViewReceiver::init()
+{
+    wstring wname = getName().toStdWString();
+    BB_GroupElementConfig config = ConfigMgr.GetGroupElementConfig(GROUP_TYPE_RECEIVERS, wname);
+
+    ReceiversMgr.UpdateVolumeLevel(wname, config.m_SrcVolumeLevel);
 }

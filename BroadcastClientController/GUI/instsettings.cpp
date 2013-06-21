@@ -4,10 +4,18 @@
 
 using namespace std;
 
+#define CHANGE_IF_NEEDED(getval, setval, val)   \
+if ((getval) != (val))                          \
+{                                               \
+    setval(type, inst_name, val);               \
+    is_changed = true;                          \
+}
+
 InstSettings::InstSettings(QWidget *parent) :
     QDialog(parent)
 {
     createInstsSettings();
+    createSaveButton();
     setLayout();
 }
 
@@ -34,21 +42,23 @@ static void getSoundDevices(GroupType type, std::vector<BB_SoundDevice>& sound_d
     }
 }
 
-static void addInstDetail(QString name, QString val, QGridLayout* layout, int row)
+static void addTextLine(QString name, QString val, QGridLayout* layout, int row, InstDetailMap& dmap)
 {
     QLabel* label = new QLabel(name);
     QLineEdit* server_detail = new QLineEdit;
     server_detail->setText(val);
     layout->addWidget(label, row, 0);
     layout->addWidget(server_detail, row, 1);
+    dmap[name] = server_detail;
 }
 
-static void addSoundDevBox(QString box_name, bool is_out, vector<BB_SoundDevice>& sound_devices,
-                           BB_GroupElementConfig& inst, QGridLayout* inst_layout, int row)
+static void addSoundDevBox(QString name, bool is_out, vector<BB_SoundDevice>& sound_devices,
+                           BB_GroupElementConfig& inst, QGridLayout* inst_layout, int row, InstDetailMap& dmap)
 {
-    QLabel* box_label = new QLabel(box_name);
+    QLabel* box_label = new QLabel(name);
     QComboBox* box = new QComboBox;
     box->clear();
+    wstring dev_id = is_out ? inst.m_OutputSoundDevId : inst.m_InputSoundDevId;
     for (unsigned int i = 0; i < sound_devices.size(); ++i)
     {
         BB_SoundDevice& device = sound_devices[i];
@@ -59,29 +69,35 @@ static void addSoundDevBox(QString box_name, bool is_out, vector<BB_SoundDevice>
             continue;
         QString device_name = QString::fromStdWString(device.m_deviceName.c_str());
         box->addItem(device_name, i);
-        if (device.m_deviceId == inst.m_InputSoundDevId)
+        if (device.m_deviceId == dev_id)
             box->setCurrentIndex(box->count()-1);
     }
     inst_layout->addWidget(box_label, row, 0);
     inst_layout->addWidget(box, row, 1);
+    dmap[name] = box;
 }
 
-static void addSpinBox(QString box_name, int val, QGridLayout* inst_layout, int row)
+static void addSliderBox(QString name, int val, int min, int max, QGridLayout* inst_layout, int row, InstDetailMap& dmap)
 {
-    QLabel* box_label = new QLabel(box_name);
-    QSpinBox* box = new QSpinBox;
-    box->setValue(val);
-    inst_layout->addWidget(box_label, row, 0);
-    inst_layout->addWidget(box, row, 1);
+    QLabel* slider_label = new QLabel(name);
+    QSlider* slider = new QSlider;
+    slider->setEnabled(true);
+    slider->setRange(min, max);
+    slider->setValue(val);
+    slider->setOrientation(Qt::Horizontal);
+    inst_layout->addWidget(slider_label, row, 0);
+    inst_layout->addWidget(slider, row, 1);
+    dmap[name] = slider;
 }
 
-static void addCheckBox(QString box_name, bool checked, QGridLayout* inst_layout, int row)
+static void addCheckBox(QString name, bool checked, QGridLayout* inst_layout, int row, InstDetailMap& dmap)
 {
-    QLabel* box_label = new QLabel(box_name);
+    QLabel* box_label = new QLabel(name);
     QCheckBox* box = new QCheckBox;
     box->setChecked(checked);
     inst_layout->addWidget(box_label, row, 0);
     inst_layout->addWidget(box, row, 1);
+    dmap[name] = box;
 }
 
 void InstSettings::createGroupInstsSettings(GroupType type, QString box_name, QGroupBox*& group_box)
@@ -91,8 +107,11 @@ void InstSettings::createGroupInstsSettings(GroupType type, QString box_name, QG
     getSoundDevices(type, sound_devices);
 
     group_box = new QGroupBox(box_name);
-
     QGridLayout* layout = new QGridLayout;
+
+    int gainMax = 4000; /* real max: SOUND_LEVEL_MAX but it's too much */
+
+    InstsDetailMap& inst_detail_map = detail_map[type];
 
     map<std::wstring, BB_GroupElementConfig>::iterator it;
     for (it = config.m_groupList.begin(); it != config.m_groupList.end(); ++it)
@@ -100,19 +119,29 @@ void InstSettings::createGroupInstsSettings(GroupType type, QString box_name, QG
         QGroupBox* inst_box = new QGroupBox;
         QGridLayout* inst_layout = new QGridLayout;
         BB_GroupElementConfig& inst = it->second;
+        InstDetailMap& dmap = inst_detail_map[inst.m_name];
 
-        addInstDetail("Channel source", QString::fromStdWString(inst.m_name), inst_layout, 0);
-        addInstDetail("Nick name", QString::fromStdWString(inst.m_nickName), inst_layout, 1);
-        addInstDetail("Channel name", QString::fromStdWString(inst.m_channelName), inst_layout, 2);
-        addSoundDevBox("Input device", false, sound_devices, inst, inst_layout, 3);
-        addSoundDevBox("Output device", true, sound_devices, inst, inst_layout, 4);
-        addSpinBox("Gain level", inst.m_MicGainLevel, inst_layout, 5);
-        addCheckBox("Enable denoising", inst.m_noiseCancel, inst_layout, 6);
-        addCheckBox("Enable echo cancellation", inst.m_echoCancel, inst_layout, 7);
-        addCheckBox("Standard Windows", inst.m_isSoundSystemWin, inst_layout, 8);
+        addTextLine("Channel source", QString::fromStdWString(inst.m_name), inst_layout, 0, dmap);
+        addTextLine("Nick name", QString::fromStdWString(inst.m_nickName), inst_layout, 1, dmap);
+        addTextLine("Channel name", QString::fromStdWString(inst.m_channelName), inst_layout, 2, dmap);
+        addSoundDevBox("Input device", false, sound_devices, inst, inst_layout, 3, dmap);
+        addSoundDevBox("Output device", true, sound_devices, inst, inst_layout, 4, dmap);
+        if (type == GROUP_TYPE_RECEIVERS)
+        {
+            addSliderBox("Volume level", inst.m_SrcVolumeLevel, SOUND_VOLUME_MIN, SOUND_VOLUME_MAX*(gainMax/SOUND_GAIN_DEFAULT), inst_layout, 5, dmap);
+        }
+        else
+        {
+            addSliderBox("Gain level", inst.m_MicGainLevel, SOUND_GAIN_MIN, gainMax, inst_layout, 5, dmap);
+            addCheckBox("Enable denoising", inst.m_noiseCancel, inst_layout, 6, dmap);
+            addCheckBox("Enable echo cancellation", inst.m_echoCancel, inst_layout, 7, dmap);
+            addCheckBox("Standard Windows", inst.m_isSoundSystemWin, inst_layout, 8, dmap);
+        }
 
         inst_box->setLayout(inst_layout);
+        inst_box->setMaximumHeight(500);
         layout->addWidget(inst_box);
+        layout->setAlignment(inst_box, Qt::AlignTop);
     }
 
     group_box->setLayout(layout);
@@ -125,6 +154,118 @@ void InstSettings::setLayout()
     GRID(layout)->addWidget(sourcesGroup, 0, 0);
     GRID(layout)->addWidget(receiversGroup, 0, 1);
     GRID(layout)->addWidget(restrictedGroup, 0, 2);
+    GRID(layout)->addWidget(saveButton, 1, 0);
 
     QWidget::setLayout(layout);
+}
+
+static bool saveDetail(GroupType type, wstring inst_name, QString name, void* container)
+{
+    bool is_changed = false;
+    BB_GroupElementConfig inst = ConfigMgr.GetGroupElementConfig(type, inst_name);
+
+    if (name == "Channel source")
+    {
+        QString val = ((QLineEdit*)container)->text();
+        CHANGE_IF_NEEDED(inst.m_name, ConfigMgr.SetGroupElementName, val.toStdWString());
+    }
+    else if (name == "Nick name")
+    {
+        QString val = ((QLineEdit*)container)->text();
+        CHANGE_IF_NEEDED(inst.m_nickName, ConfigMgr.SetGroupElementNickName, val.toStdWString());
+    }
+    else if (name == "Channel name")
+    {
+        QString val = ((QLineEdit*)container)->text();
+        CHANGE_IF_NEEDED(inst.m_channelName, ConfigMgr.SetGroupElementChannel, val.toStdWString());
+    }
+    else if (name == "Input device")
+    {
+        QString val = ((QComboBox*)container)->currentText();
+        CHANGE_IF_NEEDED(inst.m_InputSoundDevId, ConfigMgr.SetGroupElementInputSoundDevId, val.toStdWString());
+    }
+    else if (name == "Output device")
+    {
+        QString val = ((QComboBox*)container)->currentText();
+        CHANGE_IF_NEEDED(inst.m_OutputSoundDevId, ConfigMgr.SetGroupElementOutputSoundDevId, val.toStdWString());
+    }
+    else if (name == "Volume level")
+    {
+        int val = ((QSlider*)container)->value();
+        CHANGE_IF_NEEDED(inst.m_SrcVolumeLevel, ConfigMgr.SetGroupElementSrcVolumeLevel, val);
+    }
+    else if (name == "Gain level")
+    {
+        int val = ((QSlider*)container)->value();
+        CHANGE_IF_NEEDED(inst.m_MicGainLevel, ConfigMgr.SetGroupElementMicGainLevel, val);
+    }
+    else if (name == "Enable denoising")
+    {
+        Qt::CheckState val = ((QCheckBox*)container)->checkState();
+        CHANGE_IF_NEEDED(inst.m_noiseCancel, ConfigMgr.SetGroupElementNoiseCancel, val == Qt::Checked);
+    }
+    else if (name == "Enable echo cancellation")
+    {
+        Qt::CheckState val = ((QCheckBox*)container)->checkState();
+        CHANGE_IF_NEEDED(inst.m_echoCancel, ConfigMgr.SetGroupElementEchoCancel, val == Qt::Checked);
+    }
+    else if (name == "Standard Windows")
+    {
+        Qt::CheckState val = ((QCheckBox*)container)->checkState();
+        CHANGE_IF_NEEDED(inst.m_isSoundSystemWin, ConfigMgr.SetGroupElementSoundSystemWin, val == Qt::Checked);
+    }
+
+    return is_changed;
+}
+
+bool static saveInstDetails(GroupType type, wstring inst_name, InstDetailMap& dmap)
+{
+    bool is_changed = false;
+
+    InstDetailMap::iterator it;
+    for (it = dmap.begin(); it != dmap.end(); ++it)
+    {
+        QString name = it->first;
+        void* container = it->second;
+        is_changed |= saveDetail(type, inst_name, name, container);
+    }
+
+    return is_changed;
+}
+
+bool InstSettings::saveGroupInstsDetails(GroupType type)
+{
+    bool is_changed = false;
+    BB_GroupConfig config = ConfigMgr.GetGroupConfig(type);
+    InstsDetailMap& inst_detail_map = detail_map[type];
+
+    map<std::wstring, BB_GroupElementConfig>::iterator it;
+    for (it = config.m_groupList.begin(); it != config.m_groupList.end(); ++it)
+    {
+        BB_GroupElementConfig& inst = it->second;
+        InstDetailMap& dmap = inst_detail_map[inst.m_name];
+        is_changed |= saveInstDetails(type, inst.m_name, dmap);
+    }
+
+    return is_changed;
+}
+
+void InstSettings::saveDetails()
+{
+    bool is_changed = false;
+    is_changed |= saveGroupInstsDetails(GROUP_TYPE_SOURCES);
+    is_changed |= saveGroupInstsDetails(GROUP_TYPE_RECEIVERS);
+    is_changed |= saveGroupInstsDetails(GROUP_TYPE_RESTRICTED_SERVERS);
+
+    if (is_changed)
+        ConfigMgr.saveConfig();
+
+    accept();
+}
+
+void InstSettings::createSaveButton()
+{
+    saveButton = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    connect(saveButton, SIGNAL(accepted()), this, SLOT(saveDetails()));
+    connect(saveButton, SIGNAL(rejected()), this, SLOT(reject()));
 }

@@ -13,6 +13,7 @@ ControlPanel::ControlPanel(QWidget *parent) :
 
 void ControlPanel::init()
 {
+    // Initialize configuration manager and group managers
     try
     {
         ConfigMgr.init(false);
@@ -25,6 +26,8 @@ void ControlPanel::init()
     {
         QMessageBox::critical(this, "Error:", QString::fromStdWString(excp.GetInfo()));
     }
+
+    // Draw widget elements
 
     drawMenuBar();
 
@@ -79,9 +82,13 @@ void ControlPanel::drawInstancesBox(GroupType type, QString box_name, QGroupBox*
     map<std::wstring, BB_GroupElementConfig>::iterator it;
     for (it = config.m_groupList.begin(); it != config.m_groupList.end(); ++it)
     {
+        TTInstView* iview;
         BB_GroupElementConfig& inst = it->second;
         QString iname = QString::fromStdWString(inst.m_name);
-        TTInstView* iview = new TTInstView(iname);
+        if (type == GROUP_TYPE_RECEIVERS)
+            iview = new TTInstViewReceiver(iname);
+        else
+            iview = new TTInstViewSource(iname, type);
         layout->addWidget(iview);
     }
 

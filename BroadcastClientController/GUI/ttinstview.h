@@ -1,6 +1,7 @@
 #ifndef TTINSTVIEW_H
 #define TTINSTVIEW_H
 
+#include "BBTT/BB_ConfigMgr.h"
 #include <QWidget>
 
 class QLabel;
@@ -14,13 +15,17 @@ class TTInstView : public QWidget
     Q_OBJECT
 public:
     explicit TTInstView(QString iname, QWidget *parent = 0);
-    
+    QString getName() { return name; }
+
 signals:
     
 public slots:
     void changeSettings();
 
 private:
+
+    virtual void init() = 0;
+
     void drawNameLabel(QString name);
     void drawChangeButton();
     void drawStatus();
@@ -31,7 +36,9 @@ private:
 
     void setLayout();
 
-    QLabel* nameLabel;          // instance name
+    QString name;               // instance name
+
+    QLabel* nameLabel;          // instance lable
 
     QLabel* statusLabel;        // status lable
     QLabel* statusState;        // status state
@@ -46,6 +53,32 @@ private:
 
 private slots:
 
+};
+
+class TTInstViewSource : public TTInstView
+{
+public:
+    TTInstViewSource(QString iname, GroupType itype, QWidget *parent = 0) : TTInstView(iname, parent), type(itype)
+    {
+        init();
+    }
+    GroupType getType() { return type; }
+
+private:
+    void init();
+    GroupType type;             // instance group type
+};
+
+class TTInstViewReceiver : public TTInstView
+{
+public:
+    TTInstViewReceiver(QString iname, QWidget *parent = 0) : TTInstView(iname, parent)
+    {
+        init();
+    }
+
+private:
+    void init();
 };
 
 #endif // TTINSTVIEW_H
