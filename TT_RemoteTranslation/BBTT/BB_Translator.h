@@ -117,6 +117,11 @@ public:
     // Video
     void OpenVideoWindow(HWND hWnd);
 
+     //Chat
+    void StartTranslatorsChat(IWriter *writer);
+    void SendMessageToTranslators(std::wstring &txtmsg);
+    void StopTranslatorsChat();
+
 private:
     BB_Translator();
     BB_Translator(const BB_Translator &);

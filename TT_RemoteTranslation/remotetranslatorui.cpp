@@ -8,12 +8,14 @@
 #include "ui_remotetranslatorui.h"
 #include <QTimer>
 
+
 RemoteTranslatorUI::RemoteTranslatorUI(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::RemoteTranslatorUI),
     first_connect(true)
 {
     ui->setupUi(this);
+    chatWriter=0;
 }
 
 void RemoteTranslatorUI::initHapsMenu()
@@ -138,6 +140,7 @@ void RemoteTranslatorUI::activateButtons()
     ui->VideoLvlSld->setEnabled(false);
     ui->ServerSelfTestEn->setEnabled(false);
     ui->chooseTransButton->setEnabled(false);
+    ui->btnBtartTranslatorsChat->setEnabled(false);
 
     //Timer for micophone progress bar
     microphone_timer = new QTimer(this);
@@ -292,6 +295,9 @@ RemoteTranslatorUI::~RemoteTranslatorUI()
 {
     TRY_FUNC(BB_ClientConfigMgr::Instance().saveConfig());
     TRY_FUNC(TRANSLATOR.finalize());
+    if(chatWriter!=0){
+    delete chatWriter;
+    }
     delete microphone_timer;
     delete user_timer;
     delete conlost_timer;
@@ -383,8 +389,14 @@ void RemoteTranslatorUI::connectTranslator()
     ui->MicMuteBut->setCheckable(true);
     ui->TrgMuteBut->setCheckable(true);
 
+
+    chatWriter=new ChatWriter();
+    TRANSLATOR.StartTranslatorsChat(chatWriter);
+    connect(this->chatWriter, SIGNAL(StartChat(QString)),this, SLOT(on_btnBtartTranslatorsChat_clicked(QString)));
+    ui->btnBtartTranslatorsChat->setEnabled(true);
+
     if (TRANSLATOR.isLocalDstConnected())
-    {
+     {
         ui->chooseTransButton->setEnabled(true);
         ui->chooseTransButton->setCheckable(true);
     }
@@ -632,3 +644,14 @@ void RemoteTranslatorUI::on_showVideoButton_clicked(bool clicked)
 
     TRY_FUNC(TRANSLATOR.OpenVideoWindow(effectiveWinId()));
 }
+
+void RemoteTranslatorUI::on_btnBtartTranslatorsChat_clicked(QString str)
+{
+    chatWriter->RiseChat();
+    if(!str.isEmpty())
+    {
+        chatWriter->Write(str.toStdWString());
+    }
+}
+
+

@@ -686,3 +686,20 @@ void BB_Translator::ReconnectSrcChannel(wstring hapName, wstring srcName)
 }
 
 
+///Chat functions
+
+void BB_Translator::StartTranslatorsChat(IWriter *writer){
+    if(m_channelDst!=0)
+    m_channelDst->StartChat(writer);
+}
+
+void BB_Translator::SendMessageToTranslators(std::wstring &txtmsg){
+    m_channelDst->SendMessage(txtmsg);
+}
+
+void BB_Translator::StopTranslatorsChat(){
+    m_channelDst->StopChatThreads();
+}
+
+
+

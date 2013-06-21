@@ -5,6 +5,9 @@
 #include <tchar.h>
 #include <time.h>
 #include <vector>
+#include <ctime>
+
+
 
 using namespace std;
 
@@ -12,10 +15,16 @@ BB_InstanceAudio::BB_InstanceAudio(const BB_InstanceContext &context) :
     BB_Instance(context)
 {
     m_isMuted = true;
+    m_audioLoopThread=NULL;
 }
 
 BB_InstanceAudio::~BB_InstanceAudio(void)
 {
+    if (m_audioLoopThread != NULL)
+    {
+
+        StopChatThreads();
+    }
 }
 
 void BB_InstanceAudio::init()
@@ -190,4 +199,130 @@ void BB_InstanceAudio::getUsers(std::vector<BB_ChannelUser> &userList)
             }
         }
     }
+}
+
+
+
+/////////
+//Chat functions
+//
+void BB_InstanceAudio::StopChatThreads()
+{
+    // Stop all the threads
+    if(m_audioLoopThread!=NULL&&m_stopThread){
+    m_stopThread = true;
+    m_audioLoopThread->Join();
+    delete m_audioLoopThread;
+    m_audioLoopThread = NULL;
+    }
+
+}
+void BB_InstanceAudio::StartChat(IWriter *writer){
+    m_stopThread=false;
+    m_writer=writer;
+    m_audioLoopThread = new Thread(this);
+
+  }
+
+
+static const std::string currentDateTime() {
+    time_t     now = time(0);
+    struct tm  tstruct;
+    char       buf[80];
+    tstruct = *localtime(&now);
+    strftime(buf, sizeof(buf), "%X", &tstruct);
+
+    return buf;
+}
+
+static int StringToWString(std::wstring &ws, const std::string &s)
+{
+    std::wstring wsTmp(s.begin(), s.end());
+
+    ws = wsTmp;
+
+    return 0;
+}
+
+void BB_InstanceAudio::run()
+{
+    TextMessage textmsg;
+    TTMessage msg;
+    int wait_ms = 10000;
+    wstring str;
+    wstring ui_message;
+    User user;
+     wstring time_str;
+    while(!m_stopThread )
+    {
+        if(TT_GetMessage(m_ttInst, &msg, &wait_ms)){
+        if (msg.wmMsg == WM_TEAMTALK_CMD_USER_TEXTMSG)
+        {
+            if(!TT_GetTextMessage(m_ttInst, msg.lParam, FALSE, &textmsg))
+                continue;
+            if(!TT_GetUser(m_ttInst, textmsg.nFromUserID, &user))
+                   return;
+            StringToWString(time_str,currentDateTime());
+            str=textmsg.szMessage;
+            switch(textmsg.nMsgType)
+            {
+            case MSGTYPE_CHANNEL :
+                if(textmsg.nChannelID != TT_GetMyChannelID(m_ttInst))
+                 {
+                    TTCHAR chpath[TT_STRLEN] = {0};
+                    TT_GetChannelPath(m_ttInst, textmsg.nChannelID, chpath);
+                    ui_message=time_str +L": <";
+                    ui_message.append(user.szNickname).append(L"->").append(chpath).append(L"> ").append(str);
+                }else{
+
+                    ui_message=time_str +L": <";
+                    ui_message.append(user.szNickname).append(L"> ").append(str);
+                }
+                m_writer->Write(ui_message);
+
+                break;
+            case MSGTYPE_BROADCAST :
+                ui_message=time_str +L": <";
+                ui_message.append(user.szNickname).append(L"->BROADCAST> ").append(str);   // line += QString("<%1->BROADCAST> %2").arg(_Q(user.szNickname)).arg(_Q(msg.szMessage));
+                m_writer->Write(ui_message);
+                break;
+            case MSGTYPE_USER :
+                ui_message=time_str +L": <";
+                ui_message.append(user.szNickname).append(L"> ").append(str);            //QString("<%1> %2").arg(_Q(user.szNickname)).arg(_Q(msg.szMessage));
+                m_writer->Write(ui_message);
+                break;
+            case MSGTYPE_CUSTOM :
+
+                break;
+            }
+        }
+        }
+    }
+}
+
+
+static void CopyWSToChar(wstring wstr,TTCHAR* ttstr){
+
+    do {
+        wcsncpy(ttstr, wstr.c_str(), 512);
+        if(wstr.size() >= 512)
+            ttstr[511] = '\0';
+    } while(0);
+}
+
+//can recieve till 512 characters
+void BB_InstanceAudio::SendMessage(wstring &txtmsg){
+    if(txtmsg.length()==0||txtmsg.length()>512)
+        return;
+
+    int mychanid = TT_GetMyChannelID(m_ttInst);
+    if(mychanid<=0)
+        return;
+    TextMessage msg;
+    msg.nFromUserID = TT_GetMyUserID(m_ttInst);
+    msg.nChannelID = mychanid;
+    msg.nMsgType = MSGTYPE_CHANNEL;
+    //txtmsg.copy(msg.szMessage,txtmsg.length());
+    CopyWSToChar(txtmsg,msg.szMessage);
+    TT_DoTextMessage(m_ttInst, &msg);
 }

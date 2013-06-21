@@ -11,7 +11,7 @@
 #include <vector>
 
 #include <QMainWindow>
-
+#include "chat.h"
 #define ConfigUI (BB_ClientConfigMgr::Instance().getConfig())
 #define TRANSLATOR (BB_Translator::Instance())
 
@@ -36,7 +36,6 @@ public:
 public slots:
 
     void changeMainConfig();
-    
 private slots:
 
     void on_NickName_editingFinished();
@@ -72,6 +71,10 @@ private slots:
 
     void on_chooseTransButton_clicked(bool checked);
 
+    void on_btnBtartTranslatorsChat_clicked(QString  str="");
+
+
+
 private:
 
     void initMainConfig();
@@ -92,6 +95,7 @@ private:
     QTimer *microphone_timer;
     QTimer *user_timer;
     QTimer *conlost_timer;
+    ChatWriter *chatWriter;
 
     bool first_connect;
 };

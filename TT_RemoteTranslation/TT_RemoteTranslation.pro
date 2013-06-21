@@ -30,7 +30,8 @@ SOURCES += main.cpp\
     Utils/Lockable.cpp \
     BBTT/BB_InstanceVideo.cpp \
     BBTT/BB_InstanceAudio.cpp \
-    BBTT/BB_InstanceDummy.cpp
+    BBTT/BB_InstanceDummy.cpp \
+    chat.cpp
 
 HEADERS  += \
     common.h \
@@ -57,12 +58,15 @@ HEADERS  += \
     Utils/CriticalSection.h \
     BBTT/BB_InstanceVideo.h \
     BBTT/BB_InstanceAudio.h \
-    BBTT/BB_InstanceDummy.h
+    BBTT/BB_InstanceDummy.h \
+    BBTT/IWriter.h \
+    chat.h
 
 FORMS    += remotetranslatorui.ui \
     sounddevices.ui \
     soundfilters.ui \
-    manconnect.ui
+    manconnect.ui \
+    chat.ui
 
 OTHER_FILES += \
     images/webcam_stop.png \

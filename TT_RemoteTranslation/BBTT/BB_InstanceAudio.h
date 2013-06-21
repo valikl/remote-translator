@@ -5,8 +5,11 @@
 #endif
 #include <../TeamTalk/TeamTalk4.h>
 #include "BB_Instance.h"
+#include "IRunnable.h"
+#include "BB_Thread.h"
+#include "IWriter.h"
 
-class BB_InstanceAudio : public BB_Instance
+class BB_InstanceAudio : public BB_Instance,  public IRunnable
 {
 public:
     BB_InstanceAudio(const BB_InstanceContext &context);
@@ -16,7 +19,6 @@ public:
 	// Use init and finalize instead
     virtual void init();
     virtual void finalize();
-
     // Return users list
     virtual void getUsers(std::vector<BB_ChannelUser> &userList);
 
@@ -34,11 +36,24 @@ public:
     void SetAGCEnable(bool bEnable, const AGC *agc = NULL);
     void GetMicrophoneLevel(int &level);
 
+    ///chat functions
+    // the thread procedure
+    virtual void run();
+    void StartChat(IWriter *writer);
+    void SendMessage(std::wstring &txtmsg);
+    void StopChatThreads();
+
 private:
 
     bool m_isMuted;
 
     void updateUserGainLevel(int volume);
+
+    //chat properties
+    Thread *m_audioLoopThread;
+    bool m_stopThread;
+
+    IWriter *m_writer;
 };
 
 
