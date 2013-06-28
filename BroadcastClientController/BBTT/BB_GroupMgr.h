@@ -12,6 +12,7 @@
 #include "Utils/Utils.h"
 #include "Utils/Lock.h"
 #include "Utils/BB_Exception.h"
+#include "GUI/iinststatus.h"
 
 using namespace std;
 
@@ -62,7 +63,7 @@ public:
 
     std::vector<BB_SoundDevice> getSoundDevices() { return m_soundDevList; }
 
-    void AddInstance(const std::wstring name, const std::wstring inputSoundDevId, const std::wstring outputSoundDevId)
+    void AddInstance(const std::wstring name, const std::wstring inputSoundDevId, const std::wstring outputSoundDevId, IInstStatus* instStat)
     {
         if (FindInstance(name) != NULL)
         {

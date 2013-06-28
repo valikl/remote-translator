@@ -2,6 +2,7 @@
 #define TTINSTVIEW_H
 
 #include "BBTT/BB_ConfigMgr.h"
+#include "iinststatus.h"
 #include <QWidget>
 
 class QLabel;
@@ -10,12 +11,13 @@ class QProgressBar;
 class QLayout;
 class QGroupBox;
 
-class TTInstView : public QWidget
+class TTInstView : public QWidget, public IInstStatus
 {
     Q_OBJECT
 public:
     explicit TTInstView(QString iname, QWidget *parent = 0);
     QString getName() { return name; }
+    virtual void setError();
 
 signals:
     

@@ -61,7 +61,8 @@ HEADERS  += \
     GUI/common_gui.h \
     GUI/audiosettings.h \
     GUI/groupsettings.h \
-    GUI/instsettings.h
+    GUI/instsettings.h \
+    GUI/iinststatus.h
 
 
 

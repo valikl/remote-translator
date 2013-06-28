@@ -23,6 +23,11 @@ void TTInstView::drawNameLabel(QString name)
     nameLabel->setFont(font);
 }
 
+void TTInstView::setError()
+{
+    statusState->setText("Error");
+}
+
 void TTInstView::drawStatus()
 {
     statusLabel = new QLabel;
@@ -122,7 +127,7 @@ void TTInstViewSource::init()
     BB_GroupElementConfig config = ConfigMgr.GetGroupElementConfig(getType(), wname);
 
     BB_GroupMgrSource& mgr = getType() == GROUP_TYPE_SOURCES ? SourcesMgr : RestrictedMgr;
-    mgr.AddInstance(wname, config.m_InputSoundDevId, config.m_OutputSoundDevId);
+    mgr.AddInstance(wname, config.m_InputSoundDevId, config.m_OutputSoundDevId, this);
 
     TRY_FUNC_WITH_RETURN(mgr.EnableDenoising(wname, config.m_noiseCancel));
     TRY_FUNC_WITH_RETURN(mgr.EnableEchoCancellation(wname, config.m_echoCancel));
@@ -134,7 +139,7 @@ void TTInstViewReceiver::init()
 {
     wstring wname = getName().toStdWString();
     BB_GroupElementConfig config = ConfigMgr.GetGroupElementConfig(GROUP_TYPE_RECEIVERS, wname);
-    ReceiversMgr.AddInstance(wname, config.m_InputSoundDevId, config.m_OutputSoundDevId);
+    ReceiversMgr.AddInstance(wname, config.m_InputSoundDevId, config.m_OutputSoundDevId, this);
 
     TRY_FUNC_WITH_RETURN(ReceiversMgr.UpdateVolumeLevel(wname, config.m_SrcVolumeLevel));
 }
