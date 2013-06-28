@@ -124,10 +124,25 @@ void BB_Instance::processTTMessage(const TTMessage& msg)
     }
 }
 
+bool BB_Instance::FindUser(std::vector<BB_ChannelUser> userList, INT32 id, wstring userName, BB_ChannelUser &user)
+{
+    for (int i = 0; i < userList.size(); i++)
+    {
+        if (userList[i].m_id == id && userList[i].m_userName == userName)
+        {
+            user = userList[i];
+            return true;
+        }
+    }
+    return false;
+}
+
 void BB_Instance::getUsers(std::vector<BB_ChannelUser> &userList)
 {
     INT32* userIDs = NULL;
     INT32 size = 0;
+
+    vector<BB_ChannelUser> tmpUserList = m_UserList;
 
     // Always rebuild list
     m_UserList.clear();
@@ -163,6 +178,33 @@ void BB_Instance::getUsers(std::vector<BB_ChannelUser> &userList)
         // What happen if name is changed or new user connected/disconnected
         user.m_userName = ttUser.szNickname;
         user.m_isActive = (ttUser.uUserState & USERSTATE_TALKING) ==  USERSTATE_TALKING;
+        user.m_PacketsLost = false;
+        if (user.m_isActive)
+        {
+            UserStatistics stats;
+            if (TT_GetUserStatistics(m_ttInst, userIDs[i], &stats))
+            {
+                BB_ChannelUser tmpUser;
+                if (FindUser(tmpUserList, userIDs[i], user.m_userName, tmpUser))
+                {
+                    int audlost = stats.nAudioPacketsLost - tmpUser.nAudioPacketsLost;
+                    int audrecv = stats.nAudioPacketsRecv - tmpUser.nAudioPacketsRecv;
+
+                    float audloss_pct = 0.0f;
+                    if (audrecv)
+                    {
+                        audloss_pct = (float)audlost / (float)audrecv;
+                    }
+                    if (audloss_pct >= .03f)
+                    {
+                        user.m_PacketsLost = true;
+                    }
+                }
+                //user.m_PacketsLost = true;
+                user.nAudioPacketsLost = stats.nAudioPacketsLost;
+                user.nAudioPacketsRecv = stats.nAudioPacketsRecv;
+            }
+        }
         user.m_isVideo = (ttUser.uUserState & USERSTATE_VIDEO) ==  USERSTATE_VIDEO;
         user.m_id = userIDs[i];
         m_UserList.push_back(user);
