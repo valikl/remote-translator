@@ -122,17 +122,19 @@ void TTInstViewSource::init()
     BB_GroupElementConfig config = ConfigMgr.GetGroupElementConfig(getType(), wname);
 
     BB_GroupMgrSource& mgr = getType() == GROUP_TYPE_SOURCES ? SourcesMgr : RestrictedMgr;
+    mgr.AddInstance(wname, config.m_InputSoundDevId, config.m_OutputSoundDevId);
 
-    mgr.EnableDenoising(wname, config.m_noiseCancel);
-    mgr.EnableEchoCancellation(wname, config.m_echoCancel);
-    mgr.EnableVoiceActivation(wname, config.m_EnableVoiceActivation);
-    mgr.SetAGCEnable(wname, config.m_AGC.m_enable, &(config.m_AGC));
+    TRY_FUNC_WITH_RETURN(mgr.EnableDenoising(wname, config.m_noiseCancel));
+    TRY_FUNC_WITH_RETURN(mgr.EnableEchoCancellation(wname, config.m_echoCancel));
+    TRY_FUNC_WITH_RETURN(mgr.EnableVoiceActivation(wname, config.m_EnableVoiceActivation));
+    TRY_FUNC_WITH_RETURN(mgr.SetAGCEnable(wname, config.m_AGC.m_enable, &(config.m_AGC)));
 }
 
 void TTInstViewReceiver::init()
 {
     wstring wname = getName().toStdWString();
     BB_GroupElementConfig config = ConfigMgr.GetGroupElementConfig(GROUP_TYPE_RECEIVERS, wname);
+    ReceiversMgr.AddInstance(wname, config.m_InputSoundDevId, config.m_OutputSoundDevId);
 
-    ReceiversMgr.UpdateVolumeLevel(wname, config.m_SrcVolumeLevel);
+    TRY_FUNC_WITH_RETURN(ReceiversMgr.UpdateVolumeLevel(wname, config.m_SrcVolumeLevel));
 }
