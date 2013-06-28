@@ -25,6 +25,7 @@ public slots:
 private:
 
     virtual void init() = 0;
+    virtual GroupType getType() = 0;
 
     void drawNameLabel(QString name);
     void drawChangeButton();
@@ -76,6 +77,7 @@ public:
     {
         init();
     }
+    GroupType getType() { return GROUP_TYPE_RECEIVERS; }
 
 private:
     void init();

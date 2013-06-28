@@ -6,7 +6,10 @@
 
 class QGroupBox;
 class QDialogButtonBox;
+class QGridLayout;
 class QLayout;
+
+class BB_SoundDevice;
 
 typedef std::map<QString, void*> InstDetailMap;
 typedef std::map<std::wstring, InstDetailMap> InstsDetailMap;
@@ -38,6 +41,36 @@ signals:
 public slots:
     
     void saveDetails();
+};
+
+class InstSettingsView : public QWidget
+{
+    Q_OBJECT
+public:
+    explicit InstSettingsView(QString iname, GroupType itype, QWidget *parent = 0) :
+        name(iname), type(itype)
+    {
+        setLayout();
+    }
+
+    QString getName() { return name; }
+    GroupType getType() { return type; }
+    InstDetailMap& getDetailMap() { return dmap; }
+    bool saveDetails();
+
+signals:
+
+public slots:
+
+private:
+    void setLayout();
+
+    QString name;               // instance name
+    GroupType type;             // instance group type
+    InstDetailMap dmap;
+    QLayout *layout;
+
+private slots:
 };
 
 #endif // GROUPSETTINGS_H

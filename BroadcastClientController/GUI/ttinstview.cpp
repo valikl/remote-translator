@@ -112,7 +112,7 @@ void TTInstView::setLayout()
 
 void TTInstView::changeSettings()
 {
-    AudioSettings audio_settings(this);
+    AudioSettings audio_settings(getName(), getType(), this);
     audio_settings.exec();
 }
 

@@ -109,39 +109,17 @@ void InstSettings::createGroupInstsSettings(GroupType type, QString box_name, QG
     group_box = new QGroupBox(box_name);
     QGridLayout* layout = new QGridLayout;
 
-    int gainMax = 4000; /* real max: SOUND_LEVEL_MAX but it's too much */
-
     InstsDetailMap& inst_detail_map = detail_map[type];
 
     map<std::wstring, BB_GroupElementConfig>::iterator it;
     for (it = config.m_groupList.begin(); it != config.m_groupList.end(); ++it)
     {
-        QGroupBox* inst_box = new QGroupBox;
-        QGridLayout* inst_layout = new QGridLayout;
         BB_GroupElementConfig& inst = it->second;
-        InstDetailMap& dmap = inst_detail_map[inst.m_name];
-
-        addTextLine("Channel source", QString::fromStdWString(inst.m_name), inst_layout, 0, dmap);
-        addTextLine("Nick name", QString::fromStdWString(inst.m_nickName), inst_layout, 1, dmap);
-        addTextLine("Channel name", QString::fromStdWString(inst.m_channelName), inst_layout, 2, dmap);
-        addSoundDevBox("Input device", false, sound_devices, inst, inst_layout, 3, dmap);
-        addSoundDevBox("Output device", true, sound_devices, inst, inst_layout, 4, dmap);
-        if (type == GROUP_TYPE_RECEIVERS)
-        {
-            addSliderBox("Volume level", inst.m_SrcVolumeLevel, SOUND_VOLUME_MIN, SOUND_VOLUME_MAX*(gainMax/SOUND_GAIN_DEFAULT), inst_layout, 5, dmap);
-        }
-        else
-        {
-            addSliderBox("Gain level", inst.m_MicGainLevel, SOUND_GAIN_MIN, gainMax, inst_layout, 5, dmap);
-            addCheckBox("Enable denoising", inst.m_noiseCancel, inst_layout, 6, dmap);
-            addCheckBox("Enable echo cancellation", inst.m_echoCancel, inst_layout, 7, dmap);
-            addCheckBox("Standard Windows", inst.m_isSoundSystemWin, inst_layout, 8, dmap);
-        }
-
-        inst_box->setLayout(inst_layout);
-        inst_box->setMaximumHeight(500);
-        layout->addWidget(inst_box);
-        layout->setAlignment(inst_box, Qt::AlignTop);
+        QString iname = QString::fromStdWString(inst.m_name);
+        InstSettingsView* iview = new InstSettingsView(iname, type);
+        layout->addWidget(iview);
+        layout->setAlignment(iview, Qt::AlignTop);
+        inst_detail_map[inst.m_name] = iview->getDetailMap();
     }
 
     group_box->setLayout(layout);
@@ -218,7 +196,7 @@ static bool saveDetail(GroupType type, wstring inst_name, QString name, void* co
     return is_changed;
 }
 
-bool static saveInstDetails(GroupType type, wstring inst_name, InstDetailMap& dmap)
+static bool saveInstDetails(GroupType type, wstring inst_name, InstDetailMap& dmap)
 {
     bool is_changed = false;
 
@@ -268,4 +246,40 @@ void InstSettings::createSaveButton()
     saveButton = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(saveButton, SIGNAL(accepted()), this, SLOT(saveDetails()));
     connect(saveButton, SIGNAL(rejected()), this, SLOT(reject()));
+}
+
+void InstSettingsView::setLayout()
+{
+    wstring wname = getName().toStdWString();
+    BB_GroupElementConfig config = ConfigMgr.GetGroupElementConfig(getType(), wname);
+    std::vector<BB_SoundDevice> sound_devices;
+    getSoundDevices(type, sound_devices);
+
+    layout = new QGridLayout;
+
+    int gainMax = 4000; /* real max: SOUND_LEVEL_MAX but it's too much */
+
+    addTextLine("Channel source", QString::fromStdWString(config.m_name), GRID(layout), 0, dmap);
+    addTextLine("Nick name", QString::fromStdWString(config.m_nickName), GRID(layout), 1, dmap);
+    addTextLine("Channel name", QString::fromStdWString(config.m_channelName), GRID(layout), 2, dmap);
+    addSoundDevBox("Input device", false, sound_devices, config, GRID(layout), 3, dmap);
+    addSoundDevBox("Output device", true, sound_devices, config, GRID(layout), 4, dmap);
+    if (type == GROUP_TYPE_RECEIVERS)
+    {
+        addSliderBox("Volume level", config.m_SrcVolumeLevel, SOUND_VOLUME_MIN, SOUND_VOLUME_MAX*(gainMax/SOUND_GAIN_DEFAULT), GRID(layout), 5, dmap);
+    }
+    else
+    {
+        addSliderBox("Gain level", config.m_MicGainLevel, SOUND_GAIN_MIN, gainMax, GRID(layout), 5, dmap);
+        addCheckBox("Enable denoising", config.m_noiseCancel, GRID(layout), 6, dmap);
+        addCheckBox("Enable echo cancellation", config.m_echoCancel, GRID(layout), 7, dmap);
+        addCheckBox("Standard Windows", config.m_isSoundSystemWin, GRID(layout), 8, dmap);
+    }
+
+    QWidget::setLayout(layout);
+}
+
+bool InstSettingsView::saveDetails()
+{
+    return saveInstDetails(type, getName().toStdWString(), dmap);
 }
