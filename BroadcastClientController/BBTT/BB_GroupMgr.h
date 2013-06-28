@@ -86,10 +86,15 @@ public:
         }
         context.m_outputSoundDevId = soundDevice.m_id;
 
-        context.m_nickName = /*m_channelPrefix +*/ BB_ConfigMgr::Instance().GetGroupElementConfig(m_groupType, name).m_nickName;
-        context.m_channelName = L"/" + BB_ConfigMgr::Instance().GetConnectionConfig(m_groupType).m_srcPath +
-                                L"/" + BB_ConfigMgr::Instance().GetGroupElementConfig(m_groupType, name).m_channelName +
-                                L"/";
+        context.m_nickName = BB_ConfigMgr::Instance().GetGroupElementConfig(m_groupType, name).m_nickName;
+
+        context.m_channelName = L"";
+        if (BB_ConfigMgr::Instance().GetConnectionConfig(m_groupType).m_srcPath != L"")
+        {
+            // Not root
+            context.m_channelName = L"/" + BB_ConfigMgr::Instance().GetConnectionConfig(m_groupType).m_srcPath;
+        }
+        context.m_channelName += L"/" + BB_ConfigMgr::Instance().GetGroupElementConfig(m_groupType, name).m_channelName + L"/";
 
         // Get channel id
         for (unsigned int i=0; i < m_channels.size(); i++)
