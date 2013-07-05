@@ -9,12 +9,12 @@
 #include "BB_Instance.h"
 #include "Utils/IRunnable.h"
 #include "Utils/BB_Thread.h"
-
+#include "GUI/iinststatus.h"
 
 class BB_InstanceReceiver : public BB_Instance, public IRunnable
 {
 public:
-    BB_InstanceReceiver(GroupType groupType, const BB_InstanceContext &context, const std::wstring name);
+    BB_InstanceReceiver(GroupType groupType, const BB_InstanceContext &context, const std::wstring name, IInstStatus* instStat);
     ~BB_InstanceReceiver(void);
 
     // We don't want to call TT functions in Ctor & Dtor
@@ -30,6 +30,7 @@ public:
 
     // Operations
     void UpdateVolumeLevel(int volumeLevel);
+    int GetVolumeLevel();
 
 private:
     // TODO: add functions transmission checkbox enabling, change sound card,
@@ -40,6 +41,8 @@ private:
 
     GroupType m_groupType;
     std::wstring m_name;
+
+    IInstStatus* m_instStat;
 
     Thread *m_thread;
     bool m_stopThread;

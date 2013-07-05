@@ -48,6 +48,19 @@ void BB_GroupMgrSource::UpdateMicrophoneGainLevel(const std::wstring name, int g
     inst->UpdateMicrophoneGainLevel(gainLevel);
 }
 
+int BB_GroupMgrSource::GetMicrophoneGainLevel(const std::wstring name)
+{
+    Lock lock(m_cs);
+
+    BB_InstanceSource *inst = FindInstance(name);
+
+    if (inst == NULL)
+    {
+        THROW_EXCEPT("Cannot return microphone level. Group instance is not connected");
+    }
+    return inst->GetMicrophoneGainLevel();
+}
+
 void BB_GroupMgrSource::EnableDenoising(const std::wstring name, bool bEnable)
 {
     Lock lock(m_cs);
@@ -60,6 +73,21 @@ void BB_GroupMgrSource::EnableDenoising(const std::wstring name, bool bEnable)
     }
 
     inst->EnableDenoising(bEnable);
+}
+
+
+bool BB_GroupMgrSource::IsDenoisingEnabled(const std::wstring name)
+{
+    Lock lock(m_cs);
+
+    BB_InstanceSource *inst = FindInstance(name);
+
+    if (inst == NULL)
+    {
+        THROW_EXCEPT("Cannot get denosing. Group instance is not connected");
+    }
+
+    return inst->IsDenoisingEnabled();
 }
 
 void BB_GroupMgrSource::EnableEchoCancellation(const std::wstring name, bool bEnable)
@@ -75,6 +103,19 @@ void BB_GroupMgrSource::EnableEchoCancellation(const std::wstring name, bool bEn
     inst->EnableEchoCancellation(bEnable);
 }
 
+bool BB_GroupMgrSource::IsEchoCancellationEnabled(const std::wstring name)
+{
+    Lock lock(m_cs);
+
+    BB_InstanceSource *inst = FindInstance(name);
+
+    if (inst == NULL)
+    {
+        THROW_EXCEPT("Cannot get echo cancellation. Group instance is not connected");
+    }
+    return inst->IsEchoCancellationEnabled();
+}
+
 void BB_GroupMgrSource::SetAGCEnable(const std::wstring name, bool bEnable, const AGC *agc)
 {
     Lock lock(m_cs);
@@ -86,6 +127,19 @@ void BB_GroupMgrSource::SetAGCEnable(const std::wstring name, bool bEnable, cons
         THROW_EXCEPT("Cannot update echo cancellation. Group instance is not connected");
     }
     inst->SetAGCEnable(bEnable, agc);
+}
+
+bool BB_GroupMgrSource::GetAGC(const std::wstring name, AGC &agc)
+{
+    Lock lock(m_cs);
+
+    BB_InstanceSource *inst = FindInstance(name);
+
+    if (inst == NULL)
+    {
+        THROW_EXCEPT("Cannot update echo cancellation. Group instance is not connected");
+    }
+    return inst->GetAGC(agc);
 }
 
 void BB_GroupMgrSource::EnableVoiceActivation(const std::wstring name, bool bEnable, int voiceactSlider)
@@ -101,7 +155,7 @@ void BB_GroupMgrSource::EnableVoiceActivation(const std::wstring name, bool bEna
     inst->EnableVoiceActivation(bEnable, voiceactSlider);
 }
 
-void BB_GroupMgrSource::GetMicrophoneLevel(const std::wstring name, INT32 &level)
+int BB_GroupMgrSource::IsVoiceActivationEnabled(const std::wstring name)
 {
     Lock lock(m_cs);
 
@@ -109,8 +163,9 @@ void BB_GroupMgrSource::GetMicrophoneLevel(const std::wstring name, INT32 &level
 
     if (inst == NULL)
     {
-        THROW_EXCEPT("Cannot return microphone level. Group instance is not connected");
+        THROW_EXCEPT("Cannot get voice activation. Group instance is not connected");
     }
-    inst->GetMicrophoneLevel(level);
+    return inst->IsVoiceActivationEnabled();
 }
+
 

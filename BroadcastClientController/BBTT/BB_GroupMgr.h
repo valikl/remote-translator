@@ -110,7 +110,7 @@ public:
         Lock lock(m_cs);
 
         // Add new instance
-        T *inst = new T(m_groupType, context, name);
+        T *inst = new T(m_groupType, context, name, instStat);
         inst->init();
         m_elements.insert(pair<wstring, T *>(name, inst));
     }

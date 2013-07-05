@@ -8,8 +8,8 @@
 
 using namespace std;
 
-BB_InstanceReceiver::BB_InstanceReceiver(GroupType groupType, const BB_InstanceContext &context, const wstring name) :
-    m_groupType(GROUP_TYPE_RECEIVERS), m_name(name), BB_Instance(context)
+BB_InstanceReceiver::BB_InstanceReceiver(GroupType groupType, const BB_InstanceContext &context, const wstring name, IInstStatus* instStat) :
+    m_groupType(GROUP_TYPE_RECEIVERS), m_name(name), m_instStat(instStat), BB_Instance(context)
 {
 }
 
@@ -106,6 +106,11 @@ void BB_InstanceReceiver::UpdateVolumeLevel(int volumeLevel)
     updateUserGainLevel(volumeLevel);
 }
 
+int BB_InstanceReceiver::GetVolumeLevel()
+{
+    return TT_GetSoundOutputVolume(m_ttInst);
+}
+
 void BB_InstanceReceiver::run()
 {
     int cnt = 0;
@@ -125,6 +130,11 @@ void BB_InstanceReceiver::run()
             // Read config
             BB_GroupElementConfig config = BB_ConfigMgr::Instance().GetGroupElementConfig(m_groupType, m_name);
 
+            if (TT_GetSoundOutputVolume(m_ttInst) != config.m_SrcVolumeLevel)
+            {
+                UpdateVolumeLevel(config.m_SrcVolumeLevel);
+                m_instStat->setError();
+            }
         }
         catch(BB_Exception excp)
         {

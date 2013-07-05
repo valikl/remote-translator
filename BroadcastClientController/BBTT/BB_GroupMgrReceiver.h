@@ -20,6 +20,7 @@ public:
 
     // Operations
     void UpdateVolumeLevel(const std::wstring name, int volumeLevel);
+    int GetVolumeLevel(const std::wstring name);
 
 private:
     BB_GroupMgrReceiver();
