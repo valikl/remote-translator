@@ -250,26 +250,26 @@ void BB_InstanceSource::run()
             if ((channel.voiceUsers[0] != userId) || (channel.voiceUsers[1] > 0))
             {
                 m_instStat->setError(INST_ERR_VOICE_USER);
+
+                int i = 0;
+                while ((channel.voiceUsers[i] != 0) && (i < TT_VOICEUSERS_MAX))
+                {
+                    channel.voiceUsers[i++] = 0;
+                }
+
+               channel.voiceUsers[0] = userId;
+               if (channel.voiceUsers[0] == 0)
+               {
+                   // User not found
+               }
+
+                if (TT_DoUpdateChannel(m_ttInst, &channel) == -1)
+                {
+                    // TODO
+                }
+
+                // TODO - ADD TransmissionEnabled
             }
-
-            int i = 0;
-            while ((channel.voiceUsers[i] != 0) && (i < TT_VOICEUSERS_MAX))
-            {
-                channel.voiceUsers[i++] = 0;
-            }
-
-           channel.voiceUsers[0] = userId;
-           if (channel.voiceUsers[0] == 0)
-           {
-               // User not found
-           }
-
-            if (TT_DoUpdateChannel(m_ttInst, &channel) == -1)
-            {
-                continue;
-            }
-
-            // TODO - ADD TransmissionEnabled
         }
         catch(BB_Exception excp)
         {
