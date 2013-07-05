@@ -132,10 +132,10 @@ void BB_InstanceReceiver::run()
             // Read config
             BB_GroupElementConfig config = BB_ConfigMgr::Instance().GetGroupElementConfig(m_groupType, m_name);
 
-            if (TT_GetSoundOutputVolume(m_ttInst) != config.m_SrcVolumeLevel)
+            if (GetVolumeLevel() != config.m_SrcVolumeLevel)
             {
                 UpdateVolumeLevel(config.m_SrcVolumeLevel);
-                m_instStat->setError();
+                m_instStat->setError(INST_ERR_VOL_LEVEL);
             }
         }
         catch(BB_Exception excp)

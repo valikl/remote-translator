@@ -208,19 +208,19 @@ void BB_InstanceSource::run()
             if (GetMicrophoneGainLevel() != config.m_MicGainLevel)
             {
                 UpdateMicrophoneGainLevel(config.m_MicGainLevel);
-                m_instStat->setError();
+                m_instStat->setError(INST_ERR_VOL_LEVEL);
             }
 
             if (IsDenoisingEnabled() != config.m_noiseCancel)
             {
                 EnableDenoising(config.m_noiseCancel);
-                m_instStat->setError();
+                m_instStat->setError(INST_ERR_DENOISING);
             }
 
             if (IsEchoCancellationEnabled() != config.m_echoCancel)
             {
                 EnableEchoCancellation(config.m_echoCancel);
-                m_instStat->setError();
+                m_instStat->setError(INST_ERR_ECHO_CANCEL);
             }
 
             AGC agcTmp;
@@ -231,13 +231,13 @@ void BB_InstanceSource::run()
                      agcTmp.m_maxGain != config.m_AGC.m_maxGain || agcTmp.m_maxIncrement != config.m_AGC.m_maxIncrement)))
             {
                 SetAGCEnable(config.m_AGC.m_enable, &config.m_AGC);
-                m_instStat->setError();
+                m_instStat->setError(INST_ERR_AGC);
             }
 
             if (IsVoiceActivationEnabled() != config.m_EnableVoiceActivation)
             {
                 EnableVoiceActivation(config.m_EnableVoiceActivation, config.m_VoiceActivationLevel);
-                m_instStat->setError();
+                m_instStat->setError(INST_ERR_VOICE_ACTIVE);
             }
 
             Channel channel;
@@ -249,7 +249,7 @@ void BB_InstanceSource::run()
             int userId = GetUserId();
             if ((channel.voiceUsers[0] != userId) || (channel.voiceUsers[1] > 0))
             {
-                m_instStat->setError();
+                m_instStat->setError(INST_ERR_VOICE_USER);
             }
 
             int i = 0;
@@ -268,6 +268,8 @@ void BB_InstanceSource::run()
             {
                 continue;
             }
+
+            // TODO - ADD TransmissionEnabled
         }
         catch(BB_Exception excp)
         {
