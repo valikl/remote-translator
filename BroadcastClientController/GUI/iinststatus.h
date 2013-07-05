@@ -5,6 +5,7 @@ class IInstStatus
 {
 public:
     virtual void setError() = 0;
+    virtual void setOK() = 0;
 };
 
 #endif // IINSTSTATUS_H

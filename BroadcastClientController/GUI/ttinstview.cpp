@@ -2,18 +2,17 @@
 #include "audiosettings.h"
 #include "common_gui.h"
 
-TTInstView::TTInstView(QString iname, QWidget *parent) :
-    QWidget(parent), name(iname)
+void TTInstView::setError()
 {
-    drawNameLabel(iname);
-    drawStatus();
-    drawSoundBar();
-    drawChangeButton();
-
-    setLayout();
+    statusState->setText("Error");
 }
 
-void TTInstView::drawNameLabel(QString name)
+void TTInstView::setOK()
+{
+    statusState->setText("OK");
+}
+
+void TTInstView::createNameLabel(QString name)
 {
     nameLabel = new QLabel;
     nameLabel->setText(name);
@@ -23,12 +22,13 @@ void TTInstView::drawNameLabel(QString name)
     nameLabel->setFont(font);
 }
 
-void TTInstView::setError()
+void TTInstView::init()
 {
-    statusState->setText("Error");
+    setLayout();
+    initAudio();
 }
 
-void TTInstView::drawStatus()
+void TTInstView::createStatus()
 {
     statusLabel = new QLabel;
     statusLabel->setText("Status:");
@@ -41,7 +41,7 @@ void TTInstView::drawStatus()
     statusResolve->setText("Resolve");
 }
 
-void TTInstView::drawChangeButton()
+void TTInstView::createChangeButton()
 {
     changeButton = new QPushButton;
 
@@ -49,15 +49,6 @@ void TTInstView::drawChangeButton()
     changeButton->setText("Change settings");
 
     QObject::connect(changeButton, SIGNAL(clicked()), this, SLOT(changeSettings()));
-}
-
-void TTInstView::drawSoundBar()
-{
-    soundLabel = new QLabel;
-    soundLabel->setText("Sound Level");
-
-    soundBar = new QProgressBar;
-    soundBar->setMinimumWidth(200);
 }
 
 QGroupBox* TTInstView::getStatusWidget()
@@ -77,7 +68,60 @@ QGroupBox* TTInstView::getStatusWidget()
     return status_box;
 }
 
-QGroupBox* TTInstView::getSoundBarWidget()
+void TTInstView::changeSettings()
+{
+    AudioSettings audio_settings(getName(), getType(), this);
+    audio_settings.exec();
+}
+
+void TTInstViewSource::setLayout()
+{
+    createNameLabel(getName());
+    createStatus();
+    createChangeButton();
+    createSoundBar();
+    QGroupBox* status_box = getStatusWidget();
+    QGroupBox* sound_box = getSoundBarWidget();
+
+    layout = new QGridLayout;
+    GRID(layout)->addWidget(getNameLabel(), 0, 0);
+    GRID(layout)->addWidget(status_box, 1, 0);
+    GRID(layout)->addWidget(sound_box, 2, 0);
+    GRID(layout)->addWidget(getChangeButton(), 3, 0);
+
+    QWidget::setLayout(layout);
+}
+
+void TTInstViewSource::initAudio()
+{
+    //Timer for micophone progress bar
+    microphone_timer = new QTimer(this);
+    connect(microphone_timer, SIGNAL(timeout()), this, SLOT(on_MicrophoneTimeout()));
+    microphone_timer->start(100);
+
+    wstring wname = getName().toStdWString();
+    BB_GroupElementConfig config = ConfigMgr.GetGroupElementConfig(getType(), wname);
+
+    BB_GroupMgrSource& mgr = getType() == GROUP_TYPE_SOURCES ? SourcesMgr : RestrictedMgr;
+    mgr.AddInstance(wname, config.m_InputSoundDevId, config.m_OutputSoundDevId, this);
+
+    TRY_FUNC_WITH_RETURN(mgr.EnableDenoising(wname, config.m_noiseCancel));
+    TRY_FUNC_WITH_RETURN(mgr.EnableEchoCancellation(wname, config.m_echoCancel));
+    TRY_FUNC_WITH_RETURN(mgr.EnableVoiceActivation(wname, config.m_EnableVoiceActivation));
+    TRY_FUNC_WITH_RETURN(mgr.SetAGCEnable(wname, config.m_AGC.m_enable, &(config.m_AGC)));
+    TRY_FUNC_WITH_RETURN(mgr.UpdateMicrophoneGainLevel(wname, config.m_MicGainLevel));
+}
+
+void TTInstViewSource::createSoundBar()
+{
+    soundLabel = new QLabel;
+    soundLabel->setText("Sound Level");
+
+    soundBar = new QProgressBar;
+    soundBar->setMinimumWidth(200);
+}
+
+QGroupBox* TTInstViewSource::getSoundBarWidget()
 {
     QGroupBox* sound_box = new QGroupBox;
     sound_box->setStyleSheet("QGroupBox { border-style: inset; border-width: 0px; }");
@@ -93,49 +137,32 @@ QGroupBox* TTInstView::getSoundBarWidget()
     return sound_box;
 }
 
-void TTInstView::setLayout()
+void TTInstViewSource::on_MicrophoneTimeout()
 {
-    layout = new QGridLayout;
+    BB_GroupMgrSource& mgr = getType() == GROUP_TYPE_SOURCES ? SourcesMgr : RestrictedMgr;
 
-    GRID(layout)->addWidget(nameLabel, 0, 0);
+    int level;
+    wstring wname = getName().toStdWString();
+    TRY_FUNC(level = mgr.GetMicrophoneGainLevel(wname));
+    soundBar->setValue(level);
+}
 
+void TTInstViewReceiver::setLayout()
+{
+    createNameLabel(getName());
+    createStatus();
+    createChangeButton();
     QGroupBox* status_box = getStatusWidget();
+
+    layout = new QGridLayout;
+    GRID(layout)->addWidget(getNameLabel(), 0, 0);
     GRID(layout)->addWidget(status_box, 1, 0);
-
-    QGroupBox* sound_box = getSoundBarWidget();
-    GRID(layout)->addWidget(sound_box, 2, 0);
-
-    GRID(layout)->addWidget(changeButton, 3, 0);
-
-    QFrame *line = new QFrame();
-    line->setFrameShape(QFrame::HLine);
-
-    GRID(layout)->addWidget(line);
+    GRID(layout)->addWidget(getChangeButton(), 2, 0);
 
     QWidget::setLayout(layout);
 }
 
-void TTInstView::changeSettings()
-{
-    AudioSettings audio_settings(getName(), getType(), this);
-    audio_settings.exec();
-}
-
-void TTInstViewSource::init()
-{
-    wstring wname = getName().toStdWString();
-    BB_GroupElementConfig config = ConfigMgr.GetGroupElementConfig(getType(), wname);
-
-    BB_GroupMgrSource& mgr = getType() == GROUP_TYPE_SOURCES ? SourcesMgr : RestrictedMgr;
-    mgr.AddInstance(wname, config.m_InputSoundDevId, config.m_OutputSoundDevId, this);
-
-    TRY_FUNC_WITH_RETURN(mgr.EnableDenoising(wname, config.m_noiseCancel));
-    TRY_FUNC_WITH_RETURN(mgr.EnableEchoCancellation(wname, config.m_echoCancel));
-    TRY_FUNC_WITH_RETURN(mgr.EnableVoiceActivation(wname, config.m_EnableVoiceActivation));
-    TRY_FUNC_WITH_RETURN(mgr.SetAGCEnable(wname, config.m_AGC.m_enable, &(config.m_AGC)));
-}
-
-void TTInstViewReceiver::init()
+void TTInstViewReceiver::initAudio()
 {
     wstring wname = getName().toStdWString();
     BB_GroupElementConfig config = ConfigMgr.GetGroupElementConfig(GROUP_TYPE_RECEIVERS, wname);
