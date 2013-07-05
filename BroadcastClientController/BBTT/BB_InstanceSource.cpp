@@ -186,6 +186,9 @@ INT32 BB_InstanceSource::GetUserId()
 
 void BB_InstanceSource::run()
 {
+    // Wait for configuration to be set by GUI for the first time
+    Sleep(5000);
+
     int cnt = 0;
     while(!m_stopThread)
     {
