@@ -2,14 +2,26 @@
 #include "audiosettings.h"
 #include "common_gui.h"
 
-void TTInstView::setError()
-{
-    statusState->setText("Error");
-}
-
 void TTInstView::setOK()
 {
+    emit ok();
+}
+
+void TTInstView::setError(int errcode)
+{
+    emit error();
+}
+
+void TTInstView::catchOK()
+{
     statusState->setText("OK");
+    statusState->setStyleSheet("QLabel { background-color : none; }");
+}
+
+void TTInstView::catchError()
+{
+    statusState->setText("Error");
+    statusState->setStyleSheet("QLabel { background-color : red; }");
 }
 
 void TTInstView::createNameLabel(QString name)
@@ -35,10 +47,14 @@ void TTInstView::createStatus()
 
     statusState = new QLabel;
     statusState->setText("OK");
+    statusState->setStyleSheet("QLabel { background-color : none; }");
 
     statusResolve = new QPushButton;
     statusResolve->setFixedSize(45, 30);
     statusResolve->setText("Resolve");
+
+    QObject::connect(this, SIGNAL(ok()), this, SLOT(catchOK()));
+    QObject::connect(this, SIGNAL(error()), this, SLOT(catchError()));
 }
 
 void TTInstView::createChangeButton()
@@ -55,7 +71,7 @@ QGroupBox* TTInstView::getStatusWidget()
 {
     QGroupBox* status_box = new QGroupBox;
     status_box->setStyleSheet("QGroupBox { border-style: inset; border-width: 0px; }");
-    status_box->setMaximumWidth(120);
+    status_box->setMaximumWidth(150);
 
     QHBoxLayout* status_layout = new QHBoxLayout;
     status_layout->setSpacing(10);

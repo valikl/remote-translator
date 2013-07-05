@@ -4,7 +4,7 @@
 class IInstStatus
 {
 public:
-    virtual void setError() = 0;
+    virtual void setError(int errcode) = 0;
     virtual void setOK() = 0;
 };
 

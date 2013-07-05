@@ -32,11 +32,13 @@ public:
     virtual void setLayout() = 0;
     virtual void initAudio() = 0;
 
-    virtual void setError();
+    virtual void setError(int errcode);
     virtual void setOK();
 
 signals:
-    
+    void ok();
+    void error();
+
 public slots:
     void changeSettings();
 
@@ -50,6 +52,8 @@ private:
     QPushButton* changeButton;  // change settings
 
 private slots:
+    void catchOK();
+    void catchError();
 
 };
 
