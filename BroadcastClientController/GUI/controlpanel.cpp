@@ -96,6 +96,7 @@ void ControlPanel::drawInstancesBox(GroupType type, QString box_name, QGroupBox*
             iview = new TTInstViewSource(iname, type);
         layout->addWidget(iview);
 
+        connect(iview, SIGNAL(warning(QString)), this, SLOT(catchError(QString)));
         connect(iview, SIGNAL(error(QString)), this, SLOT(catchError(QString)));
     }
 

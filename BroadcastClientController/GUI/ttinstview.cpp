@@ -2,11 +2,6 @@
 #include "audiosettings.h"
 #include "common_gui.h"
 
-void TTInstView::setOK()
-{
-    emit ok();
-}
-
 void TTInstView::setError(int errcode)
 {
     InstErrCode code = (InstErrCode)errcode;
@@ -17,40 +12,70 @@ void TTInstView::setError(int errcode)
     switch(code)
     {
     case INST_ERR_NONE:
-        errstr += "No error";
+        emit warning("");
         break;
     case INST_ERR_DENOISING:
         errstr += "Denoising error";
+        emit error(errstr);
         break;
     case INST_ERR_ECHO_CANCEL:
         errstr += "Echo cancellation error";
+        emit error(errstr);
         break;
     case INST_ERR_VOICE_ACTIVE:
         errstr += "Voice activation error";
+        emit error(errstr);
         break;
     case INST_ERR_AGC:
         errstr += "AGC error";
+        emit error(errstr);
         break;
     case INST_ERR_VOICE_USER:
         errstr += "User error";
+        emit error(errstr);
         break;
     case INST_ERR_VOL_LEVEL:
         errstr += "Volume level error";
+        emit error(errstr);
+        break;
+    case INST_ERR_FIXED_DENOISING:
+        errstr += "Denoising error fixed";
+        emit warning(errstr);
+        break;
+    case INST_ERR_FIXED_ECHO_CANCEL:
+        errstr += "Echo cancellation error fixed";
+        emit warning(errstr);
+        break;
+    case INST_ERR_FIXED_VOICE_ACTIVE:
+        errstr += "Voice activation error fixed";
+        emit warning(errstr);
+        break;
+    case INST_ERR_FIXED_AGC:
+        errstr += "AGC error fixed";
+        emit warning(errstr);
+        break;
+    case INST_ERR_FIXED_VOICE_USER:
+        errstr += "User error fixed";
+        emit warning(errstr);
+        break;
+    case INST_ERR_FIXED_VOL_LEVEL:
+        errstr += "Volume level error fixed";
+        emit warning(errstr);
         break;
     default:
         errstr += "Unknown error";
+        emit error(errstr);
         break;
     }
-    emit error(errstr);
 }
 
-void TTInstView::catchOK()
+void TTInstView::catchWarning(QString msg)
 {
     statusState->setText("OK");
     statusState->setStyleSheet("QLabel { background-color : none; }");
 }
 
-void TTInstView::catchError(QString errstr)
+void TTInstView::catchError(QString msg)
 {
     statusState->setText("Error");
     statusState->setStyleSheet("QLabel { background-color : red; }");
@@ -85,7 +110,7 @@ void TTInstView::createStatus()
     statusResolve->setFixedSize(45, 30);
     statusResolve->setText("Resolve");
 
-    QObject::connect(this, SIGNAL(ok()), this, SLOT(catchOK()));
+    QObject::connect(this, SIGNAL(warning(QString)), this, SLOT(catchWarning(QString)));
     QObject::connect(this, SIGNAL(error(QString)), this, SLOT(catchError(QString)));
 }
 
