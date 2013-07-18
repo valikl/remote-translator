@@ -32,12 +32,12 @@ public:
     virtual void setLayout() = 0;
     virtual void initAudio() = 0;
 
-    virtual void setError(int errcode);
     virtual void setOK();
+    virtual void setError(int errcode);
 
 signals:
     void ok();
-    void error();
+    void error(QString errstr);
 
 public slots:
     void changeSettings();
@@ -53,7 +53,7 @@ private:
 
 private slots:
     void catchOK();
-    void catchError();
+    void catchError(QString errstr);
 
 };
 

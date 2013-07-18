@@ -2,6 +2,7 @@
 #define CONTROLPANEL_H
 
 #include "BBTT/BB_ConfigMgr.h"
+#include "iinststatus.h"
 #include <QWidget>
 
 class QMenuBar;
@@ -42,6 +43,7 @@ signals:
 public slots:
     void callGroupSettings();
     void callInstSettings();
+    void catchError(QString errstr);
 
 };
 

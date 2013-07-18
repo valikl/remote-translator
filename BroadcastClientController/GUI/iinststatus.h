@@ -15,7 +15,7 @@ enum InstErrCode
 class IInstStatus
 {
 public:
-    virtual void setError(InstErrCode errcode) = 0;
+    virtual void setError(int errcode) = 0;
     virtual void setOK() = 0;
 };
 

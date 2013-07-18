@@ -9,7 +9,37 @@ void TTInstView::setOK()
 
 void TTInstView::setError(int errcode)
 {
-    emit error();
+    InstErrCode code = (InstErrCode)errcode;
+    QString errstr = name + ": ";
+
+    switch(code)
+    {
+    case INST_ERR_NONE:
+        errstr += "No error";
+        break;
+    case INST_ERR_DENOISING:
+        errstr += "Denoising error";
+        break;
+    case INST_ERR_ECHO_CANCEL:
+        errstr += "Echo cancellation error";
+        break;
+    case INST_ERR_VOICE_ACTIVE:
+        errstr += "Voice activation error";
+        break;
+    case INST_ERR_AGC:
+        errstr += "AGC error";
+        break;
+    case INST_ERR_VOICE_USER:
+        errstr += "User error";
+        break;
+    case INST_ERR_VOL_LEVEL:
+        errstr += "Volume level error";
+        break;
+    default:
+        errstr += "Unknown error";
+        break;
+    }
+    emit error(errstr);
 }
 
 void TTInstView::catchOK()
@@ -18,7 +48,7 @@ void TTInstView::catchOK()
     statusState->setStyleSheet("QLabel { background-color : none; }");
 }
 
-void TTInstView::catchError()
+void TTInstView::catchError(QString errstr)
 {
     statusState->setText("Error");
     statusState->setStyleSheet("QLabel { background-color : red; }");
@@ -54,7 +84,7 @@ void TTInstView::createStatus()
     statusResolve->setText("Resolve");
 
     QObject::connect(this, SIGNAL(ok()), this, SLOT(catchOK()));
-    QObject::connect(this, SIGNAL(error()), this, SLOT(catchError()));
+    QObject::connect(this, SIGNAL(error(QString)), this, SLOT(catchError(QString)));
 }
 
 void TTInstView::createChangeButton()

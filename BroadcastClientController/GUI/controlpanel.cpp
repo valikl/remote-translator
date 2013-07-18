@@ -11,6 +11,11 @@ ControlPanel::ControlPanel(QWidget *parent) :
     QWidget(parent)
 {}
 
+void ControlPanel::catchError(QString errstr)
+{
+    msgConsole->appendPlainText(errstr);
+}
+
 void ControlPanel::init()
 {
     // Initialize configuration manager and group managers
@@ -90,6 +95,8 @@ void ControlPanel::drawInstancesBox(GroupType type, QString box_name, QGroupBox*
         else
             iview = new TTInstViewSource(iname, type);
         layout->addWidget(iview);
+
+        connect(iview, SIGNAL(error(QString)), this, SLOT(catchError(QString)));
     }
 
     inst_group->setLayout(layout);
