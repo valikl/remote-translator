@@ -10,7 +10,9 @@ void TTInstView::setOK()
 void TTInstView::setError(int errcode)
 {
     InstErrCode code = (InstErrCode)errcode;
-    QString errstr = name + ": ";
+    QString  type = getType() == GROUP_TYPE_SOURCES ?
+                "SOURCES " : getType() == GROUP_TYPE_RECEIVERS ? "RECEIVERS " : "RESTRICTED ";
+    QString errstr = type + name + ": ";
 
     switch(code)
     {
