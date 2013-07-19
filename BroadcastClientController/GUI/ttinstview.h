@@ -25,6 +25,7 @@ public:
     // create widget components
     void createNameLabel(QString name);
     void createChangeButton();
+    void createReconnectButton();
     void createStatus();
     QGroupBox* getStatusWidget();
 
@@ -40,15 +41,16 @@ signals:
 
 public slots:
     void changeSettings();
+    virtual void reconnect() = 0;
 
 private:
 
-    QString name;               // instance name
-    QLabel* nameLabel;          // instance label
-    QLabel* statusLabel;        // status lable
-    QLabel* statusState;        // status state
-    QPushButton* statusResolve; // resolve status button
-    QPushButton* changeButton;  // change settings
+    QString name;                   // instance name
+    QLabel* nameLabel;              // instance label
+    QLabel* statusLabel;            // status lable
+    QLabel* statusState;            // status state
+    QPushButton* reconnectButton;   // reconnect button
+    QPushButton* changeButton;      // change settings
 
 private slots:
     void catchWarning(QString msg);
@@ -78,6 +80,9 @@ private:
 
 private slots:
     void on_MicrophoneTimeout();
+
+public slots:
+    virtual void reconnect();
 };
 
 class TTInstViewReceiver : public TTInstView
@@ -89,6 +94,9 @@ public:
     virtual GroupType getType() { return GROUP_TYPE_RECEIVERS; }
     virtual void setLayout();
     virtual void initAudio();
+
+public slots:
+    virtual void reconnect();
 
 private:
 

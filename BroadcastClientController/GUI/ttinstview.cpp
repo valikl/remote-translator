@@ -106,10 +106,6 @@ void TTInstView::createStatus()
     statusState->setText("OK");
     statusState->setStyleSheet("QLabel { background-color : none; }");
 
-    statusResolve = new QPushButton;
-    statusResolve->setFixedSize(45, 30);
-    statusResolve->setText("Resolve");
-
     QObject::connect(this, SIGNAL(warning(QString)), this, SLOT(catchWarning(QString)));
     QObject::connect(this, SIGNAL(error(QString)), this, SLOT(catchError(QString)));
 }
@@ -117,11 +113,25 @@ void TTInstView::createStatus()
 void TTInstView::createChangeButton()
 {
     changeButton = new QPushButton;
-
     changeButton->setFixedSize(90, 45);
     changeButton->setText("Change settings");
 
     QObject::connect(changeButton, SIGNAL(clicked()), this, SLOT(changeSettings()));
+}
+
+void TTInstView::changeSettings()
+{
+    AudioSettings audio_settings(getName(), getType(), this);
+    audio_settings.exec();
+}
+
+void TTInstView::createReconnectButton()
+{
+    reconnectButton = new QPushButton;
+    reconnectButton->setFixedSize(60, 45);
+    reconnectButton->setText("Reconnect");
+
+    QObject::connect(reconnectButton, SIGNAL(clicked()), this, SLOT(reconnect()));
 }
 
 QGroupBox* TTInstView::getStatusWidget()
@@ -135,16 +145,10 @@ QGroupBox* TTInstView::getStatusWidget()
     status_layout->setMargin(0);
     status_layout->addWidget(statusLabel);
     status_layout->addWidget(statusState);
-    status_layout->addWidget(statusResolve);
+    status_layout->addWidget(reconnectButton);
 
     status_box->setLayout(status_layout);
     return status_box;
-}
-
-void TTInstView::changeSettings()
-{
-    AudioSettings audio_settings(getName(), getType(), this);
-    audio_settings.exec();
 }
 
 void TTInstViewSource::setLayout()
@@ -152,6 +156,7 @@ void TTInstViewSource::setLayout()
     createNameLabel(getName());
     createStatus();
     createChangeButton();
+    createReconnectButton();
     createSoundBar();
     QGroupBox* status_box = getStatusWidget();
     QGroupBox* sound_box = getSoundBarWidget();
@@ -183,6 +188,15 @@ void TTInstViewSource::initAudio()
     TRY_FUNC_WITH_RETURN(mgr.EnableVoiceActivation(wname, config.m_EnableVoiceActivation));
     TRY_FUNC_WITH_RETURN(mgr.SetAGCEnable(wname, config.m_AGC.m_enable, &(config.m_AGC)));
     TRY_FUNC_WITH_RETURN(mgr.UpdateMicrophoneGainLevel(wname, config.m_MicGainLevel));
+}
+
+void TTInstViewSource::reconnect()
+{
+    microphone_timer->stop();
+    wstring wname = getName().toStdWString();
+    BB_GroupMgrSource& mgr = getType() == GROUP_TYPE_SOURCES ? SourcesMgr : RestrictedMgr;
+    mgr.RemoveInstance(wname);
+    initAudio();
 }
 
 void TTInstViewSource::createSoundBar()
@@ -225,6 +239,7 @@ void TTInstViewReceiver::setLayout()
     createNameLabel(getName());
     createStatus();
     createChangeButton();
+    createReconnectButton();
     QGroupBox* status_box = getStatusWidget();
 
     layout = new QGridLayout;
@@ -242,4 +257,11 @@ void TTInstViewReceiver::initAudio()
     ReceiversMgr.AddInstance(wname, config.m_InputSoundDevId, config.m_OutputSoundDevId, this);
 
     TRY_FUNC_WITH_RETURN(ReceiversMgr.UpdateVolumeLevel(wname, config.m_SrcVolumeLevel));
+}
+
+void TTInstViewReceiver::reconnect()
+{
+    wstring wname = getName().toStdWString();
+    ReceiversMgr.RemoveInstance(wname);
+    initAudio();
 }
