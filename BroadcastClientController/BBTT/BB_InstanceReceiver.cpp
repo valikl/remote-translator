@@ -136,7 +136,6 @@ void BB_InstanceReceiver::run()
         // Read config
         BB_GroupElementConfig config = BB_ConfigMgr::Instance().GetGroupElementConfig(m_groupType, m_name);
 
-        int vol = GetVolumeLevel();
         if (GetVolumeLevel() != config.m_SrcVolumeLevel)
         {
             try

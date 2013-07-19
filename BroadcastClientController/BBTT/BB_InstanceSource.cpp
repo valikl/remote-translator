@@ -301,9 +301,19 @@ void BB_InstanceSource::run()
                 continue;
             }
 
-            // TODO - ADD TransmissionEnabled
-
             m_instStat->setError(INST_ERR_FIXED_VOICE_USER);
+        }
+
+        if (!TT_IsTransmitting(m_ttInst, TRANSMIT_AUDIO))
+        {
+            if (!TT_EnableTransmission(m_ttInst, TRANSMIT_AUDIO, true))
+            {
+                m_instStat->setError(INST_ERR_TRANSMIT_ENABLED);
+            }
+            else
+            {
+                m_instStat->setError(INST_ERR_FIXED_TRANSMIT_ENABLED);
+            }
         }
     }
 }
