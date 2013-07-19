@@ -32,6 +32,8 @@ public:
     void UpdateVolumeLevel(int volumeLevel);
     int GetVolumeLevel();
 
+    void UpdateSoundDev(int id, bool isInput);
+
 private:
     // TODO: add functions transmission checkbox enabling, change sound card,
     // test sound card, get line-in signal, watchdog for configuration parameters, change instance language, change instance channel

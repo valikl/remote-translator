@@ -117,6 +117,20 @@ int BB_InstanceReceiver::GetVolumeLevel()
     return TT_GetSoundOutputVolume(m_ttInst);
 }
 
+void BB_InstanceReceiver::UpdateSoundDev(int id, bool isInput)
+{
+    closeSoundDevices();
+    if (isInput)
+    {
+        m_context.m_inputSoundDevId = id;
+    }
+    else
+    {
+        m_context.m_outputSoundDevId = id;
+    }
+    initSoundDevices();
+}
+
 void BB_InstanceReceiver::run()
 {
     // Wait for configuration to be set by GUI for the first time

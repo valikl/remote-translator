@@ -131,6 +131,8 @@ public:
 
     void UpdateNickName(const std::wstring name, const std::wstring nickName)
     {
+        Lock lock(m_cs);
+
         T *inst = FindInstance(name);
         if (inst == NULL)
         {
@@ -139,6 +141,27 @@ public:
 
         inst->UpdateNickName(nickName);
         BB_ConfigMgr::Instance().SetGroupElementNickName(m_groupType, name, nickName);
+    }
+
+    void UpdateSoundDev(const std::wstring name, int id, bool isInput)
+    {
+        Lock lock(m_cs);
+
+        T *inst = FindInstance(name);
+        if (inst == NULL)
+        {
+            THROW_EXCEPT("Cannot update sound device. Group instance is not connected");
+        }
+
+        inst->UpdateSoundDev(id, isInput);
+        if (isInput)
+        {
+            BB_ConfigMgr::Instance().SetGroupElementInputSoundDevId(m_groupType, name, id);
+        }
+        else
+        {
+            BB_ConfigMgr::Instance().SetGroupElementOutputSoundDevId(m_groupType, name, id);
+        }
     }
 
 protected:

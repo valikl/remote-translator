@@ -164,6 +164,20 @@ int BB_InstanceSource::IsVoiceActivationEnabled()
     //}
 }
 
+void BB_InstanceSource::UpdateSoundDev(int id, bool isInput)
+{
+    closeSoundDevices();
+    if (isInput)
+    {
+        m_context.m_inputSoundDevId = id;
+    }
+    else
+    {
+        m_context.m_outputSoundDevId = id;
+    }
+    initSoundDevices();
+}
+
 INT32 BB_InstanceSource::GetUserId()
 {
     // Read config
