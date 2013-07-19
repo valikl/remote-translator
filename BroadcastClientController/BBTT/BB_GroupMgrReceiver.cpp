@@ -33,6 +33,7 @@ void BB_GroupMgrReceiver::UpdateVolumeLevel(const std::wstring name, int volumeL
     }
 
     inst->UpdateVolumeLevel(volumeLevel);
+    BB_ConfigMgr::Instance().SetGroupElementSrcVolumeLevel(m_groupType, name, volumeLevel);
 }
 
 int BB_GroupMgrReceiver::GetVolumeLevel(const std::wstring name)

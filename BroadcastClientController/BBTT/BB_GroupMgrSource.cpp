@@ -46,6 +46,7 @@ void BB_GroupMgrSource::UpdateMicrophoneGainLevel(const std::wstring name, int g
         THROW_EXCEPT("Cannot update microphone gain level. Group instance is not connected");
     }
     inst->UpdateMicrophoneGainLevel(gainLevel);
+    BB_ConfigMgr::Instance().SetGroupElementMicGainLevel(m_groupType, name, gainLevel);
 }
 
 int BB_GroupMgrSource::GetMicrophoneGainLevel(const std::wstring name)
@@ -73,6 +74,7 @@ void BB_GroupMgrSource::EnableDenoising(const std::wstring name, bool bEnable)
     }
 
     inst->EnableDenoising(bEnable);
+    BB_ConfigMgr::Instance().SetGroupElementNoiseCancel(m_groupType, name, bEnable);
 }
 
 
@@ -100,7 +102,9 @@ void BB_GroupMgrSource::EnableEchoCancellation(const std::wstring name, bool bEn
     {
         THROW_EXCEPT("Cannot update echo cancellation. Group instance is not connected");
     }
+
     inst->EnableEchoCancellation(bEnable);
+    BB_ConfigMgr::Instance().SetGroupElementEchoCancel(m_groupType, name, bEnable);
 }
 
 bool BB_GroupMgrSource::IsEchoCancellationEnabled(const std::wstring name)
@@ -126,7 +130,9 @@ void BB_GroupMgrSource::SetAGCEnable(const std::wstring name, bool bEnable, cons
     {
         THROW_EXCEPT("Cannot update echo cancellation. Group instance is not connected");
     }
+
     inst->SetAGCEnable(bEnable, agc);
+    BB_ConfigMgr::Instance().SetGroupElementAGC(m_groupType, name, *agc);
 }
 
 bool BB_GroupMgrSource::GetAGC(const std::wstring name, AGC &agc)
@@ -153,6 +159,8 @@ void BB_GroupMgrSource::EnableVoiceActivation(const std::wstring name, bool bEna
         THROW_EXCEPT("Cannot update voice activation. Group instance is not connected");
     }
     inst->EnableVoiceActivation(bEnable, voiceactSlider);
+    BB_ConfigMgr::Instance().SetGroupElementEnableVoiceActivation(m_groupType, name, bEnable);
+    BB_ConfigMgr::Instance().SetGroupElementVoiceActivationLevel(m_groupType, name, voiceactSlider);
 }
 
 int BB_GroupMgrSource::IsVoiceActivationEnabled(const std::wstring name)

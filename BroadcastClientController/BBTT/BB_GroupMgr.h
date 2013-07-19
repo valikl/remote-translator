@@ -129,6 +129,18 @@ public:
         }
     }
 
+    void UpdateNickName(const std::wstring name, const std::wstring nickName)
+    {
+        T *inst = FindInstance(name);
+        if (inst == NULL)
+        {
+            THROW_EXCEPT("Cannot update nick name. Group instance is not connected");
+        }
+
+        inst->UpdateNickName(nickName);
+        BB_ConfigMgr::Instance().SetGroupElementNickName(m_groupType, name, nickName);
+    }
+
 protected:
 
     void InitInstanceContext(BB_InstanceContext &context)

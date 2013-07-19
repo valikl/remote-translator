@@ -94,11 +94,14 @@ void BB_Instance::joinChannel()
 
 void BB_Instance::setInstProp()
 {
-	int ret = 0;
     TTMessage msg;
     int wait_ms = 10000;
 
-	ret = TT_DoChangeNickname(m_ttInst, m_context.m_nickName.c_str());
+    if (TT_DoChangeNickname(m_ttInst, m_context.m_nickName.c_str()) == -1)
+    {
+        THROW_EXCEPT("Set nickname failed");
+    }
+
 	while(TT_GetMessage(m_ttInst, &msg, &wait_ms) &&  msg.wmMsg != WM_TEAMTALK_CMD_PROCESSING)
  		processTTMessage(msg);
 
@@ -315,4 +318,10 @@ void BB_Instance::getSoundDevices(vector<BB_SoundDevice> &soundDevs)
         soundDevs.push_back(soundDev);
     }
     delete[] soundDevices;
+}
+
+void BB_Instance::UpdateNickName(const std::wstring nickName)
+{
+    m_context.m_nickName = nickName;
+    setInstProp();
 }
