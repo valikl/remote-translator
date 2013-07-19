@@ -88,14 +88,14 @@ void BB_InstanceReceiver::updateUserGainLevel(int volume)
         if(volume <= SOUND_VOLUME_MAX)
         {
             //disable soft gain
-            if (TT_SetUserGainLevel(m_ttInst, user.m_id, SOUND_GAIN_DEFAULT))
+            if (!TT_SetUserGainLevel(m_ttInst, user.m_id, SOUND_GAIN_DEFAULT))
             {
                 THROW_EXCEPT("Set user gain level failed");
             }
         }
         else
         {
-            if (TT_SetUserGainLevel(m_ttInst, user.m_id, gain))
+            if (!TT_SetUserGainLevel(m_ttInst, user.m_id, gain))
             {
                 THROW_EXCEPT("Set user gain level failed");
             }
@@ -136,6 +136,7 @@ void BB_InstanceReceiver::run()
         // Read config
         BB_GroupElementConfig config = BB_ConfigMgr::Instance().GetGroupElementConfig(m_groupType, m_name);
 
+        int vol = GetVolumeLevel();
         if (GetVolumeLevel() != config.m_SrcVolumeLevel)
         {
             try
