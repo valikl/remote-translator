@@ -143,7 +143,7 @@ public:
         BB_ConfigMgr::Instance().SetGroupElementNickName(m_groupType, name, nickName);
     }
 
-    void UpdateSoundDev(const std::wstring name, const std::wstring id, bool isInput)
+    void UpdateSoundDev(const std::wstring name, const std::wstring id, bool isSoundSystemWin, bool isInput)
     {
         Lock lock(m_cs);
 
@@ -155,8 +155,6 @@ public:
 
         inst->UpdateSoundDev(atoi(string(id.begin(), id.end()).c_str()), isInput);
 
-        ;
-
         if (isInput)
         {
             BB_ConfigMgr::Instance().SetGroupElementInputSoundDevId(m_groupType, name, id);
@@ -165,6 +163,8 @@ public:
         {
             BB_ConfigMgr::Instance().SetGroupElementOutputSoundDevId(m_groupType, name, id);
         }
+
+        BB_ConfigMgr::Instance().SetGroupElementSoundSystemWin(m_groupType, name, isSoundSystemWin);
     }
 
 protected:
