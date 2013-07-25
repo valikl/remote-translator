@@ -143,7 +143,7 @@ public:
         BB_ConfigMgr::Instance().SetGroupElementNickName(m_groupType, name, nickName);
     }
 
-    void UpdateSoundDev(const std::wstring name, int id, bool isInput)
+    void UpdateSoundDev(const std::wstring name, const std::string id, bool isInput)
     {
         Lock lock(m_cs);
 
@@ -153,14 +153,18 @@ public:
             THROW_EXCEPT("Cannot update sound device. Group instance is not connected");
         }
 
-        inst->UpdateSoundDev(id, isInput);
+        inst->UpdateSoundDev(atoi(id.c_str()), isInput);
+
+        wstring wId;
+        wId.assign(id.begin(), id.end());
+
         if (isInput)
         {
-            BB_ConfigMgr::Instance().SetGroupElementInputSoundDevId(m_groupType, name, id);
+            BB_ConfigMgr::Instance().SetGroupElementInputSoundDevId(m_groupType, name, wId);
         }
         else
         {
-            BB_ConfigMgr::Instance().SetGroupElementOutputSoundDevId(m_groupType, name, id);
+            BB_ConfigMgr::Instance().SetGroupElementOutputSoundDevId(m_groupType, name, wId);
         }
     }
 
