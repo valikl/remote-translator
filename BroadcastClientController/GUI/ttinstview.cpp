@@ -38,6 +38,10 @@ void TTInstView::setError(int errcode)
         errstr += "Volume level error";
         emit error(errstr);
         break;
+    case INST_ERR_TRANSMIT_ENABLED:
+        errstr += "Transmit enabled error";
+        emit error(errstr);
+        break;
     case INST_ERR_FIXED_DENOISING:
         errstr += "Denoising error fixed";
         emit warning(errstr);
@@ -60,6 +64,10 @@ void TTInstView::setError(int errcode)
         break;
     case INST_ERR_FIXED_VOL_LEVEL:
         errstr += "Volume level error fixed";
+        emit warning(errstr);
+        break;
+    case INST_ERR_FIXED_TRANSMIT_ENABLED:
+        errstr += "Transmit enabled error fixed";
         emit warning(errstr);
         break;
     default:

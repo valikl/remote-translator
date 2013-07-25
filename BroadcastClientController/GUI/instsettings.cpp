@@ -137,55 +137,114 @@ void InstSettings::setLayout()
     QWidget::setLayout(layout);
 }
 
+/*************** Update functions ******************/
+
+static void updateNickName(GroupType type, wstring inst_name, wstring nick_name)
+{
+    switch (type)
+    {
+    case GROUP_TYPE_SOURCES:
+        TRY_FUNC(SourcesMgr.UpdateNickName(inst_name, nick_name));
+        break;
+    case GROUP_TYPE_RESTRICTED_SERVERS:
+        TRY_FUNC(RestrictedMgr.UpdateNickName(inst_name, nick_name));
+        break;
+    default:
+        TRY_FUNC(ReceiversMgr.UpdateNickName(inst_name, nick_name));
+        break;
+    }
+}
+
+static void updateVolumeLevel(GroupType type, wstring inst_name, int volumeLevel)
+{
+    TRY_FUNC(ReceiversMgr.UpdateVolumeLevel(inst_name, volumeLevel));
+}
+
+static void updateMicrophoneGainLevel(GroupType type, wstring inst_name, int gainLevel)
+{
+    BB_GroupMgrSource& mgr = type == GROUP_TYPE_SOURCES ? SourcesMgr : RestrictedMgr;
+    TRY_FUNC(mgr.UpdateMicrophoneGainLevel(inst_name, gainLevel));
+}
+
+static void enableDenoising(GroupType type, wstring inst_name, bool bEnable)
+{
+    BB_GroupMgrSource& mgr = type == GROUP_TYPE_SOURCES ? SourcesMgr : RestrictedMgr;
+    TRY_FUNC(mgr.EnableDenoising(inst_name, bEnable));
+}
+
+static void enableEchoCancellation(GroupType type, wstring inst_name, bool bEnable)
+{
+    BB_GroupMgrSource& mgr = type == GROUP_TYPE_SOURCES ? SourcesMgr : RestrictedMgr;
+    TRY_FUNC(mgr.EnableEchoCancellation(inst_name, bEnable));
+}
+
+static void updateSoundDev(GroupType type, wstring inst_name, wstring id, bool isInput)
+{
+    switch (type)
+    {
+    case GROUP_TYPE_SOURCES:
+        TRY_FUNC(SourcesMgr.UpdateSoundDev(inst_name, id, isInput));
+        break;
+    case GROUP_TYPE_RESTRICTED_SERVERS:
+        TRY_FUNC(RestrictedMgr.UpdateSoundDev(inst_name, id, isInput));
+        break;
+    default:
+        TRY_FUNC(ReceiversMgr.UpdateSoundDev(inst_name, id, isInput));
+        break;
+    }
+}
+
+static void updateInputSoundDev(GroupType type, wstring inst_name, wstring id)
+{
+    updateSoundDev(type, inst_name, id, true);
+}
+
+static void updateOutputSoundDev(GroupType type, wstring inst_name, wstring id)
+{
+    updateSoundDev(type, inst_name, id, false);
+}
+
+/*************** Save instance details functions ******************/
+
 static bool saveDetail(GroupType type, wstring inst_name, QString name, void* container)
 {
     bool is_changed = false;
     BB_GroupElementConfig inst = ConfigMgr.GetGroupElementConfig(type, inst_name);
 
-    if (name == "Channel source")
+    if (name == "Nick name")
     {
         QString val = ((QLineEdit*)container)->text();
-        CHANGE_IF_NEEDED(inst.m_name, ConfigMgr.SetGroupElementName, val.toStdWString());
-    }
-    else if (name == "Nick name")
-    {
-        QString val = ((QLineEdit*)container)->text();
-        CHANGE_IF_NEEDED(inst.m_nickName, ConfigMgr.SetGroupElementNickName, val.toStdWString());
-    }
-    else if (name == "Channel name")
-    {
-        QString val = ((QLineEdit*)container)->text();
-        CHANGE_IF_NEEDED(inst.m_channelName, ConfigMgr.SetGroupElementChannel, val.toStdWString());
+        CHANGE_IF_NEEDED(inst.m_nickName, updateNickName, val.toStdWString());
     }
     else if (name == "Input device")
     {
         QString val = ((QComboBox*)container)->currentText();
-        CHANGE_IF_NEEDED(inst.m_InputSoundDevId, ConfigMgr.SetGroupElementInputSoundDevId, val.toStdWString());
+        CHANGE_IF_NEEDED(inst.m_InputSoundDevId, updateInputSoundDev, val.toStdWString());
     }
     else if (name == "Output device")
     {
         QString val = ((QComboBox*)container)->currentText();
-        CHANGE_IF_NEEDED(inst.m_OutputSoundDevId, ConfigMgr.SetGroupElementOutputSoundDevId, val.toStdWString());
+        CHANGE_IF_NEEDED(inst.m_OutputSoundDevId, updateOutputSoundDev, val.toStdWString());
     }
     else if (name == "Volume level")
     {
         int val = ((QSlider*)container)->value();
-        CHANGE_IF_NEEDED(inst.m_SrcVolumeLevel, ConfigMgr.SetGroupElementSrcVolumeLevel, val);
+        CHANGE_IF_NEEDED(inst.m_SrcVolumeLevel, updateVolumeLevel, val);
     }
     else if (name == "Gain level")
     {
         int val = ((QSlider*)container)->value();
-        CHANGE_IF_NEEDED(inst.m_MicGainLevel, ConfigMgr.SetGroupElementMicGainLevel, val);
+        CHANGE_IF_NEEDED(inst.m_MicGainLevel, updateMicrophoneGainLevel, val);
     }
     else if (name == "Enable denoising")
     {
         Qt::CheckState val = ((QCheckBox*)container)->checkState();
-        CHANGE_IF_NEEDED(inst.m_noiseCancel, ConfigMgr.SetGroupElementNoiseCancel, val == Qt::Checked);
+        CHANGE_IF_NEEDED(inst.m_noiseCancel, enableDenoising, val == Qt::Checked);
     }
     else if (name == "Enable echo cancellation")
     {
         Qt::CheckState val = ((QCheckBox*)container)->checkState();
-        CHANGE_IF_NEEDED(inst.m_echoCancel, ConfigMgr.SetGroupElementEchoCancel, val == Qt::Checked);
+        CHANGE_IF_NEEDED(inst.m_echoCancel, enableEchoCancellation, val == Qt::Checked);
     }
     else if (name == "Standard Windows")
     {
@@ -259,9 +318,15 @@ void InstSettingsView::setLayout()
 
     int gainMax = 4000; /* real max: SOUND_LEVEL_MAX but it's too much */
 
-    addTextLine("Channel source", QString::fromStdWString(config.m_name), GRID(layout), 0, dmap);
+    //  instance name
+    QLabel* nameLabel = new QLabel;
+    nameLabel->setText(getName());
+    QFont font;
+    font.setBold(true);
+    nameLabel->setFont(font);
+    layout->addWidget(nameLabel);
+
     addTextLine("Nick name", QString::fromStdWString(config.m_nickName), GRID(layout), 1, dmap);
-    addTextLine("Channel name", QString::fromStdWString(config.m_channelName), GRID(layout), 2, dmap);
     addSoundDevBox("Input device", false, sound_devices, config, GRID(layout), 3, dmap);
     addSoundDevBox("Output device", true, sound_devices, config, GRID(layout), 4, dmap);
     if (type == GROUP_TYPE_RECEIVERS)

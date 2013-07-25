@@ -76,7 +76,7 @@ try \
 } \
 catch(BB_Exception excp) \
 { \
-    QMessageBox::critical(this, "Error:", QString::fromStdWString(excp.GetInfo())); \
+    QMessageBox::critical(NULL, "Error:", QString::fromStdWString(excp.GetInfo())); \
 }
 
 #define TRY_FUNC_WITH_RETURN(func) \
@@ -86,7 +86,7 @@ try \
 } \
 catch(BB_Exception excp) \
 { \
-    QMessageBox::critical(this, "Error:", QString::fromStdWString(excp.GetInfo())); \
+    QMessageBox::critical(NULL, "Error:", QString::fromStdWString(excp.GetInfo())); \
     return; \
 }
 
@@ -97,7 +97,7 @@ try \
 } \
 catch(BB_Exception excp) \
 { \
-    QMessageBox::critical(this, "Error:", QString::fromStdWString(excp.GetInfo())); \
+    QMessageBox::critical(NULL, "Error:", QString::fromStdWString(excp.GetInfo())); \
 }
 
 #define TRY_BLOCK_RETURN_ON_ERR(block) \
