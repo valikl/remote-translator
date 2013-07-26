@@ -52,26 +52,31 @@ static void addTextLine(QString name, QString val, QGridLayout* layout, int row,
     dmap[name] = server_detail;
 }
 
-static void addSoundDevBox(QString name, bool is_out, vector<BB_SoundDevice>& sound_devices,
-                           BB_GroupElementConfig& inst, QGridLayout* inst_layout, int row, InstDetailMap& dmap)
+static void showSoundDevList(QComboBox* box, bool is_out, bool is_win,
+                             vector<BB_SoundDevice>& sound_devices, wstring curr_dev_id)
 {
-    QLabel* box_label = new QLabel(name);
-    QComboBox* box = new QComboBox;
     box->clear();
-    wstring dev_id = is_out ? inst.m_OutputSoundDevId : inst.m_InputSoundDevId;
     for (unsigned int i = 0; i < sound_devices.size(); ++i)
     {
         BB_SoundDevice& device = sound_devices[i];
-        if ((inst.m_isSoundSystemWin && !device.m_isSoundSystemWin) ||
-            (!inst.m_isSoundSystemWin && device.m_isSoundSystemWin))
+        if ((is_win && !device.m_isSoundSystemWin) || (!is_win && device.m_isSoundSystemWin))
             continue;
         if ((is_out && !device.m_isOutputDevice) || (!is_out && device.m_isOutputDevice))
             continue;
         QString device_name = QString::fromStdWString(device.m_deviceName.c_str());
         box->addItem(device_name, i);
-        if (device.m_deviceId == dev_id)
+        if (device.m_deviceId == curr_dev_id)
             box->setCurrentIndex(box->count()-1);
     }
+}
+
+static void addSoundDevBox(QString name, bool is_out, vector<BB_SoundDevice>& sound_devices,
+                           BB_GroupElementConfig& inst, QGridLayout* inst_layout, int row, InstDetailMap& dmap)
+{
+    QLabel* box_label = new QLabel(name);
+    QComboBox* box = new QComboBox;
+    wstring curr_dev_id = is_out ? inst.m_OutputSoundDevId : inst.m_InputSoundDevId;
+    showSoundDevList(box, is_out, inst.m_isSoundSystemWin, sound_devices, curr_dev_id);
     inst_layout->addWidget(box_label, row, 0);
     inst_layout->addWidget(box, row, 1);
     dmap[name] = box;
@@ -98,6 +103,15 @@ static void addCheckBox(QString name, bool checked, QGridLayout* inst_layout, in
     inst_layout->addWidget(box_label, row, 0);
     inst_layout->addWidget(box, row, 1);
     dmap[name] = box;
+}
+
+static void addRadioButtonBox(QString name, bool checked, QGridLayout* inst_layout, int row, int col, InstDetailMap& dmap)
+{
+    QRadioButton* button = new QRadioButton;
+    button->setText(name);
+    button->setChecked(checked);
+    inst_layout->addWidget(button, row, col);
+    dmap[name] = button;
 }
 
 void InstSettings::createGroupInstsSettings(GroupType type, QString box_name, QGroupBox*& group_box)
@@ -180,16 +194,18 @@ static void enableEchoCancellation(GroupType type, wstring inst_name, bool bEnab
 
 static void updateSoundDev(GroupType type, wstring inst_name, wstring id, bool isInput)
 {
+    BB_GroupElementConfig inst = ConfigMgr.GetGroupElementConfig(type, inst_name);
+
     switch (type)
     {
     case GROUP_TYPE_SOURCES:
-        TRY_FUNC(SourcesMgr.UpdateSoundDev(inst_name, id, isInput));
+        TRY_FUNC(SourcesMgr.UpdateSoundDev(inst_name, id, isInput, inst.m_isSoundSystemWin));
         break;
     case GROUP_TYPE_RESTRICTED_SERVERS:
-        TRY_FUNC(RestrictedMgr.UpdateSoundDev(inst_name, id, isInput));
+        TRY_FUNC(RestrictedMgr.UpdateSoundDev(inst_name, id, isInput, inst.m_isSoundSystemWin));
         break;
     default:
-        TRY_FUNC(ReceiversMgr.UpdateSoundDev(inst_name, id, isInput));
+        TRY_FUNC(ReceiversMgr.UpdateSoundDev(inst_name, id, isInput, inst.m_isSoundSystemWin));
         break;
     }
 }
@@ -206,7 +222,7 @@ static void updateOutputSoundDev(GroupType type, wstring inst_name, wstring id)
 
 /*************** Save instance details functions ******************/
 
-static bool saveDetail(GroupType type, wstring inst_name, QString name, void* container)
+static bool saveDetail(GroupType type, wstring inst_name, QString name, void* container, InstDetailMap& dmap)
 {
     bool is_changed = false;
     BB_GroupElementConfig inst = ConfigMgr.GetGroupElementConfig(type, inst_name);
@@ -218,11 +234,17 @@ static bool saveDetail(GroupType type, wstring inst_name, QString name, void* co
     }
     else if (name == "Input device")
     {
+        bool is_win = ((QRadioButton*)dmap["Windows Standard"])->isChecked();
+        CHANGE_IF_NEEDED(inst.m_isSoundSystemWin, ConfigMgr.SetGroupElementSoundSystemWin, is_win);
+
         QString val = ((QComboBox*)container)->currentText();
         CHANGE_IF_NEEDED(inst.m_InputSoundDevId, updateInputSoundDev, val.toStdWString());
     }
     else if (name == "Output device")
     {
+        bool is_win = ((QRadioButton*)dmap["Windows Standard"])->isChecked();
+        CHANGE_IF_NEEDED(inst.m_isSoundSystemWin, ConfigMgr.SetGroupElementSoundSystemWin, is_win);
+
         QString val = ((QComboBox*)container)->currentText();
         CHANGE_IF_NEEDED(inst.m_OutputSoundDevId, updateOutputSoundDev, val.toStdWString());
     }
@@ -248,8 +270,8 @@ static bool saveDetail(GroupType type, wstring inst_name, QString name, void* co
     }
     else if (name == "Standard Windows")
     {
-        Qt::CheckState val = ((QCheckBox*)container)->checkState();
-        CHANGE_IF_NEEDED(inst.m_isSoundSystemWin, ConfigMgr.SetGroupElementSoundSystemWin, val == Qt::Checked);
+        bool val = ((QRadioButton*)container)->isChecked();
+        CHANGE_IF_NEEDED(inst.m_isSoundSystemWin, ConfigMgr.SetGroupElementSoundSystemWin, val);
     }
 
     return is_changed;
@@ -264,7 +286,7 @@ static bool saveInstDetails(GroupType type, wstring inst_name, InstDetailMap& dm
     {
         QString name = it->first;
         void* container = it->second;
-        is_changed |= saveDetail(type, inst_name, name, container);
+        is_changed |= saveDetail(type, inst_name, name, container, dmap);
     }
 
     return is_changed;
@@ -327,21 +349,41 @@ void InstSettingsView::setLayout()
     layout->addWidget(nameLabel);
 
     addTextLine("Nick name", QString::fromStdWString(config.m_nickName), GRID(layout), 1, dmap);
+
     addSoundDevBox("Input device", false, sound_devices, config, GRID(layout), 3, dmap);
     addSoundDevBox("Output device", true, sound_devices, config, GRID(layout), 4, dmap);
+    addRadioButtonBox("Sound system", !config.m_isSoundSystemWin, GRID(layout), 5, 0, dmap);
+    addRadioButtonBox("Windows Standard", config.m_isSoundSystemWin, GRID(layout), 5, 1, dmap);
+
     if (type == GROUP_TYPE_RECEIVERS)
     {
         addSliderBox("Volume level", config.m_SrcVolumeLevel, SOUND_VOLUME_MIN, SOUND_VOLUME_MAX*(gainMax/SOUND_GAIN_DEFAULT), GRID(layout), 5, dmap);
     }
     else
     {
-        addSliderBox("Gain level", config.m_MicGainLevel, SOUND_GAIN_MIN, gainMax, GRID(layout), 5, dmap);
-        addCheckBox("Enable denoising", config.m_noiseCancel, GRID(layout), 6, dmap);
-        addCheckBox("Enable echo cancellation", config.m_echoCancel, GRID(layout), 7, dmap);
-        addCheckBox("Standard Windows", config.m_isSoundSystemWin, GRID(layout), 8, dmap);
+        addSliderBox("Gain level", config.m_MicGainLevel, SOUND_GAIN_MIN, gainMax, GRID(layout), 6, dmap);
+        addCheckBox("Enable denoising", config.m_noiseCancel, GRID(layout), 7, dmap);
+        addCheckBox("Enable echo cancellation", config.m_echoCancel, GRID(layout), 8, dmap);
     }
 
+    QRadioButton* button = (QRadioButton*)dmap["Windows Standard"];
+    QObject::connect(button, SIGNAL(toggled(bool)), this, SLOT(changeDevices(bool)));
+
     QWidget::setLayout(layout);
+}
+
+void InstSettingsView::changeDevices(bool is_win)
+{
+    std::vector<BB_SoundDevice> sound_devices;
+    getSoundDevices(type, sound_devices);
+
+    wstring wname = getName().toStdWString();
+    BB_GroupElementConfig inst = ConfigMgr.GetGroupElementConfig(getType(), wname);
+
+    QComboBox* in_box = (QComboBox*)dmap["Input device"];
+    QComboBox* out_box = (QComboBox*)dmap["Output device"];
+    showSoundDevList(in_box, false, is_win, sound_devices, inst.m_InputSoundDevId);
+    showSoundDevList(out_box, true, is_win, sound_devices, inst.m_OutputSoundDevId);
 }
 
 bool InstSettingsView::saveDetails()

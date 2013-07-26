@@ -71,6 +71,7 @@ private:
     QLayout *layout;
 
 private slots:
+    void changeDevices(bool is_win);
 };
 
 #endif // GROUPSETTINGS_H
