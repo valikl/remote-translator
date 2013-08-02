@@ -102,7 +102,7 @@ void TTInstView::createNameLabel(QString name)
 void TTInstView::init()
 {
     setLayout();
-    initAudio();
+    TRY_FUNC_WITH_RETURN(initAudio());
 }
 
 void TTInstView::createStatus()
@@ -180,22 +180,22 @@ void TTInstViewSource::setLayout()
 
 void TTInstViewSource::initAudio()
 {
-    //Timer for micophone progress bar
-    microphone_timer = new QTimer(this);
-    connect(microphone_timer, SIGNAL(timeout()), this, SLOT(on_MicrophoneTimeout()));
-    microphone_timer->start(100);
-
     wstring wname = getName().toStdWString();
     BB_GroupElementConfig config = ConfigMgr.GetGroupElementConfig(getType(), wname);
 
     BB_GroupMgrSource& mgr = getType() == GROUP_TYPE_SOURCES ? SourcesMgr : RestrictedMgr;
-    mgr.AddInstance(wname, config.m_InputSoundDevId, config.m_OutputSoundDevId, this);
+    TRY_FUNC_WITH_RETURN(mgr.AddInstance(wname, config.m_InputSoundDevId, config.m_OutputSoundDevId, this));
 
     TRY_FUNC_WITH_RETURN(mgr.EnableDenoising(wname, config.m_noiseCancel));
     TRY_FUNC_WITH_RETURN(mgr.EnableEchoCancellation(wname, config.m_echoCancel));
     TRY_FUNC_WITH_RETURN(mgr.EnableVoiceActivation(wname, config.m_EnableVoiceActivation));
     TRY_FUNC_WITH_RETURN(mgr.SetAGCEnable(wname, config.m_AGC.m_enable, &(config.m_AGC)));
     TRY_FUNC_WITH_RETURN(mgr.UpdateMicrophoneGainLevel(wname, config.m_MicGainLevel));
+
+    //Timer for micophone progress bar
+    microphone_timer = new QTimer(this);
+    connect(microphone_timer, SIGNAL(timeout()), this, SLOT(on_MicrophoneTimeout()));
+    microphone_timer->start(100);
 }
 
 void TTInstViewSource::reconnect()
@@ -262,8 +262,7 @@ void TTInstViewReceiver::initAudio()
 {
     wstring wname = getName().toStdWString();
     BB_GroupElementConfig config = ConfigMgr.GetGroupElementConfig(GROUP_TYPE_RECEIVERS, wname);
-    ReceiversMgr.AddInstance(wname, config.m_InputSoundDevId, config.m_OutputSoundDevId, this);
-
+    TRY_FUNC_WITH_RETURN(ReceiversMgr.AddInstance(wname, config.m_InputSoundDevId, config.m_OutputSoundDevId, this));
     TRY_FUNC_WITH_RETURN(ReceiversMgr.UpdateVolumeLevel(wname, config.m_SrcVolumeLevel));
 }
 
@@ -271,5 +270,5 @@ void TTInstViewReceiver::reconnect()
 {
     wstring wname = getName().toStdWString();
     ReceiversMgr.RemoveInstance(wname);
-    initAudio();
+    TRY_FUNC_WITH_RETURN(initAudio());
 }
