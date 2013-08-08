@@ -182,20 +182,7 @@ INT32 BB_InstanceSource::GetUserId()
 {
     // Read config
     BB_GroupElementConfig config = BB_ConfigMgr::Instance().GetGroupElementConfig(m_groupType, m_name);
-
-    INT32 userId = 0;
-    std::vector<BB_ChannelUser> users;
-    getUsers(users);
-    for(unsigned int i=0; i < users.size(); i++)
-    {
-        if (users[i].m_userName == config.m_nickName)
-        {
-            userId = users[i].m_id;
-            break;
-        }
-    }
-
-    return userId;
+    return BB_Instance::GetUserId(config.m_nickName);
 }
 
 void BB_InstanceSource::run()
@@ -213,6 +200,20 @@ void BB_InstanceSource::run()
             continue;
         }
         cnt = 0;
+
+        Channel channel;
+        if (!TT_GetChannel(m_ttInst, m_channelId, &channel))
+        {
+            m_instStat->setError(INST_ERR_INST_NOT_FOUND);
+            continue;
+        }
+
+        int userId = GetUserId();
+        if (userId < 0)
+        {
+            m_instStat->setError(INST_ERR_USER_NOT_FOUND);
+            continue;
+        }
 
         // Read config
         BB_GroupElementConfig config = BB_ConfigMgr::Instance().GetGroupElementConfig(m_groupType, m_name);
@@ -287,13 +288,6 @@ void BB_InstanceSource::run()
             }
         }
 
-        Channel channel;
-        if (!TT_GetChannel(m_ttInst, m_channelId, &channel))
-        {
-            continue;
-        }
-
-        int userId = GetUserId();
         if ((channel.voiceUsers[0] != userId) || (channel.voiceUsers[1] > 0))
         {
             int i = 0;

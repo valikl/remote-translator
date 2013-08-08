@@ -131,6 +131,13 @@ void BB_InstanceReceiver::UpdateSoundDev(int id, bool isInput)
     initSoundDevices();
 }
 
+INT32 BB_InstanceReceiver::GetUserId()
+{
+    // Read config
+    BB_GroupElementConfig config = BB_ConfigMgr::Instance().GetGroupElementConfig(m_groupType, m_name);
+    return BB_Instance::GetUserId(config.m_nickName);
+}
+
 void BB_InstanceReceiver::run()
 {
     // Wait for configuration to be set by GUI for the first time
@@ -146,6 +153,20 @@ void BB_InstanceReceiver::run()
             continue;
         }
         cnt = 0;
+
+        Channel channel;
+        if (!TT_GetChannel(m_ttInst, m_channelId, &channel))
+        {
+            m_instStat->setError(INST_ERR_INST_NOT_FOUND);
+            continue;
+        }
+
+        int userId = GetUserId();
+        if (userId < 0)
+        {
+            m_instStat->setError(INST_ERR_USER_NOT_FOUND);
+            continue;
+        }
 
         // Read config
         BB_GroupElementConfig config = BB_ConfigMgr::Instance().GetGroupElementConfig(m_groupType, m_name);

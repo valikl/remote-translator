@@ -38,6 +38,8 @@ private:
     // TODO: add functions transmission checkbox enabling, change sound card,
     // test sound card, get line-in signal, watchdog for configuration parameters, change instance language, change instance channel
 
+    INT32 GetUserId();
+
     void updateUserGainLevel(int volume);
     int gainLevel(int refVolume);
 
