@@ -4,7 +4,7 @@
 
 void TTInstView::setError(int errcode)
 {
-    InstErrCode code = (InstErrCode)errcode;
+    code = (InstErrCode)errcode;
     QString  type = getType() == GROUP_TYPE_SOURCES ?
                 "SOURCES " : getType() == GROUP_TYPE_RECEIVERS ? "RECEIVERS " : "RESTRICTED ";
     QString errstr = type + name + ": ";
@@ -40,6 +40,14 @@ void TTInstView::setError(int errcode)
         break;
     case INST_ERR_TRANSMIT_ENABLED:
         errstr += "Transmit enabled error";
+        emit error(errstr);
+        break;
+    case INST_ERR_INST_NOT_FOUND:
+        errstr += "Instance not found";
+        emit error(errstr);
+        break;
+    case INST_ERR_USER_NOT_FOUND:
+        errstr += "User not found";
         emit error(errstr);
         break;
     case INST_ERR_FIXED_DENOISING:
@@ -87,6 +95,8 @@ void TTInstView::catchError(QString msg)
 {
     statusState->setText("Error");
     statusState->setStyleSheet("QLabel { background-color : red; }");
+    if (code == INST_ERR_INST_NOT_FOUND || code == INST_ERR_USER_NOT_FOUND)
+        reconnect();
 }
 
 void TTInstView::createNameLabel(QString name)
@@ -203,8 +213,8 @@ void TTInstViewSource::reconnect()
     microphone_timer->stop();
     wstring wname = getName().toStdWString();
     BB_GroupMgrSource& mgr = getType() == GROUP_TYPE_SOURCES ? SourcesMgr : RestrictedMgr;
-    mgr.RemoveInstance(wname);
-    initAudio();
+    TRY_FUNC_WITH_RETURN(mgr.RemoveInstance(wname));
+    TRY_FUNC_WITH_RETURN(initAudio());
 }
 
 void TTInstViewSource::createSoundBar()
@@ -269,6 +279,6 @@ void TTInstViewReceiver::initAudio()
 void TTInstViewReceiver::reconnect()
 {
     wstring wname = getName().toStdWString();
-    ReceiversMgr.RemoveInstance(wname);
+    TRY_FUNC_WITH_RETURN(ReceiversMgr.RemoveInstance(wname));
     TRY_FUNC_WITH_RETURN(initAudio());
 }

@@ -51,6 +51,7 @@ private:
     QLabel* statusState;            // status state
     QPushButton* reconnectButton;   // reconnect button
     QPushButton* changeButton;      // change settings
+    InstErrCode code;
 
 private slots:
     void catchWarning(QString msg);
