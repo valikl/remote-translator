@@ -84,6 +84,8 @@ public:
     // Udpate nick name
     void UpdateNickName(const std::wstring nickName);
 
+    INT32 GetUserId(const std::wstring nickName);
+
 protected:
 		
     void joinChannel();

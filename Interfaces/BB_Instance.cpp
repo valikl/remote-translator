@@ -325,3 +325,28 @@ void BB_Instance::UpdateNickName(const std::wstring nickName)
     m_context.m_nickName = nickName;
     setInstProp();
 }
+
+INT32 BB_Instance::GetUserId(const std::wstring nickName)
+{
+    INT32 userId = -1;
+    std::vector<BB_ChannelUser> users;
+    try
+    {
+        getUsers(users);
+    }
+    catch(BB_Exception excp)
+    {
+        return userId;
+    }
+
+    for(unsigned int i=0; i < users.size(); i++)
+    {
+        if (users[i].m_userName == nickName)
+        {
+            userId = users[i].m_id;
+            break;
+        }
+    }
+
+    return userId;
+}
