@@ -2,9 +2,9 @@
 #include "audiosettings.h"
 #include "common_gui.h"
 
-void TTInstView::setError(int errcode)
+void TTInstView::setError(int code)
 {
-    code = (InstErrCode)errcode;
+    errcode = (InstErrCode)code;
     QString  type = getType() == GROUP_TYPE_SOURCES ?
                 "SOURCES " : getType() == GROUP_TYPE_RECEIVERS ? "RECEIVERS " : "RESTRICTED ";
     QString errstr = type + name + ": ";
@@ -95,7 +95,7 @@ void TTInstView::catchError(QString msg)
 {
     statusState->setText("Error");
     statusState->setStyleSheet("QLabel { background-color : red; }");
-    if (code == INST_ERR_INST_NOT_FOUND || code == INST_ERR_USER_NOT_FOUND)
+    if (errcode == INST_ERR_INST_NOT_FOUND || errcode == INST_ERR_USER_NOT_FOUND)
         reconnect();
 }
 
