@@ -166,10 +166,14 @@ void BB_InstanceVideo::run()
     int wait_ms = 10000;
     int frameIdx = 0;
     int loopCnt = 0;
+    bool if_first_time=true;
     vector<int> droppedFrames;
 
     LONG lastWidth = 320;
     LONG lastHeight = 240;
+
+    int heightBorderWidth=35;
+    int widthBorderWidth=15;
 
     while(!m_stopThread           &&
           m_videoWin->IsActive()  &&
@@ -203,12 +207,17 @@ void BB_InstanceVideo::run()
             RECT rect;
             LONG width = 320;
             LONG height = 240;
+            if(if_first_time){
+                width=videoFrame.nWidth;
+                height=videoFrame.nHeight;
+                SetWindowPos(m_videoWin->BBGetHandle(),0,0,0,videoFrame.nWidth+widthBorderWidth,videoFrame.nHeight+heightBorderWidth,SWP_NOMOVE|SWP_NOZORDER|SWP_NOACTIVATE);
+                if_first_time=false;
+            }
             LONG x, y, scaledX, scaledY, startX, startY;
             if (GetWindowRect(m_videoWin->BBGetHandle(), &rect))
             {
-                x = rect.right - rect.left;
-                y = rect.bottom - rect.top;
-
+                x = rect.right - rect.left-widthBorderWidth;
+                y = rect.bottom - rect.top-heightBorderWidth;
                 scaledX = y * videoFrame.nWidth / videoFrame.nHeight;
                 scaledY = x * videoFrame.nHeight / videoFrame.nWidth;
 
@@ -226,14 +235,15 @@ void BB_InstanceVideo::run()
                     width = x;
                     height = scaledY;
                 }
-            }
+                            }
 
-            if ((rect.right - rect.left != lastWidth) || (rect.bottom - rect.top != lastHeight))
+            if ((rect.right - rect.left != (lastWidth+widthBorderWidth)) || (rect.bottom - rect.top != (lastHeight+heightBorderWidth)))
             {
-                lastWidth = rect.right - rect.left;
-                lastHeight = rect.bottom - rect.top;
+                lastWidth = rect.right - rect.left-widthBorderWidth;
+                lastHeight = rect.bottom - rect.top-heightBorderWidth;
                 RedrawWindow(m_videoWin->BBGetHandle(), NULL, NULL, RDW_ERASE | RDW_INVALIDATE);
             }
+
             TT_PaintVideoFrame(m_ttInst, userId, hDC, startX, startY, width, height);
             TT_ReleaseUserVideoFrame(m_ttInst, userId);
         }

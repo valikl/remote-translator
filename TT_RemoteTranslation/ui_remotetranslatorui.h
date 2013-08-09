@@ -1,8 +1,8 @@
 /********************************************************************************
 ** Form generated from reading UI file 'remotetranslatorui.ui'
 **
-** Created: Fri Jun 21 04:12:11 2013
-**      by: Qt User Interface Compiler version 4.8.0
+** Created: Fri 9. Aug 03:59:40 2013
+**      by: Qt User Interface Compiler version 4.8.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -103,6 +103,13 @@ public:
         if (RemoteTranslatorUI->objectName().isEmpty())
             RemoteTranslatorUI->setObjectName(QString::fromUtf8("RemoteTranslatorUI"));
         RemoteTranslatorUI->resize(340, 575);
+        QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(RemoteTranslatorUI->sizePolicy().hasHeightForWidth());
+        RemoteTranslatorUI->setSizePolicy(sizePolicy);
+        RemoteTranslatorUI->setMinimumSize(QSize(340, 575));
+        RemoteTranslatorUI->setMaximumSize(QSize(340, 575));
         actionConfigure_Audio = new QAction(RemoteTranslatorUI);
         actionConfigure_Audio->setObjectName(QString::fromUtf8("actionConfigure_Audio"));
         actionChange_nickname = new QAction(RemoteTranslatorUI);
@@ -296,7 +303,7 @@ public:
 
         retranslateUi(RemoteTranslatorUI);
 
-        ControlTabs->setCurrentIndex(1);
+        ControlTabs->setCurrentIndex(0);
 
 
         QMetaObject::connectSlotsByName(RemoteTranslatorUI);
