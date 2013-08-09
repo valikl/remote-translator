@@ -9,6 +9,7 @@ chatDialog::chatDialog(QWidget *parent) :
     TxtMessage=ui->txtMessage;
     TxtChat =ui->txtMessages;
     this->writer=0;
+    this->setWindowFlags(this->windowFlags() | Qt::WindowMinimizeButtonHint);
    // TRANSLATOR.StartTranslatorsChat(writer);
 }
 
@@ -23,7 +24,6 @@ chatDialog::~chatDialog()
   //  delete writer;
 }
 
-
 ChatWriter::ChatWriter(){
     m_chat=0;
 }
@@ -34,9 +34,17 @@ void ChatWriter::RiseChat(){
     m_chat->writer=this;
 }
 
+void ChatWriter::ShowUpChatWindow(){
+    m_chat->setWindowState(m_chat->windowState() & ~Qt::WindowMinimized | Qt::WindowActive);
+    m_chat->show();
+    m_chat->raise();
+    m_chat->activateWindow();
+}
+
 ChatWriter::~ChatWriter(){
 
 }
+
 void ChatWriter::StartWindow(QString str){
      emit StartChat(str);
 }
@@ -50,6 +58,9 @@ void ChatWriter::Write(std::wstring msg)
     }
     if(m_chat!=0&&m_chat->TxtChat!=0)
     {
+       if(m_chat->isMinimized()){
+            emit ActivateChat();
+       }
         m_chat->TxtChat->append(qmsg);
     }
 

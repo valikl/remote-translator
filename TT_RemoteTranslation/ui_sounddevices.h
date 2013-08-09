@@ -1,8 +1,8 @@
 /********************************************************************************
 ** Form generated from reading UI file 'sounddevices.ui'
 **
-** Created: Fri Jan 25 04:55:05 2013
-**      by: Qt User Interface Compiler version 4.8.0
+** Created: Fri 9. Aug 03:59:40 2013
+**      by: Qt User Interface Compiler version 4.8.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -41,7 +41,7 @@ public:
     {
         if (SoundDevices->objectName().isEmpty())
             SoundDevices->setObjectName(QString::fromUtf8("SoundDevices"));
-        SoundDevices->resize(432, 350);
+        SoundDevices->resize(452, 350);
         ActSDButton = new QDialogButtonBox(SoundDevices);
         ActSDButton->setObjectName(QString::fromUtf8("ActSDButton"));
         ActSDButton->setGeometry(QRect(20, 290, 341, 32));

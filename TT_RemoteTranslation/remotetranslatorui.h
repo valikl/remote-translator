@@ -73,6 +73,8 @@ private slots:
 
     void on_btnBtartTranslatorsChat_clicked(QString  str="");
 
+    void ActivateChatWindow();
+
 
 
 private:

@@ -277,10 +277,7 @@ void RemoteTranslatorUI::setUserItems(InstType inst_type)
         if (users[i].m_isActive)
         {
             QListWidgetItem* active_item = users_list->item(users_list->count()-1);
-            if (users[i].m_PacketsLost)
-                active_item->setBackgroundColor("red");
-            else
-                active_item->setBackgroundColor("green");
+            active_item->setBackgroundColor("green");
             QFont font;
             font.setBold(true);
             active_item->setFont(font);
@@ -396,6 +393,7 @@ void RemoteTranslatorUI::connectTranslator()
     chatWriter=new ChatWriter();
     TRANSLATOR.StartTranslatorsChat(chatWriter);
     connect(this->chatWriter, SIGNAL(StartChat(QString)),this, SLOT(on_btnBtartTranslatorsChat_clicked(QString)));
+    connect(this->chatWriter, SIGNAL(ActivateChat()),this, SLOT(ActivateChatWindow()));
     ui->btnBtartTranslatorsChat->setEnabled(true);
 
     if (TRANSLATOR.isLocalDstConnected())
@@ -658,6 +656,12 @@ void RemoteTranslatorUI::on_btnBtartTranslatorsChat_clicked(QString str)
     {
         chatWriter->Write(str.toStdWString());
     }
+}
+
+void RemoteTranslatorUI::ActivateChatWindow(){
+
+    chatWriter->ShowUpChatWindow();
+
 }
 
 
