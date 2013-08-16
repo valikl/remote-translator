@@ -57,9 +57,22 @@ int BB_GroupMgrSource::GetMicrophoneGainLevel(const std::wstring name)
 
     if (inst == NULL)
     {
-        THROW_EXCEPT("Cannot return microphone level. Group instance is not connected");
+        THROW_EXCEPT("Cannot return microphone gain level. Group instance is not connected");
     }
     return inst->GetMicrophoneGainLevel();
+}
+
+int BB_GroupMgrSource::GetMicrophoneLevel(const std::wstring name)
+{
+    Lock lock(m_cs);
+
+    BB_InstanceSource *inst = FindInstance(name);
+
+    if (inst == NULL)
+    {
+        THROW_EXCEPT("Cannot return microphone level. Group instance is not connected");
+    }
+    return inst->GetMicrophoneLevel();
 }
 
 void BB_GroupMgrSource::EnableDenoising(const std::wstring name, bool bEnable)

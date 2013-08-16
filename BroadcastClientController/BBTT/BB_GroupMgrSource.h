@@ -23,6 +23,8 @@ public:
     void UpdateMicrophoneGainLevel(const std::wstring name, int gainLevel);
     int GetMicrophoneGainLevel(const std::wstring name);
 
+    int GetMicrophoneLevel(const std::wstring name);
+
     void EnableDenoising(const std::wstring name, bool bEnable);
     bool IsDenoisingEnabled(const std::wstring name);
 

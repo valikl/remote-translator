@@ -76,6 +76,11 @@ INT32 BB_InstanceSource::GetMicrophoneGainLevel()
     return TT_GetSoundInputGainLevel(m_ttInst);
 }
 
+INT32 BB_InstanceSource::GetMicrophoneLevel()
+{
+    return TT_GetSoundInputLevel(m_ttInst);
+}
+
 void BB_InstanceSource::EnableDenoising(bool bEnable)
 {
     if (!TT_EnableDenoising(m_ttInst, bEnable))

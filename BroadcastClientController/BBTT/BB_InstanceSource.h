@@ -32,6 +32,8 @@ public:
     void UpdateMicrophoneGainLevel(int gainLevel);
     INT32 GetMicrophoneGainLevel();
 
+    INT32 GetMicrophoneLevel();
+
     void EnableDenoising(bool bEnable);
     bool IsDenoisingEnabled();
 
