@@ -357,7 +357,7 @@ void InstSettingsView::setLayout()
 
     if (type == GROUP_TYPE_RECEIVERS)
     {
-        addSliderBox("Volume level", config.m_SrcVolumeLevel, SOUND_VOLUME_MIN, SOUND_VOLUME_MAX*(gainMax/SOUND_GAIN_DEFAULT), GRID(layout), 5, dmap);
+        addSliderBox("Volume level", config.m_SrcVolumeLevel, SOUND_VOLUME_MIN, SOUND_VOLUME_MAX*(gainMax/SOUND_GAIN_DEFAULT), GRID(layout), 6, dmap);
     }
     else
     {
