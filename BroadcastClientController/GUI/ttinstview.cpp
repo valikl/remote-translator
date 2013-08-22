@@ -87,14 +87,12 @@ void TTInstView::setError(int code)
 
 void TTInstView::catchWarning(QString msg)
 {
-    statusState->setText("OK");
-    statusState->setStyleSheet("QLabel { background-color : none; }");
+    showStatusState(true);
 }
 
 void TTInstView::catchError(QString msg)
 {
-    statusState->setText("Error");
-    statusState->setStyleSheet("QLabel { background-color : red; }");
+    showStatusState(false);
     if (errcode == INST_ERR_INST_NOT_FOUND || errcode == INST_ERR_USER_NOT_FOUND)
         reconnect();
 }
@@ -111,8 +109,23 @@ void TTInstView::createNameLabel(QString name)
 
 void TTInstView::init()
 {
-    setLayout();
     TRY_FUNC_WITH_RETURN(initAudio());
+    createStatus();
+    setLayout();
+}
+
+void TTInstView::showStatusState(bool is_ok)
+{
+    if (is_ok)
+    {
+        statusState->setText("OK");
+        statusState->setStyleSheet("QLabel { background-color : none; }");
+    }
+    else
+    {
+        statusState->setText("Error");
+        statusState->setStyleSheet("QLabel { background-color : red; }");
+    }
 }
 
 void TTInstView::createStatus()
@@ -121,8 +134,7 @@ void TTInstView::createStatus()
     statusLabel->setText("Status:");
 
     statusState = new QLabel;
-    statusState->setText("OK");
-    statusState->setStyleSheet("QLabel { background-color : none; }");
+    showStatusState(is_connected);
 
     QObject::connect(this, SIGNAL(warning(QString)), this, SLOT(catchWarning(QString)));
     QObject::connect(this, SIGNAL(error(QString)), this, SLOT(catchError(QString)));
@@ -172,7 +184,6 @@ QGroupBox* TTInstView::getStatusWidget()
 void TTInstViewSource::setLayout()
 {
     createNameLabel(getName());
-    createStatus();
     createChangeButton();
     createReconnectButton();
     createSoundBar();
@@ -190,6 +201,12 @@ void TTInstViewSource::setLayout()
 
 void TTInstViewSource::initAudio()
 {
+    is_connected = false;
+
+    //Timer for micophone progress bar
+    microphone_timer = new QTimer(this);
+    connect(microphone_timer, SIGNAL(timeout()), this, SLOT(on_MicrophoneTimeout()));
+
     wstring wname = getName().toStdWString();
     BB_GroupElementConfig config = ConfigMgr.GetGroupElementConfig(getType(), wname);
 
@@ -202,10 +219,8 @@ void TTInstViewSource::initAudio()
     TRY_FUNC_WITH_RETURN(mgr.SetAGCEnable(wname, config.m_AGC.m_enable, &(config.m_AGC)));
     TRY_FUNC_WITH_RETURN(mgr.UpdateMicrophoneGainLevel(wname, config.m_MicGainLevel));
 
-    //Timer for micophone progress bar
-    microphone_timer = new QTimer(this);
-    connect(microphone_timer, SIGNAL(timeout()), this, SLOT(on_MicrophoneTimeout()));
     microphone_timer->start(100);
+    is_connected = true;
 }
 
 void TTInstViewSource::reconnect()
@@ -224,6 +239,10 @@ void TTInstViewSource::createSoundBar()
 
     soundBar = new QProgressBar;
     soundBar->setMinimumWidth(200);
+    soundBar->setEnabled(true);
+    soundBar->setMinimum(0);
+    soundBar->setMaximum(20);
+    soundBar->setTextVisible(false);
 }
 
 QGroupBox* TTInstViewSource::getSoundBarWidget()
@@ -248,14 +267,13 @@ void TTInstViewSource::on_MicrophoneTimeout()
 
     int level;
     wstring wname = getName().toStdWString();
-    TRY_FUNC(level = mgr.GetMicrophoneGainLevel(wname));
+    TRY_FUNC(level = mgr.GetMicrophoneLevel(wname));
     soundBar->setValue(level);
 }
 
 void TTInstViewReceiver::setLayout()
 {
     createNameLabel(getName());
-    createStatus();
     createChangeButton();
     createReconnectButton();
     QGroupBox* status_box = getStatusWidget();
@@ -270,10 +288,12 @@ void TTInstViewReceiver::setLayout()
 
 void TTInstViewReceiver::initAudio()
 {
+    is_connected = false;
     wstring wname = getName().toStdWString();
     BB_GroupElementConfig config = ConfigMgr.GetGroupElementConfig(GROUP_TYPE_RECEIVERS, wname);
     TRY_FUNC_WITH_RETURN(ReceiversMgr.AddInstance(wname, config.m_InputSoundDevId, config.m_OutputSoundDevId, this));
     TRY_FUNC_WITH_RETURN(ReceiversMgr.UpdateVolumeLevel(wname, config.m_SrcVolumeLevel));
+    is_connected = true;
 }
 
 void TTInstViewReceiver::reconnect()
@@ -281,4 +301,5 @@ void TTInstViewReceiver::reconnect()
     wstring wname = getName().toStdWString();
     TRY_FUNC_WITH_RETURN(ReceiversMgr.RemoveInstance(wname));
     TRY_FUNC_WITH_RETURN(initAudio());
+    showStatusState(is_connected);
 }

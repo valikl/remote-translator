@@ -95,13 +95,32 @@ static void addSliderBox(QString name, int val, int min, int max, QGridLayout* i
     dmap[name] = slider;
 }
 
-static void addCheckBox(QString name, bool checked, QGridLayout* inst_layout, int row, InstDetailMap& dmap)
+static void addCheckBox(QString name, bool checked, QGridLayout* inst_layout, int row, int col, InstDetailMap& dmap)
 {
-    QLabel* box_label = new QLabel(name);
     QCheckBox* box = new QCheckBox;
+    box->setText(name);
     box->setChecked(checked);
-    inst_layout->addWidget(box_label, row, 0);
-    inst_layout->addWidget(box, row, 1);
+    inst_layout->addWidget(box, row, col);
+    dmap[name] = box;
+}
+
+static void addSpinBox(QString name, int val, QGridLayout* inst_layout, int row, int col, InstDetailMap& dmap)
+{
+    QGroupBox* spin_box = new QGroupBox;
+    QGridLayout* spin_layout = new QGridLayout;
+
+    QLabel* box_label = new QLabel(name);
+    QSpinBox* box = new QSpinBox;
+    box->setFixedWidth(50);
+    box->setValue(val);
+
+    spin_layout->addWidget(box_label, 0, 0);
+    spin_layout->addWidget(box, 0, 1);
+    spin_box->setStyleSheet("QGroupBox { border-style: inset; border-width: 0px; }");
+    spin_box->setLayout(spin_layout);
+
+    inst_layout->addWidget(spin_box, row, col);
+
     dmap[name] = box;
 }
 
@@ -362,8 +381,10 @@ void InstSettingsView::setLayout()
     else
     {
         addSliderBox("Gain level", config.m_MicGainLevel, SOUND_GAIN_MIN, gainMax, GRID(layout), 6, dmap);
-        addCheckBox("Enable denoising", config.m_noiseCancel, GRID(layout), 7, dmap);
-        addCheckBox("Enable echo cancellation", config.m_echoCancel, GRID(layout), 8, dmap);
+        addCheckBox("Enable denoising", config.m_noiseCancel, GRID(layout), 7, 0, dmap);
+        addCheckBox("Enable echo cancellation", config.m_echoCancel, GRID(layout), 7, 1, dmap);
+        addCheckBox("Enable voice activation", config.m_EnableVoiceActivation, GRID(layout), 8, 0, dmap);
+        addSpinBox("Voice activation level", config.m_VoiceActivationLevel, GRID(layout), 8, 1, dmap);
     }
 
     QRadioButton* button = (QRadioButton*)dmap["Windows Standard"];

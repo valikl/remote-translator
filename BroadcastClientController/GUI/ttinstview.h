@@ -27,7 +27,10 @@ public:
     void createChangeButton();
     void createReconnectButton();
     void createStatus();
+    void showStatusState(bool is_ok);
     QGroupBox* getStatusWidget();
+    QLabel* statusState;            // status state
+    bool is_connected;
 
     void init();
     virtual void setLayout() = 0;
@@ -48,7 +51,6 @@ private:
     QString name;                   // instance name
     QLabel* nameLabel;              // instance label
     QLabel* statusLabel;            // status lable
-    QLabel* statusState;            // status state
     QPushButton* reconnectButton;   // reconnect button
     QPushButton* changeButton;      // change settings
     InstErrCode errcode;

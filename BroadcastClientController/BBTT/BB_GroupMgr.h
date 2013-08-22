@@ -148,12 +148,10 @@ public:
         Lock lock(m_cs);
 
         T *inst = FindInstance(name);
-        if (inst == NULL)
+        if (inst != NULL)
         {
-            THROW_EXCEPT("Cannot update sound device. Group instance is not connected");
-        }
-
-        inst->UpdateSoundDev(atoi(string(id.begin(), id.end()).c_str()), isInput);
+            inst->UpdateSoundDev(atoi(string(id.begin(), id.end()).c_str()), isInput);
+        }        
 
         if (isInput)
         {
