@@ -218,13 +218,13 @@ static void updateSoundDev(GroupType type, wstring inst_name, wstring id, bool i
     switch (type)
     {
     case GROUP_TYPE_SOURCES:
-        TRY_FUNC(SourcesMgr.UpdateSoundDev(inst_name, id, isInput, inst.m_isSoundSystemWin));
+        TRY_FUNC(SourcesMgr.UpdateSoundDev(inst_name, id, inst.m_isSoundSystemWin, isInput));
         break;
     case GROUP_TYPE_RESTRICTED_SERVERS:
-        TRY_FUNC(RestrictedMgr.UpdateSoundDev(inst_name, id, isInput, inst.m_isSoundSystemWin));
+        TRY_FUNC(RestrictedMgr.UpdateSoundDev(inst_name, id, inst.m_isSoundSystemWin, isInput));
         break;
     default:
-        TRY_FUNC(ReceiversMgr.UpdateSoundDev(inst_name, id, isInput, inst.m_isSoundSystemWin));
+        TRY_FUNC(ReceiversMgr.UpdateSoundDev(inst_name, id, inst.m_isSoundSystemWin, isInput));
         break;
     }
 }
