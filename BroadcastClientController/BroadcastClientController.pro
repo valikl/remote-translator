@@ -66,8 +66,8 @@ HEADERS  += \
 
 
 
-win32:CONFIG(release, debug|release): LIBS += -L../$$PWD/TT_Lib/ -lTeamTalk4
-else:win32:CONFIG(debug, debug|release): LIBS += -L../$$PWD/TT_Lib/ -lTeamTalk4
+win32:CONFIG(release, debug|release): LIBS += -L../TT_Lib/ -lTeamTalk4
+else:win32:CONFIG(debug, debug|release): LIBS += -L../TT_Lib/ -lTeamTalk4
 
 INCLUDEPATH += $$PWD/
 INCLUDEPATH += ../
@@ -75,8 +75,8 @@ INCLUDEPATH += ../Interfaces/
 INCLUDEPATH += ../Ticpp/
 DEPENDPATH += $$PWD/
 
-win32:CONFIG(release, debug|release): PRE_TARGETDEPS += ../$$PWD/TT_Lib/TeamTalk4.lib
-else:win32:CONFIG(debug, debug|release): PRE_TARGETDEPS += ../$$PWD/TT_Lib/TeamTalk4.lib
+win32:CONFIG(release, debug|release): PRE_TARGETDEPS += ../TT_Lib/TeamTalk4.lib
+else:win32:CONFIG(debug, debug|release): PRE_TARGETDEPS += ../TT_Lib/TeamTalk4.lib
 
 win32:DEFINES += TIXML_USE_TICPP
 
