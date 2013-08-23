@@ -150,7 +150,12 @@ public:
         T *inst = FindInstance(name);
         if (inst != NULL)
         {
-            inst->UpdateSoundDev(atoi(string(id.begin(), id.end()).c_str()), isInput);
+            BB_SoundDevice soundDevice;
+            if (!FindSoundDev(id, isSoundSystemWin, soundDevice))
+            {
+                THROW_EXCEPT("Sound device not found");
+            }
+            inst->UpdateSoundDev(soundDevice.m_id, isInput);
         }        
 
         if (isInput)
