@@ -236,7 +236,7 @@ void BB_InstanceAudio::SetAdminUser(){
 
     if (!TT_GetServerUsers(m_ttInst, userIDs, &size) || size == 0)
     {
-        THROW_EXCEPT_WITH_ID("Build channel users list failed", EXCEPTION_ID_CONNECTION_LOST);
+        THROW_EXCEPT_WITH_ID("Build server users list failed", EXCEPTION_ID_CONNECTION_LOST);
     }
 
     if (size == 0)
@@ -259,7 +259,6 @@ void BB_InstanceAudio::SetAdminUser(){
         {
             continue;
         }
-        str=ttUser.szNickname;
         if(config.m_AdminNickName.compare(ttUser.szNickname)==0){
             adminUser=ttUser;
             break;
