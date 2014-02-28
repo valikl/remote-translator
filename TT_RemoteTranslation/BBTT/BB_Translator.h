@@ -118,9 +118,10 @@ public:
     void OpenVideoWindow(HWND hWnd);
 
      //Chat
-    void StartTranslatorsChat(IWriter *writer);
+    void StartTranslatorsChat(IWriter *writer, IWriter *adminWriter);
     void SendMessageToTranslators(std::wstring &txtmsg);
     void StopTranslatorsChat();
+
 
 private:
     BB_Translator();

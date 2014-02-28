@@ -16,6 +16,7 @@ RemoteTranslatorUI::RemoteTranslatorUI(QWidget *parent) :
 {
     ui->setupUi(this);
     chatWriter=0;
+    adminChatWriter=0;
 }
 
 void RemoteTranslatorUI::initHapsMenu()
@@ -298,6 +299,9 @@ RemoteTranslatorUI::~RemoteTranslatorUI()
     if(chatWriter!=0){
     delete chatWriter;
     }
+    if(adminChatWriter!=0){
+        delete adminChatWriter;
+    }
     delete microphone_timer;
     delete user_timer;
     delete conlost_timer;
@@ -391,8 +395,11 @@ void RemoteTranslatorUI::connectTranslator()
 
 
     chatWriter=new ChatWriter();
-    TRANSLATOR.StartTranslatorsChat(chatWriter);
+    adminChatWriter=new ChatWriter();
+
+    TRANSLATOR.StartTranslatorsChat(chatWriter, adminChatWriter);
     connect(this->chatWriter, SIGNAL(StartChat(QString)),this, SLOT(on_btnBtartTranslatorsChat_clicked(QString)));
+    connect(this->chatWriter, SIGNAL(ActivateChat()),this, SLOT(ActivateChatWindow()));
     ui->btnBtartTranslatorsChat->setEnabled(true);
 
     if (TRANSLATOR.isLocalDstConnected())
@@ -657,4 +664,15 @@ void RemoteTranslatorUI::on_btnBtartTranslatorsChat_clicked(QString str)
     }
 }
 
+void RemoteTranslatorUI::ActivateChatWindow(){
 
+    chatWriter->ShowUpChatWindow();
+
+}
+
+
+
+void RemoteTranslatorUI::on_btnStartAdminChat_clicked(QString str)
+{
+
+}

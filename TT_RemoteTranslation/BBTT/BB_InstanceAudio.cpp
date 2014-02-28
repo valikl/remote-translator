@@ -217,11 +217,56 @@ void BB_InstanceAudio::StopChatThreads()
     }
 
 }
-void BB_InstanceAudio::StartChat(IWriter *writer){
+void BB_InstanceAudio::StartChat(IWriter *writer, IWriter *adminWriter){
     m_stopThread=false;
     m_writer=writer;
+    m_adminWriter=adminWriter;
+    SetAdminUser();
     m_audioLoopThread = new Thread(this);
 
+  }
+
+void BB_InstanceAudio::SetAdminUser(){
+    INT32* userIDs = NULL;
+    INT32 size = 0;
+
+    ClientConfig config = BB_ClientConfigMgr::Instance().getConfig();
+
+    //adminUser=0;
+
+    if (!TT_GetServerUsers(m_ttInst, userIDs, &size) || size == 0)
+    {
+        THROW_EXCEPT_WITH_ID("Build channel users list failed", EXCEPTION_ID_CONNECTION_LOST);
+    }
+
+    if (size == 0)
+    {
+        cout << "No users!" << endl;
+        THROW_EXCEPT("Build server users list failed");
+    }
+
+    userIDs = new INT32[size];
+    if (!TT_GetServerUsers(m_ttInst, userIDs, &size))
+    {
+        delete[] userIDs;
+        THROW_EXCEPT("Build server users list failed");
+    }
+
+    for (int i = 0; i < size; ++i)
+    {
+        User ttUser;
+        if (!TT_GetUser(m_ttInst, userIDs[i], &ttUser))
+        {
+            continue;
+        }
+        str=ttUser.szNickname;
+        if(config.m_AdminNickName.compare(ttUser.szNickname)==0){
+            adminUser=ttUser;
+            break;
+        }
+    }
+
+    delete[] userIDs;
   }
 
 

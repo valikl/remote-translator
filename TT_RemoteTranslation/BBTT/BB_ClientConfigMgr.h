@@ -20,6 +20,7 @@ const std::string ATTR_NICK_NAME("nickName");
 const std::string ATTR_HAP_NAME("hapName");
 const std::string ATTR_SRC_NAME("srcName");
 const std::string ATTR_TRG_NAME("trgName");
+const std::string ATTR_ADMIN_NICK_NAME("adminNickName");
 
 const std::string NODE_TEMPLATES("Templates");
 const std::string ATTR_HAP_PREFIX("hapPrefix");
@@ -118,6 +119,9 @@ struct ClientConfig
     std::wstring m_Happening;
     std::wstring m_SrcChannel;
     std::wstring m_TrgChannel;
+    //administrator NickName
+    std::wstring m_AdminNickName;
+    ///
     int m_MicGainLevel;
     int m_SrcVolumeLevel;
     int m_TrgVolumeLevel;

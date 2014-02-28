@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'remotetranslatorui.ui'
 **
-** Created: Fri Jun 21 04:12:11 2013
+** Created: Fri Feb 28 03:32:25 2014
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -92,6 +92,7 @@ public:
     QSlider *VideoLvlSld;
     QPushButton *showVideoButton;
     QPushButton *btnBtartTranslatorsChat;
+    QPushButton *btnStartAdminChat;
     QMenuBar *menuBar;
     QMenu *menuSound_Settings;
     QMenu *menuManual_TT_connection;
@@ -103,6 +104,13 @@ public:
         if (RemoteTranslatorUI->objectName().isEmpty())
             RemoteTranslatorUI->setObjectName(QString::fromUtf8("RemoteTranslatorUI"));
         RemoteTranslatorUI->resize(340, 575);
+        QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(RemoteTranslatorUI->sizePolicy().hasHeightForWidth());
+        RemoteTranslatorUI->setSizePolicy(sizePolicy);
+        RemoteTranslatorUI->setMinimumSize(QSize(340, 575));
+        RemoteTranslatorUI->setMaximumSize(QSize(340, 575));
         actionConfigure_Audio = new QAction(RemoteTranslatorUI);
         actionConfigure_Audio->setObjectName(QString::fromUtf8("actionConfigure_Audio"));
         actionChange_nickname = new QAction(RemoteTranslatorUI);
@@ -270,6 +278,9 @@ public:
         btnBtartTranslatorsChat = new QPushButton(translateControl);
         btnBtartTranslatorsChat->setObjectName(QString::fromUtf8("btnBtartTranslatorsChat"));
         btnBtartTranslatorsChat->setGeometry(QRect(10, 400, 101, 31));
+        btnStartAdminChat = new QPushButton(translateControl);
+        btnStartAdminChat->setObjectName(QString::fromUtf8("btnStartAdminChat"));
+        btnStartAdminChat->setGeometry(QRect(0, 260, 61, 31));
         ControlTabs->addTab(translateControl, QString());
         RemoteTranslatorUI->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(RemoteTranslatorUI);
@@ -434,6 +445,7 @@ public:
 "<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt; font-weight:600;\">Video quality</span></p></body></html>", 0, QApplication::UnicodeUTF8));
         showVideoButton->setText(QApplication::translate("RemoteTranslatorUI", "Show video", 0, QApplication::UnicodeUTF8));
         btnBtartTranslatorsChat->setText(QApplication::translate("RemoteTranslatorUI", "Start Chat", 0, QApplication::UnicodeUTF8));
+        btnStartAdminChat->setText(QApplication::translate("RemoteTranslatorUI", "Admin Chat", 0, QApplication::UnicodeUTF8));
         ControlTabs->setTabText(ControlTabs->indexOf(translateControl), QApplication::translate("RemoteTranslatorUI", "Tab 2", 0, QApplication::UnicodeUTF8));
         menuSound_Settings->setTitle(QApplication::translate("RemoteTranslatorUI", "Sound Settings", 0, QApplication::UnicodeUTF8));
         menuManual_TT_connection->setTitle(QApplication::translate("RemoteTranslatorUI", "Manual connection", 0, QApplication::UnicodeUTF8));

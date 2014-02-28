@@ -73,7 +73,11 @@ private slots:
 
     void on_btnBtartTranslatorsChat_clicked(QString  str="");
 
+    void ActivateChatWindow();
 
+
+
+    void on_btnStartAdminChat_clicked(QString str);
 
 private:
 
@@ -96,6 +100,7 @@ private:
     QTimer *user_timer;
     QTimer *conlost_timer;
     ChatWriter *chatWriter;
+    ChatWriter *adminChatWriter;
 
     bool first_connect;
 };

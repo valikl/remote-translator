@@ -38,6 +38,7 @@ Q_OBJECT
 
 signals:
     void StartChat(QString str);
+    void ActivateChat();
 
 public:
    ChatWriter();
@@ -45,6 +46,7 @@ public:
    void RiseChat();
    ~ChatWriter();
     chatDialog *m_chat;
+    void ShowUpChatWindow();
 private:
     void StartWindow(QString str);
 };

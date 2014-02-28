@@ -187,6 +187,10 @@ void BB_ClientConfigMgr::loadServerConnectConfig(const ticpp::Document &doc)
 					m_config.m_TrgChannel = wstrValue;
 					continue;
 				}
+                if(strName==ATTR_ADMIN_NICK_NAME){
+
+                    m_config.m_AdminNickName=wstrValue;
+                }
 		    }
 			break;
 		}
@@ -448,6 +452,7 @@ int BB_ClientConfigMgr::saveConfig()
 		ATTR_NICK_NAME + "=\"" + string(m_config.m_NickName.begin(), m_config.m_NickName.end()) + "\" " + 
 		ATTR_HAP_NAME + "=\"" + string(m_config.m_Happening.begin(), m_config.m_Happening.end()) + "\" " + 
 		ATTR_SRC_NAME + "=\"" + string(m_config.m_SrcChannel.begin(), m_config.m_SrcChannel.end()) + "\" " + 
+        ATTR_ADMIN_NICK_NAME + "=\"" + string(m_config.m_AdminNickName.begin(), m_config.m_AdminNickName.end()) + "\" " +
 		ATTR_TRG_NAME + "=\"" + string(m_config.m_TrgChannel.begin(), m_config.m_TrgChannel.end()) + "\" " + "/>\n";
 
 	xml += "<" + NODE_TEMPLATES + " " +
