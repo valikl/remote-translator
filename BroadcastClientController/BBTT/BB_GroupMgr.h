@@ -24,14 +24,26 @@ public:
     ~BB_GroupMgr() {};
 
     void init()
-    {        
+    {
+        BB_InstanceContext context;
+        InitInstanceContext(context);
+        BB_Instance inst(context);
+
         try
         {
-            BB_InstanceContext context;
-            InitInstanceContext(context);
-            BB_Instance inst(context);
             inst.init();
+        }
+        catch(BB_Exception excp)
+        {
+            // Create sound devices list anyway
+            m_soundDevList.clear();
+            inst.getSoundDevices(m_soundDevList);
 
+            THROW_EXCEPT(excp.GetInfo());
+        }
+
+        try
+        {
             // Build Sound device list
             m_soundDevList.clear();
             inst.getSoundDevices(m_soundDevList);
@@ -47,6 +59,7 @@ public:
             THROW_EXCEPT(excp.GetInfo());
         }
     }
+
     void finalize()
     {
         Lock lock(m_cs);
