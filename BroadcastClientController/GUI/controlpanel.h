@@ -9,6 +9,7 @@ class QMenuBar;
 class QGroupBox;
 class QLayout;
 class QPlainTextEdit;
+typedef std::vector<QString> ErrorList;
 
 class ControlPanel : public QWidget
 {
@@ -26,6 +27,7 @@ private:
     void drawReceivers();
     void drawRestricted();
     void drawMsgConsole();
+    void drawErrConsole();
 
     void setLayout();
 
@@ -34,7 +36,9 @@ private:
     QGroupBox *receiversGroup;
     QGroupBox *restrictedGroup;
 
+    QPlainTextEdit* errConsole;
     QPlainTextEdit* msgConsole;
+    ErrorList fatal_errlist;
 
     QLayout *layout;
 
@@ -44,7 +48,7 @@ public slots:
     void callGroupSettings();
     void callInstSettings();
     void catchError(QString errstr);
-
+    void catchFatalError(QString errstr);
 };
 
 #endif // CONTROLPANEL_H

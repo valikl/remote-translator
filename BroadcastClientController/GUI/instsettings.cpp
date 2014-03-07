@@ -42,6 +42,15 @@ static void getSoundDevices(GroupType type, std::vector<BB_SoundDevice>& sound_d
     }
 }
 
+static void addLabel(QString name, QGridLayout* layout, int row, int col, bool is_bold)
+{
+    QLabel* label = new QLabel(name);
+    QFont font;
+    font.setBold(true);
+    label->setFont(font);
+    layout->addWidget(label, row, col);
+}
+
 static void addTextLine(QString name, QString val, QGridLayout* layout, int row, InstDetailMap& dmap)
 {
     QLabel* label = new QLabel(name);
@@ -111,9 +120,9 @@ static void addSpinBox(QString name, int val, QGridLayout* inst_layout, int row,
 
     QLabel* box_label = new QLabel(name);
     QSpinBox* box = new QSpinBox;
-    box->setFixedWidth(50);
     box->setValue(val);
 
+    spin_layout->setSpacing(0);
     spin_layout->addWidget(box_label, 0, 0);
     spin_layout->addWidget(box, 0, 1);
     spin_box->setStyleSheet("QGroupBox { border-style: inset; border-width: 0px; }");
@@ -385,6 +394,12 @@ void InstSettingsView::setLayout()
         addCheckBox("Enable echo cancellation", config.m_echoCancel, GRID(layout), 7, 1, dmap);
         addCheckBox("Enable voice activation", config.m_EnableVoiceActivation, GRID(layout), 8, 0, dmap);
         addSpinBox("Voice activation level", config.m_VoiceActivationLevel, GRID(layout), 8, 1, dmap);
+        addLabel("AGC settings:", GRID(layout), 9, 0, true);
+        addCheckBox("enable", config.m_AGC.m_enable, GRID(layout), 10, 0, dmap);
+        addSpinBox("gain level", config.m_AGC.m_gainLevel, GRID(layout), 11, 0, dmap);
+        addSpinBox("max gain", config.m_AGC.m_maxGain, GRID(layout), 11, 1, dmap);
+        addSpinBox("max increment", config.m_AGC.m_maxIncrement, GRID(layout), 12, 0, dmap);
+        addSpinBox("max decrement", config.m_AGC.m_maxDecrement, GRID(layout), 12, 1, dmap);
     }
 
     QRadioButton* button = (QRadioButton*)dmap["Windows Standard"];

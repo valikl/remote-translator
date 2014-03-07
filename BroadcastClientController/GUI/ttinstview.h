@@ -39,6 +39,7 @@ public:
     virtual void setError(int errcode);
 
 signals:
+    void fatal_error(QString errstr);
     void error(QString errstr);
     void warning(QString errstr);
 
