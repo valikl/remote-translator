@@ -228,8 +228,9 @@ void TTInstViewSource::reconnect()
     microphone_timer->stop();
     wstring wname = getName().toStdWString();
     BB_GroupMgrSource& mgr = getType() == GROUP_TYPE_SOURCES ? SourcesMgr : RestrictedMgr;
-    TRY_FUNC_WITH_RETURN(mgr.RemoveInstance(wname));
-    TRY_FUNC_WITH_RETURN(initAudio());
+    TRY_FUNC(mgr.RemoveInstance(wname));
+    TRY_FUNC(initAudio());
+    showStatusState(is_connected);
 }
 
 void TTInstViewSource::createSoundBar()
@@ -299,7 +300,7 @@ void TTInstViewReceiver::initAudio()
 void TTInstViewReceiver::reconnect()
 {
     wstring wname = getName().toStdWString();
-    TRY_FUNC_WITH_RETURN(ReceiversMgr.RemoveInstance(wname));
-    TRY_FUNC_WITH_RETURN(initAudio());
+    TRY_FUNC(ReceiversMgr.RemoveInstance(wname));
+    TRY_FUNC(initAudio());
     showStatusState(is_connected);
 }

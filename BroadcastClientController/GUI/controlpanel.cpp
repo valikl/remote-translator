@@ -13,7 +13,16 @@ ControlPanel::ControlPanel(QWidget *parent) :
 
 void ControlPanel::catchError(QString errstr)
 {
+    QDateTime current = QDateTime::currentDateTime();
+    errstr = current.toString() + " " + errstr;
     msgConsole->appendPlainText(errstr);
+}
+
+void ControlPanel::catchFatalError(QString errstr)
+{
+    QDateTime current = QDateTime::currentDateTime();
+    errstr = current.toString() + " " + errstr;
+    errConsole->appendPlainText(errstr);
 }
 
 void ControlPanel::init()
@@ -29,7 +38,11 @@ void ControlPanel::init()
     }
     catch(BB_Exception excp)
     {
-        QMessageBox::critical(this, "Error:", QString::fromStdWString(excp.GetInfo()));
+        QDateTime current = QDateTime::currentDateTime();
+        QString errstr = QString::fromStdWString(excp.GetInfo());
+        QMessageBox::critical(this, "Error:", errstr);
+        errstr = current.toString() + " " + errstr;
+        fatal_errlist.push_back(errstr);
     }
 
     // Draw widget elements
@@ -40,6 +53,7 @@ void ControlPanel::init()
     drawReceivers();
     drawRestricted();
 
+    drawErrConsole();
     drawMsgConsole();
 
     setLayout();
@@ -98,13 +112,23 @@ void ControlPanel::drawInstancesBox(GroupType type, QString box_name, QGroupBox*
 
         connect(iview, SIGNAL(warning(QString)), this, SLOT(catchError(QString)));
         connect(iview, SIGNAL(error(QString)), this, SLOT(catchError(QString)));
+        connect(iview, SIGNAL(fatal_error(QString)), this, SLOT(catchFatalError(QString)));
     }
 
     inst_group->setLayout(layout);
 }
 
+void ControlPanel::drawErrConsole()
+{
+    ErrorList::iterator it;
+    errConsole = new QPlainTextEdit;
+    for (it = fatal_errlist.begin(); it != fatal_errlist.end(); ++it)
+        errConsole->appendPlainText(*it);
+}
+
 void ControlPanel::drawMsgConsole()
 {
+    ErrorList::iterator it;
     msgConsole = new QPlainTextEdit;
 }
 
@@ -113,16 +137,12 @@ void ControlPanel::setLayout()
     layout = new QGridLayout;
     GRID(layout)->addWidget(menuBar, 0, 0);
 
-    QGroupBox* groups_box = new QGroupBox;
-    groups_box->setStyleSheet("QGroupBox { border-style: inset; border-width: 0px; }");
-
     QGridLayout* groups_layout = new QGridLayout;
     groups_layout->setMargin(0);
 
     groups_layout->addWidget(sourcesGroup, 0, 0);
     groups_layout->addWidget(receiversGroup, 0, 1);
     groups_layout->addWidget(restrictedGroup, 0, 2);
-    groups_layout->addWidget(msgConsole, 1, 0);
 
     groups_layout->setAlignment(sourcesGroup, Qt::AlignTop);
     groups_layout->setAlignment(receiversGroup, Qt::AlignTop);
@@ -131,10 +151,24 @@ void ControlPanel::setLayout()
     groups_layout->setColumnStretch(0, 30);
     groups_layout->setColumnStretch(1, 30);
     groups_layout->setColumnStretch(2, 30);
+
+    QGroupBox* groups_box = new QGroupBox;
+    groups_box->setStyleSheet("QGroupBox { border-style: inset; border-width: 0px; }");
     groups_box->setLayout(groups_layout);
 
+    QGridLayout* console_layout = new QGridLayout;
+    console_layout->setMargin(0);
+    console_layout->addWidget(new QLabel("Permanent errors"), 0, 0);
+    console_layout->addWidget(new QLabel("Fixed errors and warnings"), 0, 1);
+    console_layout->addWidget(errConsole, 1, 0);
+    console_layout->addWidget(msgConsole, 1, 1);
+
+    QGroupBox* console_box = new QGroupBox;
+    console_box->setStyleSheet("QGroupBox { border-style: inset; border-width: 0px; }");
+    console_box->setLayout(console_layout);
+
     GRID(layout)->addWidget(groups_box, 1, 0);
-    GRID(layout)->addWidget(msgConsole, 2, 0);
+    GRID(layout)->addWidget(console_box, 2, 0);
 
     QWidget::setLayout(layout);
 }
