@@ -119,8 +119,9 @@ public:
 
      //Chat
     void StartTranslatorsChat(IWriter *writer, IWriter *adminWriter);
-    void SendMessageToTranslators(std::wstring &txtmsg);
+    void SendMessageToTranslators(std::wstring &txtmsg, bool isAdminChat);
     void StopTranslatorsChat();
+    bool FindAdminUser();
 
 
 private:

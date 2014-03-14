@@ -24,12 +24,16 @@ chatDialog::~chatDialog()
   //  delete writer;
 }
 
-ChatWriter::ChatWriter(){
+ChatWriter::ChatWriter(bool isAdminChat){
     m_chat=0;
+    m_IsAdminChat=isAdminChat;
 }
 
 void ChatWriter::RiseChat(){
     m_chat=new chatDialog();
+    m_chat->IsAdminChat=m_IsAdminChat;
+    if(m_IsAdminChat)
+    m_chat->setWindowTitle(QString::fromStdWString(L"Administrator chat"));
     m_chat->show();
     m_chat->writer=this;
 }
@@ -66,7 +70,24 @@ void ChatWriter::Write(std::wstring msg)
 
 }
 
+static const std::string currentDateTime() {
+    time_t     now = time(0);
+    struct tm  tstruct;
+    char       buf[80];
+    tstruct = *localtime(&now);
+    strftime(buf, sizeof(buf), "%X", &tstruct);
 
+    return buf;
+}
+
+static int StringToWString(std::wstring &ws, const std::string &s)
+{
+    std::wstring wsTmp(s.begin(), s.end());
+
+    ws = wsTmp;
+
+    return 0;
+}
 
 void chatDialog::on_btnSend_clicked()
 {
@@ -75,7 +96,15 @@ void chatDialog::on_btnSend_clicked()
     {
 
         std::wstring str=TxtMessage->toPlainText().toStdWString();
-        TRANSLATOR.SendMessageToTranslators(str);
+        TRANSLATOR.SendMessageToTranslators(str,IsAdminChat);
+
+        if(IsAdminChat){
+            wstring ui_message;
+            wstring time_str;
+            StringToWString(time_str,currentDateTime());
+            ui_message=time_str+L": <Me> "+TxtMessage->toPlainText().toStdWString();
+            TxtChat->append(QString::fromStdWString(ui_message));
+        }
     }
     TxtMessage->clear();
 }

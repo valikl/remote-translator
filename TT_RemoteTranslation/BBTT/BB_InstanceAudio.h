@@ -40,9 +40,9 @@ public:
     // the thread procedure
     virtual void run();
     void StartChat(IWriter *writer, IWriter *adminWriter);
-    void SendMessage(std::wstring &txtmsg);
+    void SendMessage(std::wstring &txtmsg, bool isAdminChat);
     void StopChatThreads();
-    void SetAdminUser();
+    bool SetAdminUser();
 
 private:
 

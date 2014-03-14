@@ -5,6 +5,7 @@
 #include <QDialog>
 #include "BBTT/IWriter.h"
 #include "BBTT/BB_Translator.h"
+#include <time.h>
 
 #define TRANSLATOR (BB_Translator::Instance())
 
@@ -24,7 +25,7 @@ public:
     QPlainTextEdit *TxtMessage;
     QTextEdit *TxtChat;
     ChatWriter  *writer;
-
+    bool IsAdminChat;
 private slots:
     void on_btnSend_clicked();
 
@@ -41,7 +42,7 @@ signals:
     void ActivateChat();
 
 public:
-   ChatWriter();
+   ChatWriter(bool isAdminChat);
    virtual void Write(wstring msg);
    void RiseChat();
    ~ChatWriter();
@@ -49,5 +50,6 @@ public:
     void ShowUpChatWindow();
 private:
     void StartWindow(QString str);
+    bool m_IsAdminChat;
 };
 #endif // CHAT_H

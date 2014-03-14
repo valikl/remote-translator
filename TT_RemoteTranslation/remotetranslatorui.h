@@ -58,6 +58,7 @@ private slots:
     void on_MicrophoneTimeout();
     void on_UserTimeout();
     void on_ConlostTimeout();
+    void ActivateAdminChatButtons();
 
     void ActivateSoundDevices();
     void ActivateAudioFilters();
@@ -74,10 +75,10 @@ private slots:
     void on_btnBtartTranslatorsChat_clicked(QString  str="");
 
     void ActivateChatWindow();
+    void ActivateAdminChatWindow();
 
 
-
-    void on_btnStartAdminChat_clicked(QString str);
+    void on_btnStartAdminChat_clicked(QString str="");
 
 private:
 
@@ -99,6 +100,7 @@ private:
     QTimer *microphone_timer;
     QTimer *user_timer;
     QTimer *conlost_timer;
+    QTimer *admin_timer;
     ChatWriter *chatWriter;
     ChatWriter *adminChatWriter;
 

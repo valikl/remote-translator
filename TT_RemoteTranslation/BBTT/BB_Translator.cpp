@@ -693,12 +693,17 @@ void BB_Translator::StartTranslatorsChat(IWriter *writer, IWriter *adminWriter){
     m_channelDst->StartChat(writer,adminWriter);
 }
 
-void BB_Translator::SendMessageToTranslators(std::wstring &txtmsg){
-    m_channelDst->SendMessage(txtmsg);
+void BB_Translator::SendMessageToTranslators(std::wstring &txtmsg, bool isAdminChat){
+    m_channelDst->SendMessage(txtmsg, isAdminChat);
 }
 
 void BB_Translator::StopTranslatorsChat(){
     m_channelDst->StopChatThreads();
+}
+
+bool BB_Translator::FindAdminUser(){
+
+    return m_channelDst->SetAdminUser();
 }
 
 
