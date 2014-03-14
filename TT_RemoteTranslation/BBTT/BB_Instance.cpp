@@ -53,14 +53,17 @@ void BB_Instance::login()
 
     cout << "Now Connected..." << endl;
 
-    // Decode password
+    // Decode passwords
     string decodedStr = BB_Base64::base64Decode(string(m_context.m_srvUserPsw.begin(), m_context.m_srvUserPsw.end()));
     wstring decodedSrvUserPsw;
     decodedSrvUserPsw.assign(decodedStr.begin(), decodedStr.end());
 
+    decodedStr = BB_Base64::base64Decode(string(m_context.m_srvPsw.begin(), m_context.m_srvPsw.end()));
+    wstring decodedSrvPsw;
+    decodedSrvPsw.assign(decodedStr.begin(), decodedStr.end());
+
     //now that we're connected log on
-    cmd_id = TT_DoLogin(m_ttInst, _T(""), m_context.m_srvPsw.c_str(), m_context.m_srvUser.c_str(),
-        /*m_context.m_srvUserPsw*/decodedSrvUserPsw.c_str());
+    cmd_id = TT_DoLogin(m_ttInst, _T(""), decodedSrvPsw.c_str(), m_context.m_srvUser.c_str(), decodedSrvUserPsw.c_str());
     if(cmd_id < 0)
     {
         THROW_EXCEPT("Connection to the server failed");
