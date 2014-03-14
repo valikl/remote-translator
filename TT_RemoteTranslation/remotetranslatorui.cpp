@@ -18,21 +18,6 @@ RemoteTranslatorUI::RemoteTranslatorUI(QWidget *parent) :
     chatWriter=0;
 }
 
-void RemoteTranslatorUI::initHaps()
-{
-    // get list of happenings
-    TRY_BLOCK(
-        happenings = TRANSLATOR.getHappenings();
-    );
-
-    for (unsigned int i = 0; i < happenings.size(); ++i)
-    {
-        Happening hap = happenings[i];
-        if (hap.m_hapName == ConfigUI.m_Happening)
-            curr_hap_id = i;
-    }
-}
-
 void RemoteTranslatorUI::setSliders()
 {
     int gainMax = 4000; /* real max: SOUND_LEVEL_MAX but it's too much */
@@ -322,6 +307,25 @@ static void ChangeChannelMenu(vector<wstring>& channels, QComboBox* combo, wstri
     }
 }
 
+void RemoteTranslatorUI::initHaps()
+{
+    // get list of happenings
+    TRY_BLOCK(
+        happenings = TRANSLATOR.getHappenings();
+    );
+
+    for (unsigned int i = 0; i < happenings.size(); ++i)
+    {
+        Happening hap = happenings[i];
+        if (hap.m_hapName == ConfigUI.m_Happening)
+            curr_hap_id = i;
+    }
+
+    Happening hap = happenings[curr_hap_id];
+    ChangeChannelMenu(hap.m_srcChannels, ui->SrcLangList, ConfigUI.m_SrcChannel);
+    ChangeChannelMenu(hap.m_dstChannels, ui->TrgLangList, ConfigUI.m_TrgChannel);
+}
+
 // Change source language
 void RemoteTranslatorUI::on_SrcLangList_currentIndexChanged(const QString &arg1)
 {
@@ -354,6 +358,12 @@ void RemoteTranslatorUI::connectTranslator()
                                    ConfigUI.m_SrcChannel, ConfigUI.m_TrgChannel,
                                    ConfigUI.m_InputSoundDevId, ConfigUI.m_OutputSoundDevId));
 
+    if (!TRANSLATOR.isLocalDstConnected())
+    {
+        ui->chooseTransButton->setEnabled(false);
+        return;
+    }
+
     //Activate Audio filters
     enableAudioFilters();
 
@@ -370,9 +380,10 @@ void RemoteTranslatorUI::connectTranslator()
     ui->showVideoButton->setEnabled(true);
     ui->VideoLvlSld->setEnabled(true);
     ui->ServerSelfTestEn->setEnabled(true);
-
     ui->MicMuteBut->setCheckable(true);
     ui->TrgMuteBut->setCheckable(true);
+    ui->chooseTransButton->setEnabled(true);
+    ui->chooseTransButton->setCheckable(true);
 
 
     chatWriter=new ChatWriter();
@@ -381,13 +392,6 @@ void RemoteTranslatorUI::connectTranslator()
     connect(this->chatWriter, SIGNAL(ActivateChat()),this, SLOT(ActivateChatWindow()));
     ui->btnBtartTranslatorsChat->setEnabled(true);
 
-    if (TRANSLATOR.isLocalDstConnected())
-     {
-        ui->chooseTransButton->setEnabled(true);
-        ui->chooseTransButton->setCheckable(true);
-    }
-    else
-        ui->chooseTransButton->setEnabled(false);
 
     if (!ui->MicMuteBut->isChecked())
     {
