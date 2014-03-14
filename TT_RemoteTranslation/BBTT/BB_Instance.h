@@ -52,6 +52,9 @@ struct BB_ChannelUser
     INT32 m_id;
     bool m_isActive;
     bool m_isVideo;
+    bool m_PacketsLost;
+    INT64 nAudioPacketsLost;
+    INT64 nAudioPacketsRecv;
 };
 
 class BB_Instance
@@ -86,6 +89,8 @@ protected:
     void setInstProp();
 
 	void processTTMessage(const TTMessage& msg);
+
+    bool FindUser(std::vector<BB_ChannelUser> userList, INT32 id, std::wstring userName, BB_ChannelUser &user);
 
 	TTInstance* m_ttInst;
 

@@ -12,6 +12,7 @@
 #include "Utils/Utils.h"
 #include "Utils/Lock.h"
 #include "Utils/BB_Exception.h"
+#include "GUI/iinststatus.h"
 
 using namespace std;
 
@@ -23,14 +24,26 @@ public:
     ~BB_GroupMgr() {};
 
     void init()
-    {        
+    {
+        BB_InstanceContext context;
+        InitInstanceContext(context);
+        BB_Instance inst(context);
+
         try
         {
-            BB_InstanceContext context;
-            InitInstanceContext(context);
-            BB_Instance inst(context);
             inst.init();
+        }
+        catch(BB_Exception excp)
+        {
+            // Create sound devices list anyway
+            m_soundDevList.clear();
+            inst.getSoundDevices(m_soundDevList);
 
+            THROW_EXCEPT(excp.GetInfo());
+        }
+
+        try
+        {
             // Build Sound device list
             m_soundDevList.clear();
             inst.getSoundDevices(m_soundDevList);
@@ -46,6 +59,7 @@ public:
             THROW_EXCEPT(excp.GetInfo());
         }
     }
+
     void finalize()
     {
         Lock lock(m_cs);
@@ -62,7 +76,7 @@ public:
 
     std::vector<BB_SoundDevice> getSoundDevices() { return m_soundDevList; }
 
-    void AddInstance(const std::wstring name, const std::wstring inputSoundDevId, const std::wstring outputSoundDevId)
+    void AddInstance(const std::wstring name, const std::wstring inputSoundDevId, const std::wstring outputSoundDevId, IInstStatus* instStat)
     {
         if (FindInstance(name) != NULL)
         {
@@ -86,10 +100,15 @@ public:
         }
         context.m_outputSoundDevId = soundDevice.m_id;
 
-        context.m_nickName = /*m_channelPrefix +*/ BB_ConfigMgr::Instance().GetGroupElementConfig(m_groupType, name).m_nickName;
-        context.m_channelName = L"/" + BB_ConfigMgr::Instance().GetConnectionConfig(m_groupType).m_srcPath +
-                                L"/" + BB_ConfigMgr::Instance().GetGroupElementConfig(m_groupType, name).m_channelName +
-                                L"/";
+        context.m_nickName = BB_ConfigMgr::Instance().GetGroupElementConfig(m_groupType, name).m_nickName;
+
+        context.m_channelName = L"";
+        if (BB_ConfigMgr::Instance().GetConnectionConfig(m_groupType).m_srcPath != L"")
+        {
+            // Not root
+            context.m_channelName = L"/" + BB_ConfigMgr::Instance().GetConnectionConfig(m_groupType).m_srcPath;
+        }
+        context.m_channelName += L"/" + BB_ConfigMgr::Instance().GetGroupElementConfig(m_groupType, name).m_channelName + L"/";
 
         // Get channel id
         for (unsigned int i=0; i < m_channels.size(); i++)
@@ -104,7 +123,7 @@ public:
         Lock lock(m_cs);
 
         // Add new instance
-        T *inst = new T(m_groupType, context, name);
+        T *inst = new T(m_groupType, context, name, instStat);
         inst->init();
         m_elements.insert(pair<wstring, T *>(name, inst));
     }
@@ -121,6 +140,47 @@ public:
             delete inst;
             m_elements.erase(name);
         }
+    }
+
+    void UpdateNickName(const std::wstring name, const std::wstring nickName)
+    {
+        Lock lock(m_cs);
+
+        T *inst = FindInstance(name);
+        if (inst == NULL)
+        {
+            THROW_EXCEPT("Cannot update nick name. Group instance is not connected");
+        }
+
+        inst->UpdateNickName(nickName);
+        BB_ConfigMgr::Instance().SetGroupElementNickName(m_groupType, name, nickName);
+    }
+
+    void UpdateSoundDev(const std::wstring name, const std::wstring id, bool isSoundSystemWin, bool isInput)
+    {
+        Lock lock(m_cs);
+
+        T *inst = FindInstance(name);
+        if (inst != NULL)
+        {
+            BB_SoundDevice soundDevice;
+            if (!FindSoundDev(id, isSoundSystemWin, soundDevice))
+            {
+                THROW_EXCEPT("Sound device not found");
+            }
+            inst->UpdateSoundDev(soundDevice.m_id, isInput);
+        }        
+
+        if (isInput)
+        {
+            BB_ConfigMgr::Instance().SetGroupElementInputSoundDevId(m_groupType, name, id);
+        }
+        else
+        {
+            BB_ConfigMgr::Instance().SetGroupElementOutputSoundDevId(m_groupType, name, id);
+        }
+
+        BB_ConfigMgr::Instance().SetGroupElementSoundSystemWin(m_groupType, name, isSoundSystemWin);
     }
 
 protected:

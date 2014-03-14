@@ -40,9 +40,6 @@ private slots:
 
     void on_NickName_editingFinished();
 
-    // happening slots
-    void on_HapList_currentIndexChanged(const QString &arg1);
-
     // source/target language slots
     void on_SrcLangList_currentIndexChanged(const QString &arg1);
     void on_TrgLangList_currentIndexChanged(const QString &arg1);
@@ -65,7 +62,6 @@ private slots:
     void ActivateManConnect();
     void RestoreDefaultConfig();
 
-    void on_LocalSelfTestEn_stateChanged(int checked);
     void on_ServerSelfTestEn_stateChanged(int checked);
 
     void on_showVideoButton_clicked(bool clicked);
@@ -86,7 +82,7 @@ private:
     void initTranslator();
     void activateButtons();
 
-    void initHapsMenu();
+    void initHaps();
     void setSliders();
     void setUserItems(InstType inst_type);
 
@@ -95,6 +91,7 @@ private:
     void activateSliders();
 
     std::vector<Happening> happenings;
+    int curr_hap_id;
 
     Ui::RemoteTranslatorUI *ui;
     QTimer *microphone_timer;

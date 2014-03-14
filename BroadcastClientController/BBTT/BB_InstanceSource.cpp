@@ -8,8 +8,8 @@
 
 using namespace std;
 
-BB_InstanceSource::BB_InstanceSource(GroupType groupType, const BB_InstanceContext &context, const wstring name) :
-    m_groupType(groupType), m_name(name), BB_Instance(context)
+BB_InstanceSource::BB_InstanceSource(GroupType groupType, const BB_InstanceContext &context, const wstring name, IInstStatus* instStat) :
+    m_groupType(groupType), m_name(name), m_instStat(instStat), BB_Instance(context)
 {
 }
 
@@ -71,6 +71,16 @@ void BB_InstanceSource::UpdateMicrophoneGainLevel(int gainLevel)
     }
 }
 
+INT32 BB_InstanceSource::GetMicrophoneGainLevel()
+{
+    return TT_GetSoundInputGainLevel(m_ttInst);
+}
+
+INT32 BB_InstanceSource::GetMicrophoneLevel()
+{
+    return TT_GetSoundInputLevel(m_ttInst);
+}
+
 void BB_InstanceSource::EnableDenoising(bool bEnable)
 {
     if (!TT_EnableDenoising(m_ttInst, bEnable))
@@ -79,12 +89,22 @@ void BB_InstanceSource::EnableDenoising(bool bEnable)
     }
 }
 
+bool BB_InstanceSource::IsDenoisingEnabled()
+{
+    return !((TT_GetFlags(m_ttInst) & CLIENT_SNDINPUT_DENOISING) == 0);
+}
+
 void BB_InstanceSource::EnableEchoCancellation(bool bEnable)
 {
     if (!TT_EnableEchoCancellation(m_ttInst, bEnable))
     {
         THROW_EXCEPT("Echo cancelation update failed");
     }
+}
+
+bool BB_InstanceSource::IsEchoCancellationEnabled()
+{
+    return !((TT_GetFlags(m_ttInst) & CLIENT_SNDINPUT_AEC) == 0);
 }
 
 void BB_InstanceSource::SetAGCEnable(bool bEnable, const AGC *agc)
@@ -104,6 +124,23 @@ void BB_InstanceSource::SetAGCEnable(bool bEnable, const AGC *agc)
     }
 }
 
+bool BB_InstanceSource::GetAGC(AGC &agc)
+{
+    if ((TT_GetFlags(m_ttInst) & CLIENT_SNDINPUT_AGC) == 0)
+    {
+        return false;
+    }
+    else
+    {
+        agc.m_enable = true;
+        if (!TT_GetAGCSettings(m_ttInst, &agc.m_gainLevel, &agc.m_maxIncrement, &agc.m_maxDecrement, &agc.m_maxGain))
+        {
+            // TODO
+        }
+        return true;
+    }
+}
+
 void BB_InstanceSource::EnableVoiceActivation(bool bEnable, int voiceactSlider)
 {
     if (!TT_EnableVoiceActivation(m_ttInst, bEnable))
@@ -119,34 +156,45 @@ void BB_InstanceSource::EnableVoiceActivation(bool bEnable, int voiceactSlider)
     }
 }
 
-void BB_InstanceSource::GetMicrophoneLevel(INT32 &level)
+int BB_InstanceSource::IsVoiceActivationEnabled()
 {
-    level = TT_GetSoundInputLevel(m_ttInst);
+    // TODO CLIENT_SNDINPUT_VOICEACTIVATION is not defined
+    //if ((TT_GetFlags(m_ttInst) & CLIENT_SNDINPUT_VOICEACTIVATION) == 0)
+    //{
+    //    return -1;
+    //}
+    //else
+    //{
+        return TT_GetVoiceActivationLevel(m_ttInst);
+    //}
 }
 
+void BB_InstanceSource::UpdateSoundDev(int id, bool isInput)
+{
+    closeSoundDevices();
+    if (isInput)
+    {
+        m_context.m_inputSoundDevId = id;
+    }
+    else
+    {
+        m_context.m_outputSoundDevId = id;
+    }
+    initSoundDevices();
+}
 
 INT32 BB_InstanceSource::GetUserId()
 {
     // Read config
     BB_GroupElementConfig config = BB_ConfigMgr::Instance().GetGroupElementConfig(m_groupType, m_name);
-
-    INT32 userId = 0;
-    std::vector<BB_ChannelUser> users;
-    getUsers(users);
-    for(unsigned int i=0; i < users.size(); i++)
-    {
-        if (users[i].m_userName == config.m_nickName)
-        {
-            userId = users[i].m_id;
-            break;
-        }
-    }
-
-    return userId;
+    return BB_Instance::GetUserId(config.m_nickName);
 }
 
 void BB_InstanceSource::run()
 {
+    // Wait for configuration to be set by GUI for the first time
+    Sleep(5000);
+
     int cnt = 0;
     while(!m_stopThread)
     {
@@ -158,73 +206,127 @@ void BB_InstanceSource::run()
         }
         cnt = 0;
 
-        try
+        Channel channel;
+        if (!TT_GetChannel(m_ttInst, m_channelId, &channel))
         {
-            // Read config
-            BB_GroupElementConfig config = BB_ConfigMgr::Instance().GetGroupElementConfig(m_groupType, m_name);
+            m_instStat->setError(INST_ERR_INST_NOT_FOUND);
+            continue;
+        }
 
-            if (!TT_SetSoundInputGainLevel(m_ttInst, config.m_MicGainLevel))
+        int userId = GetUserId();
+        if (userId < 0)
+        {
+            m_instStat->setError(INST_ERR_USER_NOT_FOUND);
+            continue;
+        }
+
+        // Read config
+        BB_GroupElementConfig config = BB_ConfigMgr::Instance().GetGroupElementConfig(m_groupType, m_name);
+
+        if (GetMicrophoneGainLevel() != config.m_MicGainLevel)
+        {
+            try
             {
+                UpdateMicrophoneGainLevel(config.m_MicGainLevel);
+                m_instStat->setError(INST_ERR_FIXED_VOL_LEVEL);
             }
-
-            if (!TT_EnableDenoising(m_ttInst, config.m_noiseCancel))
+            catch(BB_Exception excp)
             {
+                m_instStat->setError(INST_ERR_VOL_LEVEL);
             }
+        }
 
-            if (!TT_EnableEchoCancellation(m_ttInst, config.m_echoCancel))
+        if (IsDenoisingEnabled() != config.m_noiseCancel)
+        {
+            try
             {
+                EnableDenoising(config.m_noiseCancel);
+                m_instStat->setError(INST_ERR_FIXED_DENOISING);
             }
-
-            if (!TT_EnableAGC(m_ttInst, /*TODO bEnable*/true))
+            catch(BB_Exception excp)
             {
+                m_instStat->setError(INST_ERR_DENOISING);
             }
+        }
 
-            if (/*TODO bEnable*/true)
+        if (IsEchoCancellationEnabled() != config.m_echoCancel)
+        {
+            try
             {
-                if (!TT_SetAGCSettings(m_ttInst, config.m_AGC.m_gainLevel, config.m_AGC.m_maxIncrement,
-                        config.m_AGC.m_maxDecrement, config.m_AGC.m_maxGain))
-                {
-                }
+                EnableEchoCancellation(config.m_echoCancel);
+                m_instStat->setError(INST_ERR_FIXED_ECHO_CANCEL);
             }
-
-            if (!TT_EnableVoiceActivation(m_ttInst, config.m_EnableVoiceActivation))
+            catch(BB_Exception excp)
             {
+                m_instStat->setError(INST_ERR_ECHO_CANCEL);
             }
+        }
 
-            if (config.m_EnableVoiceActivation)
+        AGC agcTmp;
+        bool agcEnabled = GetAGC(agcTmp);
+        if ((agcEnabled != config.m_AGC.m_enable) ||
+            (agcEnabled == config.m_AGC.m_enable && agcEnabled &&
+                (agcTmp.m_gainLevel != config.m_AGC.m_gainLevel || agcTmp.m_maxDecrement != config.m_AGC.m_maxDecrement ||
+                 agcTmp.m_maxGain != config.m_AGC.m_maxGain || agcTmp.m_maxIncrement != config.m_AGC.m_maxIncrement)))
+        {
+            try
             {
-                if (!TT_SetVoiceActivationLevel(m_ttInst, config.m_VoiceActivationLevel))
-                {
-                }
+                SetAGCEnable(config.m_AGC.m_enable, &config.m_AGC);
+                m_instStat->setError(INST_ERR_FIXED_AGC);
             }
-
-            Channel channel;
-            if (!TT_GetChannel(m_ttInst, m_channelId, &channel))
+            catch(BB_Exception excp)
             {
-                continue;
+                m_instStat->setError(INST_ERR_AGC);
             }
+        }
 
+        if (IsVoiceActivationEnabled() != config.m_EnableVoiceActivation)
+        {
+            try
+            {
+                EnableVoiceActivation(config.m_EnableVoiceActivation, config.m_VoiceActivationLevel);
+                m_instStat->setError(INST_ERR_FIXED_VOICE_ACTIVE);
+            }
+            catch(BB_Exception excp)
+            {
+                m_instStat->setError(INST_ERR_VOICE_ACTIVE);
+            }
+        }
+
+        if ((channel.voiceUsers[0] != userId) || (channel.voiceUsers[1] > 0))
+        {
             int i = 0;
             while ((channel.voiceUsers[i] != 0) && (i < TT_VOICEUSERS_MAX))
             {
                 channel.voiceUsers[i++] = 0;
             }
 
-           channel.voiceUsers[0] = GetUserId();
+           channel.voiceUsers[0] = userId;
            if (channel.voiceUsers[0] == 0)
            {
-               // User not found
+               m_instStat->setError(INST_ERR_VOICE_USER);
+               continue;
            }
 
             if (TT_DoUpdateChannel(m_ttInst, &channel) == -1)
             {
+                m_instStat->setError(INST_ERR_VOICE_USER);
                 continue;
             }
+
+            m_instStat->setError(INST_ERR_FIXED_VOICE_USER);
         }
-        catch(BB_Exception excp)
+
+        if (!TT_IsTransmitting(m_ttInst, TRANSMIT_AUDIO))
         {
-            // Not found in the list
-            continue;
+            if (!TT_EnableTransmission(m_ttInst, TRANSMIT_AUDIO, true))
+            {
+                m_instStat->setError(INST_ERR_TRANSMIT_ENABLED);
+            }
+            else
+            {
+                m_instStat->setError(INST_ERR_FIXED_TRANSMIT_ENABLED);
+            }
         }
     }
 }

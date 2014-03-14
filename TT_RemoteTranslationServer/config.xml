@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<BBconfig>
+<ServerConnect ip="tt4.de.kbb1.com" tcp="10333" udp="10333" srvPassword="haverim" srvUser="alexm" srvUserPassword="aruts666" nickName="Valik" hapName="" srcName="Hebrew" trgName="Testing" />
+</BBconfig>

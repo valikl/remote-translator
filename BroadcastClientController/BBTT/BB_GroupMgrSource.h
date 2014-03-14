@@ -21,11 +21,23 @@ public:
 
     // Operations
     void UpdateMicrophoneGainLevel(const std::wstring name, int gainLevel);
+    int GetMicrophoneGainLevel(const std::wstring name);
+
+    int GetMicrophoneLevel(const std::wstring name);
+
     void EnableDenoising(const std::wstring name, bool bEnable);
+    bool IsDenoisingEnabled(const std::wstring name);
+
     void EnableEchoCancellation(const std::wstring name, bool bEnable);
+    bool IsEchoCancellationEnabled(const std::wstring name);
+
     void EnableVoiceActivation(const std::wstring name, bool bEnable, int voiceactSlider = 0);
+    // Return -1 if disabled, otherwise return voiceactSlider
+    int IsVoiceActivationEnabled(const std::wstring name);
+
     void SetAGCEnable(const std::wstring name, bool bEnable, const AGC *agc);
-    void GetMicrophoneLevel(const std::wstring name, int &level);
+    // Return true if enabled
+    bool GetAGC(const std::wstring name, AGC &agc);
 
 private:
     BB_GroupMgrSource(GroupType groupType);

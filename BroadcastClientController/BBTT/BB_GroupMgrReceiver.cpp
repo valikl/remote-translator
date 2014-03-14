@@ -33,8 +33,20 @@ void BB_GroupMgrReceiver::UpdateVolumeLevel(const std::wstring name, int volumeL
     }
 
     inst->UpdateVolumeLevel(volumeLevel);
+    BB_ConfigMgr::Instance().SetGroupElementSrcVolumeLevel(m_groupType, name, volumeLevel);
 }
 
+int BB_GroupMgrReceiver::GetVolumeLevel(const std::wstring name)
+{
+    Lock lock(m_cs);
 
+    BB_InstanceReceiver *inst = FindInstance(name);
 
+    if (inst == NULL)
+    {
+        THROW_EXCEPT("Cannot update volume level. Group instance is not connected");
+    }
+
+    return inst->GetVolumeLevel();
+}
 

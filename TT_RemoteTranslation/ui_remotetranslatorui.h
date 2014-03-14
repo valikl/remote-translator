@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'remotetranslatorui.ui'
 **
-** Created: Fri Mar 14 05:20:27 2014
+** Created: Fri Mar 14 03:23:26 2014
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -50,17 +50,12 @@ public:
     QLabel *label;
     QLabel *label_2;
     QLineEdit *NickName;
-    QLabel *label_3;
-    QComboBox *HapList;
     QLabel *label_9;
     QLabel *label_4;
     QComboBox *SrcLangList;
     QLabel *label_5;
     QComboBox *TrgLangList;
     QPushButton *LangConnect;
-    QLabel *label_6;
-    QLabel *label_8;
-    QCheckBox *LocalSelfTestEn;
     QLabel *label_13;
     QCheckBox *ServerSelfTestEn;
     QWidget *translateControl;
@@ -75,7 +70,6 @@ public:
     QListWidget *SrcUsersList;
     QFrame *line;
     QLabel *label_14;
-    QLabel *label_15;
     QSlider *SrcLevelSld;
     QFrame *line_3;
     QLabel *label_18;
@@ -88,7 +82,6 @@ public:
     QListWidget *TrgUsersList;
     QFrame *line_4;
     QLabel *label_19;
-    QLabel *label_21;
     QSlider *VideoLvlSld;
     QPushButton *showVideoButton;
     QPushButton *btnBtartTranslatorsChat;
@@ -141,12 +134,6 @@ public:
         NickName = new QLineEdit(connectControl);
         NickName->setObjectName(QString::fromUtf8("NickName"));
         NickName->setGeometry(QRect(140, 50, 161, 20));
-        label_3 = new QLabel(connectControl);
-        label_3->setObjectName(QString::fromUtf8("label_3"));
-        label_3->setGeometry(QRect(40, 90, 81, 20));
-        HapList = new QComboBox(connectControl);
-        HapList->setObjectName(QString::fromUtf8("HapList"));
-        HapList->setGeometry(QRect(140, 90, 181, 22));
         label_9 = new QLabel(connectControl);
         label_9->setObjectName(QString::fromUtf8("label_9"));
         label_9->setGeometry(QRect(50, 120, 261, 41));
@@ -165,21 +152,12 @@ public:
         LangConnect = new QPushButton(connectControl);
         LangConnect->setObjectName(QString::fromUtf8("LangConnect"));
         LangConnect->setGeometry(QRect(140, 250, 61, 23));
-        label_6 = new QLabel(connectControl);
-        label_6->setObjectName(QString::fromUtf8("label_6"));
-        label_6->setGeometry(QRect(40, 280, 261, 41));
-        label_8 = new QLabel(connectControl);
-        label_8->setObjectName(QString::fromUtf8("label_8"));
-        label_8->setGeometry(QRect(20, 330, 91, 20));
-        LocalSelfTestEn = new QCheckBox(connectControl);
-        LocalSelfTestEn->setObjectName(QString::fromUtf8("LocalSelfTestEn"));
-        LocalSelfTestEn->setGeometry(QRect(120, 330, 16, 18));
         label_13 = new QLabel(connectControl);
         label_13->setObjectName(QString::fromUtf8("label_13"));
-        label_13->setGeometry(QRect(170, 330, 111, 20));
+        label_13->setGeometry(QRect(230, 330, 61, 20));
         ServerSelfTestEn = new QCheckBox(connectControl);
         ServerSelfTestEn->setObjectName(QString::fromUtf8("ServerSelfTestEn"));
-        ServerSelfTestEn->setGeometry(QRect(290, 330, 16, 18));
+        ServerSelfTestEn->setGeometry(QRect(300, 330, 16, 18));
         ControlTabs->addTab(connectControl, QString());
         translateControl = new QWidget();
         translateControl->setObjectName(QString::fromUtf8("translateControl"));
@@ -220,12 +198,9 @@ public:
         label_14 = new QLabel(translateControl);
         label_14->setObjectName(QString::fromUtf8("label_14"));
         label_14->setGeometry(QRect(30, 200, 261, 31));
-        label_15 = new QLabel(translateControl);
-        label_15->setObjectName(QString::fromUtf8("label_15"));
-        label_15->setGeometry(QRect(10, 230, 141, 20));
         SrcLevelSld = new QSlider(translateControl);
         SrcLevelSld->setObjectName(QString::fromUtf8("SrcLevelSld"));
-        SrcLevelSld->setGeometry(QRect(170, 230, 160, 16));
+        SrcLevelSld->setGeometry(QRect(80, 230, 160, 16));
         SrcLevelSld->setOrientation(Qt::Horizontal);
         line_3 = new QFrame(translateControl);
         line_3->setObjectName(QString::fromUtf8("line_3"));
@@ -237,10 +212,10 @@ public:
         label_18->setGeometry(QRect(30, 260, 261, 41));
         label_20 = new QLabel(translateControl);
         label_20->setObjectName(QString::fromUtf8("label_20"));
-        label_20->setGeometry(QRect(10, 300, 131, 31));
+        label_20->setGeometry(QRect(20, 300, 51, 21));
         TrgLvlSld = new QSlider(translateControl);
         TrgLvlSld->setObjectName(QString::fromUtf8("TrgLvlSld"));
-        TrgLvlSld->setGeometry(QRect(170, 300, 160, 16));
+        TrgLvlSld->setGeometry(QRect(80, 300, 160, 16));
         TrgLvlSld->setOrientation(Qt::Horizontal);
         chooseTransButton = new QPushButton(translateControl);
         chooseTransButton->setObjectName(QString::fromUtf8("chooseTransButton"));
@@ -265,12 +240,9 @@ public:
         label_19 = new QLabel(translateControl);
         label_19->setObjectName(QString::fromUtf8("label_19"));
         label_19->setGeometry(QRect(20, 450, 291, 31));
-        label_21 = new QLabel(translateControl);
-        label_21->setObjectName(QString::fromUtf8("label_21"));
-        label_21->setGeometry(QRect(0, 480, 91, 20));
         VideoLvlSld = new QSlider(translateControl);
         VideoLvlSld->setObjectName(QString::fromUtf8("VideoLvlSld"));
-        VideoLvlSld->setGeometry(QRect(90, 480, 160, 16));
+        VideoLvlSld->setGeometry(QRect(80, 480, 160, 16));
         VideoLvlSld->setOrientation(Qt::Horizontal);
         showVideoButton = new QPushButton(translateControl);
         showVideoButton->setObjectName(QString::fromUtf8("showVideoButton"));
@@ -285,7 +257,7 @@ public:
         RemoteTranslatorUI->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(RemoteTranslatorUI);
         menuBar->setObjectName(QString::fromUtf8("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 340, 21));
+        menuBar->setGeometry(QRect(0, 0, 340, 18));
         menuSound_Settings = new QMenu(menuBar);
         menuSound_Settings->setObjectName(QString::fromUtf8("menuSound_Settings"));
         menuManual_TT_connection = new QMenu(menuBar);
@@ -333,11 +305,6 @@ public:
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; font-weight:600;\">NickName</span></p></body></html>", 0, QApplication::UnicodeUTF8));
-        label_3->setText(QApplication::translate("RemoteTranslatorUI", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-"p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; font-weight:600;\">Happenings</span></p></body></html>", 0, QApplication::UnicodeUTF8));
         label_9->setText(QApplication::translate("RemoteTranslatorUI", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
@@ -354,22 +321,11 @@ public:
 "</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
 "<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; font-weight:600;\">Translate to:</span></p></body></html>", 0, QApplication::UnicodeUTF8));
         LangConnect->setText(QApplication::translate("RemoteTranslatorUI", "Connect", 0, QApplication::UnicodeUTF8));
-        label_6->setText(QApplication::translate("RemoteTranslatorUI", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-"p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
-"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:16pt; font-weight:600;\">Self Test</span></p></body></html>", 0, QApplication::UnicodeUTF8));
-        label_8->setText(QApplication::translate("RemoteTranslatorUI", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-"p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; font-weight:600;\">Local self test</span></p></body></html>", 0, QApplication::UnicodeUTF8));
-        LocalSelfTestEn->setText(QString());
         label_13->setText(QApplication::translate("RemoteTranslatorUI", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; font-weight:600;\">Server self test</span></p></body></html>", 0, QApplication::UnicodeUTF8));
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; font-weight:600;\">Self test</span></p></body></html>", 0, QApplication::UnicodeUTF8));
         ServerSelfTestEn->setText(QString());
         ControlTabs->setTabText(ControlTabs->indexOf(connectControl), QApplication::translate("RemoteTranslatorUI", "Tab 1", 0, QApplication::UnicodeUTF8));
         label_10->setText(QApplication::translate("RemoteTranslatorUI", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
@@ -403,12 +359,7 @@ public:
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
-"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:16pt; font-weight:600;\">&quot;From&quot; channel volume</span></p></body></html>", 0, QApplication::UnicodeUTF8));
-        label_15->setText(QApplication::translate("RemoteTranslatorUI", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-"p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
-"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt; font-weight:600;\">&quot;From&quot; channel volume</span></p></body></html>", 0, QApplication::UnicodeUTF8));
+"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:16pt; font-weight:600;\">Source volume</span></p></body></html>", 0, QApplication::UnicodeUTF8));
         label_18->setText(QApplication::translate("RemoteTranslatorUI", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
@@ -418,7 +369,6 @@ public:
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
-"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt; font-weight:600;\">Other translators </span></p>\n"
 "<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt; font-weight:600;\">volume</span></p></body></html>", 0, QApplication::UnicodeUTF8));
         chooseTransButton->setText(QApplication::translate("RemoteTranslatorUI", "Choose local", 0, QApplication::UnicodeUTF8));
         TrgMuteBut->setText(QApplication::translate("RemoteTranslatorUI", "Translators mute", 0, QApplication::UnicodeUTF8));
@@ -437,12 +387,7 @@ public:
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
-"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:16pt; font-weight:600;\">Video control</span></p></body></html>", 0, QApplication::UnicodeUTF8));
-        label_21->setText(QApplication::translate("RemoteTranslatorUI", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-"p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
-"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt; font-weight:600;\">Video quality</span></p></body></html>", 0, QApplication::UnicodeUTF8));
+"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:16pt; font-weight:600;\">Video quality</span></p></body></html>", 0, QApplication::UnicodeUTF8));
         showVideoButton->setText(QApplication::translate("RemoteTranslatorUI", "Show video", 0, QApplication::UnicodeUTF8));
         btnBtartTranslatorsChat->setText(QApplication::translate("RemoteTranslatorUI", "Translators Chat", 0, QApplication::UnicodeUTF8));
         btnBtartTranslatorsChat->setShortcut(QApplication::translate("RemoteTranslatorUI", "Ctrl+S", 0, QApplication::UnicodeUTF8));

@@ -8,8 +8,8 @@
 
 using namespace std;
 
-BB_InstanceReceiver::BB_InstanceReceiver(GroupType groupType, const BB_InstanceContext &context, const wstring name) :
-    m_groupType(GROUP_TYPE_RECEIVERS), m_name(name), BB_Instance(context)
+BB_InstanceReceiver::BB_InstanceReceiver(GroupType groupType, const BB_InstanceContext &context, const wstring name, IInstStatus* instStat) :
+    m_groupType(GROUP_TYPE_RECEIVERS), m_name(name), m_instStat(instStat), BB_Instance(context)
 {
 }
 
@@ -88,11 +88,17 @@ void BB_InstanceReceiver::updateUserGainLevel(int volume)
         if(volume <= SOUND_VOLUME_MAX)
         {
             //disable soft gain
-            TT_SetUserGainLevel(m_ttInst, user.m_id, SOUND_GAIN_DEFAULT);
+            if (!TT_SetUserGainLevel(m_ttInst, user.m_id, SOUND_GAIN_DEFAULT))
+            {
+                THROW_EXCEPT("Set user gain level failed");
+            }
         }
         else
         {
-            TT_SetUserGainLevel(m_ttInst, user.m_id, gain);
+            if (!TT_SetUserGainLevel(m_ttInst, user.m_id, gain))
+            {
+                THROW_EXCEPT("Set user gain level failed");
+            }
         }
     }
 }
@@ -106,10 +112,38 @@ void BB_InstanceReceiver::UpdateVolumeLevel(int volumeLevel)
     updateUserGainLevel(volumeLevel);
 }
 
+int BB_InstanceReceiver::GetVolumeLevel()
+{
+    return TT_GetSoundOutputVolume(m_ttInst);
+}
+
+void BB_InstanceReceiver::UpdateSoundDev(int id, bool isInput)
+{
+    closeSoundDevices();
+    if (isInput)
+    {
+        m_context.m_inputSoundDevId = id;
+    }
+    else
+    {
+        m_context.m_outputSoundDevId = id;
+    }
+    initSoundDevices();
+}
+
+INT32 BB_InstanceReceiver::GetUserId()
+{
+    // Read config
+    BB_GroupElementConfig config = BB_ConfigMgr::Instance().GetGroupElementConfig(m_groupType, m_name);
+    return BB_Instance::GetUserId(config.m_nickName);
+}
+
 void BB_InstanceReceiver::run()
 {
-    int cnt = 0;
+    // Wait for configuration to be set by GUI for the first time
+    Sleep(5000);
 
+    int cnt = 0;
     while(!m_stopThread)
     {
         // Every 1 sec.
@@ -120,16 +154,34 @@ void BB_InstanceReceiver::run()
         }
         cnt = 0;
 
-        try
+        Channel channel;
+        if (!TT_GetChannel(m_ttInst, m_channelId, &channel))
         {
-            // Read config
-            BB_GroupElementConfig config = BB_ConfigMgr::Instance().GetGroupElementConfig(m_groupType, m_name);
-
-        }
-        catch(BB_Exception excp)
-        {
-            // Not found in the list
+            m_instStat->setError(INST_ERR_INST_NOT_FOUND);
             continue;
+        }
+
+        int userId = GetUserId();
+        if (userId < 0)
+        {
+            m_instStat->setError(INST_ERR_USER_NOT_FOUND);
+            continue;
+        }
+
+        // Read config
+        BB_GroupElementConfig config = BB_ConfigMgr::Instance().GetGroupElementConfig(m_groupType, m_name);
+
+        if (GetVolumeLevel() != config.m_SrcVolumeLevel)
+        {
+            try
+            {
+                UpdateVolumeLevel(config.m_SrcVolumeLevel);
+                m_instStat->setError(INST_ERR_FIXED_VOL_LEVEL);
+            }
+            catch(BB_Exception excp)
+            {
+                m_instStat->setError(INST_ERR_VOL_LEVEL);
+            }
         }
     }
 }

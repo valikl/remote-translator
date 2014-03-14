@@ -1,32 +1,32 @@
 #ifndef AUDIOSETTINGS_H
 #define AUDIOSETTINGS_H
 
+#include "BBTT/BB_ConfigMgr.h"
 #include <QDialog>
 
-class QLabel;
-class QSlider;
-class QGroupBox;
+class QDialogButtonBox;
+class InstSettingsView;
 
 class AudioSettings : public QDialog
 {
     Q_OBJECT
 public:
-    explicit AudioSettings(QWidget *parent);
+    explicit AudioSettings(QString iname, GroupType itype, QWidget *parent);
 
 private:
-    void drawSlider(QSlider* slider, QLabel* label, QString name, int min, int max, int val);
     void setLayout();
 
-    QLabel* volumeLabel;
-    QLabel* gainLabel;
-    QSlider* volumeSlider;
-    QSlider* gainSlider;
-    QLayout *layout;
+    QString name;               // instance name
+    GroupType type;             // instance group type
+    InstSettingsView* iview;
+    QDialogButtonBox* saveButton;
+    QLayout* layout;
 
 signals:
     
 public slots:
     
+    void saveDetails();
 };
 
 #endif // AUDIOSETTINGS_H

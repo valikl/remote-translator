@@ -368,7 +368,6 @@ string BB_ConfigMgr::buildGroupConfig(BB_GroupConfig &groupConfig, const string 
 
     std::map<wstring, BB_GroupElementConfig>::iterator it;
     for (it = groupConfig.m_groupList.begin(); it != groupConfig.m_groupList.end(); ++it)
-    for (unsigned int i=0; i < groupConfig.m_groupList.size(); i++)
     {
         xml += "<" + nodeGroupName + " " +
             ATTR_NAME + "=\"" + string(it->second.m_name.begin(), it->second.m_name.end()) + "\" " +
