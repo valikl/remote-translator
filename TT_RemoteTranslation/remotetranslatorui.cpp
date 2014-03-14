@@ -18,10 +18,8 @@ RemoteTranslatorUI::RemoteTranslatorUI(QWidget *parent) :
     chatWriter=0;
 }
 
-void RemoteTranslatorUI::initHapsMenu()
+void RemoteTranslatorUI::initHaps()
 {
-    ui->HapList->clear();
-
     // get list of happenings
     TRY_BLOCK(
         happenings = TRANSLATOR.getHappenings();
@@ -30,9 +28,8 @@ void RemoteTranslatorUI::initHapsMenu()
     for (unsigned int i = 0; i < happenings.size(); ++i)
     {
         Happening hap = happenings[i];
-        ui->HapList->addItem(QString::fromStdWString(hap.m_hapName), i);
         if (hap.m_hapName == ConfigUI.m_Happening)
-            ui->HapList->setCurrentIndex(i);
+            curr_hap_id = i;
     }
 }
 
@@ -71,7 +68,7 @@ void RemoteTranslatorUI::activateSliders()
 void RemoteTranslatorUI::initMainConfig()
 {
     //Initialize ComboBoxes
-    initHapsMenu();
+    initHaps();
 
     // set nick name
     ui->NickName->setText(QString::fromStdWString(ConfigUI.m_NickName));
@@ -129,7 +126,6 @@ void RemoteTranslatorUI::activateButtons()
     ui->LangConnect->setCheckable(true);
 
     // disable buttons and sliders until connect
-    ui->HapList->setEnabled(false);
     ui->MicGainSld->setEnabled(false);
     ui->MicLevelInd->setEnabled(false);
     ui->SrcLevelSld->setEnabled(false);
@@ -326,20 +322,10 @@ static void ChangeChannelMenu(vector<wstring>& channels, QComboBox* combo, wstri
     }
 }
 
-// Change happening
-void RemoteTranslatorUI::on_HapList_currentIndexChanged(const QString &arg1)
-{
-    int hap_id = ui->HapList->itemData(ui->HapList->currentIndex()).toInt();
-    Happening hap = happenings[hap_id];
-    ChangeChannelMenu(hap.m_srcChannels, ui->SrcLangList, ConfigUI.m_SrcChannel);
-    ChangeChannelMenu(hap.m_dstChannels, ui->TrgLangList, ConfigUI.m_TrgChannel);
-}
-
 // Change source language
 void RemoteTranslatorUI::on_SrcLangList_currentIndexChanged(const QString &arg1)
 {
-    int hap_id = ui->HapList->itemData(ui->HapList->currentIndex()).toInt();
-    Happening hap = happenings[hap_id];
+    Happening hap = happenings[curr_hap_id];
 
     int lang_id = ui->SrcLangList->itemData(ui->SrcLangList->currentIndex()).toInt();
     BB_ClientConfigMgr::Instance().SetSrcChannel(hap.m_srcChannels[lang_id]);
@@ -355,8 +341,7 @@ void RemoteTranslatorUI::on_SrcLangList_currentIndexChanged(const QString &arg1)
 // Change target language
 void RemoteTranslatorUI::on_TrgLangList_currentIndexChanged(const QString &arg1)
 {
-    int hap_id = ui->HapList->itemData(ui->HapList->currentIndex()).toInt();
-    Happening hap = happenings[hap_id];
+    Happening hap = happenings[curr_hap_id];
 
     int lang_id = ui->TrgLangList->itemData(ui->TrgLangList->currentIndex()).toInt();
     BB_ClientConfigMgr::Instance().SetTrgChannel(hap.m_dstChannels[lang_id]);
@@ -593,28 +578,6 @@ void RemoteTranslatorUI::on_chooseTransButton_clicked(bool checked)
         TRY_FUNC(TRANSLATOR.MuteTarget(true, INSTANCE_TYPE_DST_LOCAL));
         TRY_FUNC(TRANSLATOR.MuteTarget(ConfigUI.m_TrgMute, INSTANCE_TYPE_DST));
         TRY_FUNC(TRANSLATOR.UpdateVolumeLevel(ConfigUI.m_TrgVolumeLevel, false, INSTANCE_TYPE_DST));
-    }
-}
-
-void RemoteTranslatorUI::on_LocalSelfTestEn_stateChanged(int checked)
-{
-    if (checked)
-    {
-        try
-        {
-            TRANSLATOR.StartTargetSoundLoopbackTest(ConfigUI.m_AGC, ConfigUI.m_noiseCancel, -30,
-                                                    ConfigUI.m_echoCancel, ConfigUI.m_InputSoundDevId,
-                                                    ConfigUI.m_OutputSoundDevId, ConfigUI.m_isSoundSystemWin);
-        }
-        catch(BB_Exception excp)
-        {
-            QMessageBox::critical(this, "Error:", QString::fromStdWString(excp.GetInfo()));
-            ui->LocalSelfTestEn->setChecked(false);
-        }
-    }
-    else
-    {
-        TRY_FUNC(TRANSLATOR.StopTargetSoundLoopbackTest());
     }
 }
 
