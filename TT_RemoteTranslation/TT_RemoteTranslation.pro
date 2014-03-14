@@ -31,7 +31,8 @@ SOURCES += main.cpp\
     BBTT/BB_InstanceVideo.cpp \
     BBTT/BB_InstanceAudio.cpp \
     BBTT/BB_InstanceDummy.cpp \
-    chat.cpp
+    chat.cpp \
+    Utils/BB_Base64.cpp
 
 HEADERS  += \
     common.h \
@@ -60,7 +61,8 @@ HEADERS  += \
     BBTT/BB_InstanceAudio.h \
     BBTT/BB_InstanceDummy.h \
     BBTT/IWriter.h \
-    chat.h
+    chat.h \
+    Utils/BB_Base64.h
 
 FORMS    += remotetranslatorui.ui \
     sounddevices.ui \
