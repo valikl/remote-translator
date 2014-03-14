@@ -695,15 +695,18 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="text">
-       <string>Start Chat</string>
+       <string>Translators Chat</string>
+      </property>
+      <property name="shortcut">
+       <string>Ctrl+S</string>
       </property>
      </widget>
      <widget class="QPushButton" name="btnStartAdminChat">
       <property name="geometry">
        <rect>
-        <x>0</x>
-        <y>260</y>
-        <width>61</width>
+        <x>120</x>
+        <y>400</y>
+        <width>71</width>
         <height>31</height>
        </rect>
       </property>
