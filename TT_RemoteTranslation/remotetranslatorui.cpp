@@ -81,23 +81,11 @@ void RemoteTranslatorUI::changeMainConfig()
         TRY_FUNC_WITH_RETURN(BB_ClientConfigMgr::Instance().init(false));
 
         // activate translator
-        TRY_FUNC_WITH_RETURN(initTranslator());
+        TRY_FUNC_WITH_RETURN(TRANSLATOR.init());
     }
 
     // set configuration
     initMainConfig();
-}
-
-void RemoteTranslatorUI::initTranslator()
-{
-    try
-    {
-        TRANSLATOR.init();
-    }
-    catch(BB_Exception excp)
-    {
-        QMessageBox::critical(this, "Error:", QString::fromStdWString(excp.GetInfo()));
-    }
 }
 
 void RemoteTranslatorUI::activateButtons()
@@ -150,17 +138,18 @@ void RemoteTranslatorUI::init()
 {
     ui->ControlTabs->setTabText(0, "Connection");
     ui->ControlTabs->setTabText(1, "Translation");
+    ui->ControlTabs->setCurrentIndex(0);
+
+    // activate buttons and devices
+    activateButtons();
 
     TRY_FUNC_WITH_RETURN(BB_ClientConfigMgr::Instance().init(false));
 
     // activate translator
-    TRY_FUNC_WITH_RETURN(initTranslator());
+    TRY_FUNC_WITH_RETURN(TRANSLATOR.init());
 
     // set configuration
     initMainConfig();
-
-    // activate buttons and devices
-    activateButtons();
 
     // set sliders
     setSliders();
@@ -250,7 +239,7 @@ void RemoteTranslatorUI::RestoreDefaultConfig()
     TRY_FUNC(BB_ClientConfigMgr::Instance().init(true));
 
     // activate translator
-    TRY_FUNC(initTranslator());
+    TRY_FUNC(TRANSLATOR.init());
 
     // init main configuration
     initMainConfig();
