@@ -79,7 +79,6 @@ private slots:
 private:
 
     void initMainConfig();
-    void initTranslator();
     void activateButtons();
 
     void initHaps();
