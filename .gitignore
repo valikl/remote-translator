@@ -1,0 +1,7 @@
+*/Makefile*
+*/*.xml
+*/debug
+*/release
+*/*.Debug
+*/*.Release
+*/*.user
