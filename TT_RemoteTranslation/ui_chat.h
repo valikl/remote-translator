@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'chat.ui'
 **
-** Created: Fri Mar 14 05:39:57 2014
+** Created: Sun Mar 16 04:48:56 2014
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -39,7 +39,9 @@ public:
         chatDialog->resize(263, 389);
         txtMessages = new QTextEdit(chatDialog);
         txtMessages->setObjectName(QString::fromUtf8("txtMessages"));
+        txtMessages->setEnabled(true);
         txtMessages->setGeometry(QRect(10, 30, 241, 261));
+        txtMessages->setReadOnly(true);
         txtMessage = new QPlainTextEdit(chatDialog);
         txtMessage->setObjectName(QString::fromUtf8("txtMessage"));
         txtMessage->setGeometry(QRect(10, 310, 171, 71));

@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'remotetranslatorui.ui'
 **
-** Created: Fri Mar 14 03:23:26 2014
+** Created: Sun Mar 16 04:48:56 2014
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -279,7 +279,7 @@ public:
 
         retranslateUi(RemoteTranslatorUI);
 
-        ControlTabs->setCurrentIndex(1);
+        ControlTabs->setCurrentIndex(0);
 
 
         QMetaObject::connectSlotsByName(RemoteTranslatorUI);

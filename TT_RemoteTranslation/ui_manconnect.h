@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'manconnect.ui'
 **
-** Created: Mon Oct 15 04:06:39 2012
+** Created: Sun Mar 16 04:48:56 2014
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!

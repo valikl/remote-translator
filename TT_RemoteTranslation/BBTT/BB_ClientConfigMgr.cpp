@@ -187,9 +187,10 @@ void BB_ClientConfigMgr::loadServerConnectConfig(const ticpp::Document &doc)
 					m_config.m_TrgChannel = wstrValue;
 					continue;
 				}
-                if(strName==ATTR_ADMIN_NICK_NAME){
+                if(strName == ATTR_ADMIN_NICK_NAME){
 
-                    m_config.m_AdminNickName=wstrValue;
+                    m_config.m_AdminNickName = wstrValue;
+                    continue;
                 }
 		    }
 			break;
