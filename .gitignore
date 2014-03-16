@@ -4,4 +4,4 @@
 */release
 */*.Debug
 */*.Release
-*/*.user
+*/*.user*
