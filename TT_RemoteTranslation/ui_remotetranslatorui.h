@@ -85,6 +85,7 @@ public:
     QSlider *VideoLvlSld;
     QPushButton *showVideoButton;
     QPushButton *btnBtartTranslatorsChat;
+    QPushButton *btnStartAdminChat;
     QMenuBar *menuBar;
     QMenu *menuSound_Settings;
     QMenu *menuManual_TT_connection;
@@ -249,6 +250,9 @@ public:
         btnBtartTranslatorsChat = new QPushButton(translateControl);
         btnBtartTranslatorsChat->setObjectName(QString::fromUtf8("btnBtartTranslatorsChat"));
         btnBtartTranslatorsChat->setGeometry(QRect(10, 400, 101, 31));
+        btnStartAdminChat = new QPushButton(translateControl);
+        btnStartAdminChat->setObjectName(QString::fromUtf8("btnStartAdminChat"));
+        btnStartAdminChat->setGeometry(QRect(120, 400, 71, 31));
         ControlTabs->addTab(translateControl, QString());
         RemoteTranslatorUI->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(RemoteTranslatorUI);
@@ -385,7 +389,9 @@ public:
 "</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
 "<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:16pt; font-weight:600;\">Video quality</span></p></body></html>", 0, QApplication::UnicodeUTF8));
         showVideoButton->setText(QApplication::translate("RemoteTranslatorUI", "Show video", 0, QApplication::UnicodeUTF8));
-        btnBtartTranslatorsChat->setText(QApplication::translate("RemoteTranslatorUI", "Start Chat", 0, QApplication::UnicodeUTF8));
+        btnBtartTranslatorsChat->setText(QApplication::translate("RemoteTranslatorUI", "Translators Chat", 0, QApplication::UnicodeUTF8));
+        btnBtartTranslatorsChat->setShortcut(QApplication::translate("RemoteTranslatorUI", "Ctrl+S", 0, QApplication::UnicodeUTF8));
+        btnStartAdminChat->setText(QApplication::translate("RemoteTranslatorUI", "Admin Chat", 0, QApplication::UnicodeUTF8));
         ControlTabs->setTabText(ControlTabs->indexOf(translateControl), QApplication::translate("RemoteTranslatorUI", "Tab 2", 0, QApplication::UnicodeUTF8));
         menuSound_Settings->setTitle(QApplication::translate("RemoteTranslatorUI", "Sound Settings", 0, QApplication::UnicodeUTF8));
         menuManual_TT_connection->setTitle(QApplication::translate("RemoteTranslatorUI", "Manual connection", 0, QApplication::UnicodeUTF8));

@@ -16,6 +16,7 @@ RemoteTranslatorUI::RemoteTranslatorUI(QWidget *parent) :
 {
     ui->setupUi(this);
     chatWriter=0;
+    adminChatWriter=0;
 }
 
 void RemoteTranslatorUI::setSliders()
@@ -122,6 +123,7 @@ void RemoteTranslatorUI::activateButtons()
     ui->ServerSelfTestEn->setEnabled(false);
     ui->chooseTransButton->setEnabled(false);
     ui->btnBtartTranslatorsChat->setEnabled(false);
+    ui->btnStartAdminChat->setEnabled(false);
 
     //Timer for micophone progress bar
     microphone_timer = new QTimer(this);
@@ -137,6 +139,11 @@ void RemoteTranslatorUI::activateButtons()
     conlost_timer = new QTimer(this);
     connect(conlost_timer, SIGNAL(timeout()), this, SLOT(on_ConlostTimeout()));
     conlost_timer->start(100);
+
+    //admin user timer
+    admin_timer = new QTimer(this);
+    connect(admin_timer, SIGNAL(timeout()), this, SLOT(ActivateAdminChatButtons()));
+    admin_timer->start(2000);
 }
 
 void RemoteTranslatorUI::init()
@@ -199,6 +206,17 @@ void RemoteTranslatorUI::on_ConlostTimeout()
     disconnectTranslator();
 }
 
+void RemoteTranslatorUI::ActivateAdminChatButtons()
+{
+    if (!TRANSLATOR.isConnected())
+        return;
+
+    if(TRANSLATOR.FindAdminUser()){
+
+         ui->btnStartAdminChat->setEnabled(true);
+    }else
+         ui->btnStartAdminChat->setEnabled(false);
+}
 void RemoteTranslatorUI::ActivateAudioFilters()
 {
     SoundFilters sound_filters(this);
@@ -279,9 +297,13 @@ RemoteTranslatorUI::~RemoteTranslatorUI()
     if(chatWriter!=0){
     delete chatWriter;
     }
+    if(adminChatWriter!=0){
+        delete adminChatWriter;
+    }
     delete microphone_timer;
     delete user_timer;
     delete conlost_timer;
+    delete admin_timer;
     delete ui;
 }
 
@@ -386,11 +408,16 @@ void RemoteTranslatorUI::connectTranslator()
     ui->chooseTransButton->setCheckable(true);
 
 
-    chatWriter=new ChatWriter();
-    TRANSLATOR.StartTranslatorsChat(chatWriter);
+    chatWriter=new ChatWriter(false);
+    adminChatWriter=new ChatWriter(true);
+
+    TRANSLATOR.StartTranslatorsChat(chatWriter, adminChatWriter);
     connect(this->chatWriter, SIGNAL(StartChat(QString)),this, SLOT(on_btnBtartTranslatorsChat_clicked(QString)));
     connect(this->chatWriter, SIGNAL(ActivateChat()),this, SLOT(ActivateChatWindow()));
+    connect(this->adminChatWriter, SIGNAL(StartChat(QString)),this, SLOT(on_btnStartAdminChat_clicked(QString)));
+    connect(this->adminChatWriter, SIGNAL(ActivateChat()),this, SLOT(ActivateAdminChatWindow()));
     ui->btnBtartTranslatorsChat->setEnabled(true);
+   // ui->btnStartAdminChat->setEnabled(true);
 
 
     if (!ui->MicMuteBut->isChecked())
@@ -444,6 +471,7 @@ void RemoteTranslatorUI::disconnectTranslator()
 
     ///disable btn chat
     ui->btnBtartTranslatorsChat->setEnabled(false);
+    ui->btnStartAdminChat->setEnabled(false);
     ///
     TRY_FUNC(TRANSLATOR.disconnectHap());
 
@@ -631,4 +659,17 @@ void RemoteTranslatorUI::ActivateChatWindow(){
 
 }
 
+void RemoteTranslatorUI::ActivateAdminChatWindow(){
 
+    adminChatWriter->ShowUpChatWindow();
+
+}
+
+void RemoteTranslatorUI::on_btnStartAdminChat_clicked(QString str)
+{
+    adminChatWriter->RiseChat();
+    if(!str.isEmpty())
+    {
+        adminChatWriter->Write(str.toStdWString());
+    }
+}

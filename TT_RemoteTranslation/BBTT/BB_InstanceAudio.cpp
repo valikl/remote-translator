@@ -217,11 +217,57 @@ void BB_InstanceAudio::StopChatThreads()
     }
 
 }
-void BB_InstanceAudio::StartChat(IWriter *writer){
+void BB_InstanceAudio::StartChat(IWriter *writer, IWriter *adminWriter){
     m_stopThread=false;
     m_writer=writer;
+    m_adminWriter=adminWriter;
+    SetAdminUser();
     m_audioLoopThread = new Thread(this);
 
+  }
+
+bool BB_InstanceAudio::SetAdminUser(){
+    INT32* userIDs = NULL;
+    INT32 size = 0;
+    adminUser.nUserID=0;
+    ClientConfig config = BB_ClientConfigMgr::Instance().getConfig();
+
+    //adminUser=0;
+    if(config.m_AdminNickName.length()==0) return false;
+
+    if (!TT_GetServerUsers(m_ttInst, userIDs, &size) || size == 0)
+    {
+        THROW_EXCEPT_WITH_ID("Build server users list failed", EXCEPTION_ID_CONNECTION_LOST);
+    }
+
+    if (size == 0)
+    {
+        cout << "No users!" << endl;
+        THROW_EXCEPT("Build server users list failed");
+    }
+
+    userIDs = new INT32[size];
+    if (!TT_GetServerUsers(m_ttInst, userIDs, &size))
+    {
+        delete[] userIDs;
+        THROW_EXCEPT("Build server users list failed");
+    }
+
+    for (int i = 0; i < size; ++i)
+    {
+        User ttUser;
+        if (!TT_GetUser(m_ttInst, userIDs[i], &ttUser))
+        {
+            continue;
+        }
+        if(config.m_AdminNickName.compare(ttUser.szNickname)==0){
+            adminUser=ttUser;
+            break;
+        }
+    }
+
+    delete[] userIDs;
+    return adminUser.nUserID!=0;
   }
 
 
@@ -287,9 +333,19 @@ void BB_InstanceAudio::run()
                 m_writer->Write(ui_message);
                 break;
             case MSGTYPE_USER :
-                ui_message=time_str +L": <";
-                ui_message.append(user.szNickname).append(L"> ").append(str);            //QString("<%1> %2").arg(_Q(user.szNickname)).arg(_Q(msg.szMessage));
-                m_writer->Write(ui_message);
+                if(adminUser.nUserID==0){
+                    SetAdminUser();
+                }
+                if(adminUser.nUserID!=0&&user.nUserID==adminUser.nUserID){
+                    ui_message=time_str +L": <";
+                    ui_message.append(user.szNickname).append(L"> ").append(str);
+                    m_adminWriter->Write(ui_message);
+
+                }else{
+                    ui_message=time_str +L": <";
+                    ui_message.append(user.szNickname).append(L"> ").append(str);            //QString("<%1> %2").arg(_Q(user.szNickname)).arg(_Q(msg.szMessage));
+                    m_writer->Write(ui_message);
+                }
                 break;
             case MSGTYPE_CUSTOM :
 
@@ -311,17 +367,33 @@ static void CopyWSToChar(wstring wstr,TTCHAR* ttstr){
 }
 
 //can recieve till 512 characters
-void BB_InstanceAudio::SendMessage(wstring &txtmsg){
+void BB_InstanceAudio::SendMessage(wstring &txtmsg, bool isAdminChat){
     if(txtmsg.length()==0||txtmsg.length()>512)
         return;
+    if(isAdminChat&&adminUser.nUserID==0) {
+        SetAdminUser();
+        if(adminUser.nUserID==0){
+            if(m_adminWriter!=0)
+                m_adminWriter->Write(L"There is no administrator user found");
+            return;
+        }
+    }
 
     int mychanid = TT_GetMyChannelID(m_ttInst);
+    int userID=adminUser.nUserID;
     if(mychanid<=0)
         return;
     TextMessage msg;
     msg.nFromUserID = TT_GetMyUserID(m_ttInst);
-    msg.nChannelID = mychanid;
-    msg.nMsgType = MSGTYPE_CHANNEL;
+    if(!isAdminChat){
+        msg.nChannelID = mychanid;
+        msg.nMsgType = MSGTYPE_CHANNEL;
+    }
+    else{
+        msg.nToUserID=userID;
+        msg.nMsgType = MSGTYPE_USER;
+    }
+
     //txtmsg.copy(msg.szMessage,txtmsg.length());
     CopyWSToChar(txtmsg,msg.szMessage);
     TT_DoTextMessage(m_ttInst, &msg);

@@ -39,9 +39,10 @@ public:
     ///chat functions
     // the thread procedure
     virtual void run();
-    void StartChat(IWriter *writer);
-    void SendMessage(std::wstring &txtmsg);
+    void StartChat(IWriter *writer, IWriter *adminWriter);
+    void SendMessage(std::wstring &txtmsg, bool isAdminChat);
     void StopChatThreads();
+    bool SetAdminUser();
 
 private:
 
@@ -52,8 +53,10 @@ private:
     //chat properties
     Thread *m_audioLoopThread;
     bool m_stopThread;
+    User adminUser;
 
     IWriter *m_writer;
+    IWriter *m_adminWriter;
 };
 
 
