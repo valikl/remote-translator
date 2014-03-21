@@ -7,6 +7,25 @@
 
 using namespace std;
 
+#define TRY_INIT(init) \
+try \
+{ \
+    (init); \
+} \
+catch(BB_Exception excp) \
+{ \
+    fatal_errlist.push_back(getErrStr(excp)); \
+}
+
+QString getErrStr(BB_Exception excp)
+{
+    QDateTime current = QDateTime::currentDateTime();
+    QString errstr = QString::fromStdWString(excp.GetInfo());
+    QMessageBox::critical(NULL, "Error:", errstr);
+    errstr = current.toString() + " " + errstr;
+    return errstr;
+}
+
 ControlPanel::ControlPanel(QWidget *parent) :
     QWidget(parent)
 {}
@@ -28,34 +47,18 @@ void ControlPanel::catchFatalError(QString errstr)
 void ControlPanel::init()
 {
     // Initialize configuration manager and group managers
-    try
-    {
-        ConfigMgr.init(false);
-
-        SourcesMgr.init();
-        RestrictedMgr.init();
-        ReceiversMgr.init();
-    }
-    catch(BB_Exception excp)
-    {
-        QDateTime current = QDateTime::currentDateTime();
-        QString errstr = QString::fromStdWString(excp.GetInfo());
-        QMessageBox::critical(this, "Error:", errstr);
-        errstr = current.toString() + " " + errstr;
-        fatal_errlist.push_back(errstr);
-    }
+    TRY_INIT(ConfigMgr.init(false));
+    TRY_INIT(SourcesMgr.init());
+    TRY_INIT(RestrictedMgr.init());
+    TRY_INIT(ReceiversMgr.init());
 
     // Draw widget elements
-
     drawMenuBar();
-
     drawSources();
     drawReceivers();
     drawRestricted();
-
     drawErrConsole();
     drawMsgConsole();
-
     setLayout();
 }
 
