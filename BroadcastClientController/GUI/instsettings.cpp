@@ -380,7 +380,7 @@ void InstSettingsView::setLayout()
 
     addSoundDevBox("Input device", false, sound_devices, config, GRID(layout), 3, dmap);
     addSoundDevBox("Output device", true, sound_devices, config, GRID(layout), 4, dmap);
-    addRadioButtonBox("Sound system", !config.m_isSoundSystemWin, GRID(layout), 5, 0, dmap);
+    addRadioButtonBox("Direct sound", !config.m_isSoundSystemWin, GRID(layout), 5, 0, dmap);
     addRadioButtonBox("Windows Standard", config.m_isSoundSystemWin, GRID(layout), 5, 1, dmap);
 
     if (type == GROUP_TYPE_RECEIVERS)
