@@ -45,6 +45,11 @@ public:
         return m_sInfo;
     }
 
+    void SetInfo(wstring sInfo)
+    {
+        m_sInfo = sInfo;
+    }
+
     const int GetId() const
     {
         return m_Id;
@@ -87,26 +92,6 @@ try \
 catch(BB_Exception excp) \
 { \
     QMessageBox::critical(NULL, "Error:", QString::fromStdWString(excp.GetInfo())); \
-    return; \
-}
-
-#define TRY_BLOCK(block) \
-try \
-{ \
-    block \
-} \
-catch(BB_Exception excp) \
-{ \
-    QMessageBox::critical(NULL, "Error:", QString::fromStdWString(excp.GetInfo())); \
-}
-
-#define TRY_BLOCK_RETURN_ON_ERR(block) \
-try \
-{ \
-    block \
-} \
-catch(BB_Exception excp) \
-{ \
     return; \
 }
 

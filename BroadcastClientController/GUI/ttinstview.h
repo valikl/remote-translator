@@ -33,6 +33,7 @@ public:
     bool is_connected;
 
     void init();
+    void connectInst();
     virtual void setLayout() = 0;
     virtual void initAudio() = 0;
 
@@ -67,7 +68,7 @@ class TTInstViewSource : public TTInstView
     Q_OBJECT
 public:
     TTInstViewSource(QString iname, GroupType itype, QWidget *parent = 0) :
-        TTInstView(iname, parent), type(itype) { init(); }
+        TTInstView(iname, parent), type(itype), microphone_timer(NULL) { init(); }
     virtual GroupType getType() { return type; }
     virtual void setLayout();
     virtual void initAudio();
