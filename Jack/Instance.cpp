@@ -23,34 +23,43 @@ BB_Instance::~BB_Instance(void)
 {
 }
 
+void BB_Instance::printLog(string msg)
+{
+    time_t t = time(0);
+    localtime(&t);
+    string t_str(ctime(&t));
+
+    cout << t_str.substr(0, t_str.length() -1) << " " << m_context.m_ProcessName << ": " << msg.c_str() << endl;
+}
+
 bool BB_Instance::init()
 {
 	m_ttInst = TT_InitTeamTalkPoll();
+
+    initSoundDevice();
+    printLog("Sound device initialized");
 
 	if (!connect())
 	{
 		return false;
 	}
 	
-    cout << "Going to init sound device ..." << endl;
-    initSoundDevice();
-	
 	return true;
  }
  
  bool BB_Instance::connect()
  {
-    cout << "Going to Login..." << endl;
     if (!login())
 	{
 		return false;
 	}
+    printLog("Logged in successfully");
 	
-    cout << "Going to join channel..." << endl;
 	if (!joinChannel())
 	{
 		return false;
 	}
+    printLog("Joined channel successfully");
 	
 	// Get user id
     m_userID = TT_GetMyUserID(m_ttInst);
@@ -84,7 +93,7 @@ bool BB_Instance::login()
     // now that we got all the information we needed we can connect and logon
     if (!TT_Connect(m_ttInst, m_context.m_IP.c_str(), m_context.m_TCP, m_context.m_UDP, 0, 0))
     {
-        cout << "Connection to the server failed" << endl;
+        printLog("Connection to the server failed");
         return false;
     }
      
@@ -92,7 +101,7 @@ bool BB_Instance::login()
     wait_ms = 10000;
     if (!TT_GetMessage(m_ttInst, &msg, &wait_ms) || msg.wmMsg == WM_TEAMTALK_CON_FAILED)
     {
-        cout << "Connection to the server failed1" << endl;
+        printLog("Connection to the server failed2");
         return false;
     }
 
@@ -100,21 +109,21 @@ bool BB_Instance::login()
     cmd_id = TT_DoLogin(m_ttInst, m_context.m_nickName.c_str(), m_context.m_srvPsw.c_str(), m_context.m_srvUser.c_str(), m_context.m_srvUserPsw.c_str());
     if(cmd_id < 0)
     {
-        cout << "Log on to the server failed" << endl;
+        printLog("Log on to the server failed");
         return false;
     }
 
     //wait for server reply
     if (!TT_GetMessage(m_ttInst, &msg, &wait_ms) || msg.wmMsg != WM_TEAMTALK_CMD_PROCESSING)
     {
-        cout << "Log on to the server failed" << endl;
+        printLog("Log on to the server failed2");
         return false;
     }
 
 	//get response
     if (!TT_GetMessage(m_ttInst, &msg, &wait_ms) || msg.wmMsg == WM_TEAMTALK_CMD_ERROR)
     {
-        cout << "Log on to the server failed" << endl;
+        printLog("Log on to the server failed3");
         return false;
     }
 
@@ -134,7 +143,7 @@ bool BB_Instance::joinChannel()
 
     if (TT_DoJoinChannelByID(m_ttInst, m_channelId, m_context.m_channelPsw.c_str()) == -1)
 	{
-        cout << "Cannot join the channel" << endl;
+        printLog("Cannot join the channel");
         return false;
 	}
 
@@ -148,7 +157,7 @@ bool BB_Instance::setClassroom()
     Channel channel;
     if (!TT_GetChannel(m_ttInst, m_channelId, &channel))
     {
-        cout << "Get channel failed" << endl;
+        printLog("Get channel failed");
         return false;
     }
 
@@ -164,12 +173,12 @@ bool BB_Instance::setClassroom()
 
         if (TT_DoUpdateChannel(m_ttInst, &channel) == -1)
         {
-            cout << "Update channel failed" << endl;
+            printLog("Update channel failed");
             return false;
         }
         else
         {
-            cout << "Classroom property restored" << endl;
+            printLog("Classroom property restored");
         }
     }
 
@@ -180,7 +189,7 @@ bool BB_Instance::enableTransmission()
 {
     if (!TT_EnableTransmission(m_ttInst, TRANSMIT_AUDIO, true))
     {
-        cout << "Enable Transmission failed" << endl;
+        printLog("Enable Transmission failed");
         return false;
     }
 
@@ -192,7 +201,7 @@ bool BB_Instance::startSoundLoopbackTest()
     // Ask Yossi!!!
     if (!TT_StartSoundLoopbackTest(m_ttInst, 0, 0, 48000, 2))
     {
-        cout << "Start Sound Loopback Test failed" << endl;
+        printLog("Start Sound Loopback Test failed");
         return false;
     }
 
@@ -203,7 +212,7 @@ bool BB_Instance::stopSoundLoopbackTest()
 {
     if (!TT_StopSoundLoopbackTest(m_ttInst))
     {
-        cout << "Stop Sound Loopback Test failed" << endl;
+        printLog("Stop Sound Loopback Test failed");
         return false;
     }
 
@@ -273,23 +282,25 @@ bool BB_Instance::processTTMessage(const TTMessage& msg, bool &killInst)
     {
         case WM_TEAMTALK_CMD_MYSELF_LOGGEDOUT :
         {
-            cout << "User is Logged Out" << endl;
+            printLog("User is Logged Out");
             return false;
         }
         case WM_TEAMTALK_CON_LOST:
         {
-            cout << "Connection Lost" << endl;
+            printLog("Connection Lost");
 			killInst = false;
             return false;
         }
         case WM_TEAMTALK_CMD_MYSELF_LEFT :
         {
-            cout << "User Left The Channel" << endl;
+            printLog("User Left The Channel");
             return false;
         }
         case WM_TEAMTALK_CMD_MYSELF_KICKED :
         {
-            cout << "User Was Kicked" << endl;
+            User ttUser;
+            TT_GetUser(m_ttInst, msg.wParam, &ttUser);
+            printLog(string("User Was Kicked by") + string(ttUser.szNickname));
             return false;
         }
 		default:

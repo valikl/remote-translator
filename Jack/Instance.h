@@ -18,6 +18,7 @@ struct BB_InstanceContext
     std::string m_nickName;
     std::string m_channelPath;
     std::string m_channelPsw;
+    std::string m_ProcessName;
 };
 
 
@@ -47,6 +48,8 @@ private:
     bool login();
     bool joinChannel();
     bool initSoundDevice();
+
+    void printLog(std::string msg);
 
 	bool processTTMessage(const TTMessage& msg, bool &killInst);
 

@@ -52,6 +52,7 @@ int main(int argc, const char *argv[], const char *env[])
     context.m_nickName = _T(argv[8]);
     context.m_channelPath = _T(argv[6]);
     context.m_channelPsw = _T(argv[7]);
+    context.m_ProcessName = _T(argv[0]);
 
     TT_SetLicenseInformation(_T("Bnei Baruch"), 1600664704);
 
@@ -60,25 +61,23 @@ int main(int argc, const char *argv[], const char *env[])
     BB_Instance * inst = new BB_Instance(context, role_to_internet);
     if (!inst->init())
     {
-        cout << "Cannot continue. Program terminated." << endl;
+        cout << context.m_ProcessName << ": " << "Cannot continue. Program terminated." << endl;
         exit(0);
     }
 
     if (role_to_internet)
     {
-        inst->setClassroom();
         sleep(5);
         sleep(5);
 		system(("/usr/local/bin/jack_connect system:capture_"+jack_chan+" `basename "+my_app_name+"`:in1").c_str());
 		system(("/usr/local/bin/jack_connect system:capture_"+jack_chan+" `basename "+my_app_name+"`:in2").c_str());
+        inst->setClassroom();
         inst->enableTransmission();
 	}
     else
     {
         inst->startSoundLoopbackTest();
-		system("echo sound_test_start");
         system(("/usr/local/bin/jack_connect `basename "+my_app_name+"`:out1  system:playback_"+jack_chan).c_str());
-		system("echo sound_test_stop");
         inst->stopSoundLoopbackTest();
 	}
 
@@ -89,18 +88,8 @@ int main(int argc, const char *argv[], const char *env[])
         while (1)
         {
             inst->finalize();
-			bool initOk;
-            if (killInst)
-			{			
-				delete inst;
-				inst = new BB_Instance(context, role_to_internet);
-				initOk = inst->init();
-			}
-			else
-			{
-				initOk = inst->connect();	
-			}
-            if (initOk)
+
+            if (inst->connect())
             {
                 if (role_to_internet)
                 {
@@ -114,48 +103,13 @@ int main(int argc, const char *argv[], const char *env[])
                 }
                 break;
             }
-			// Wait 10 sec
-			for (int i = 0; i < 10; i++)
+            // Wait 5 sec
+            for (int i = 0; i < 5; i++)
 			{
 				sleep(1);
 			}
         }
     }
-
-/*
-    while(1)
-    {
-        // Every 10 sec.
-        for (int i = 0; i < 10; i++)
-        {
-            sleep(1);
-        }
-
-        if (!inst->isInstExist())
-        {
-           cout << "Instance not found" << endl;
-           inst->finalize();
-           delete inst;
-           inst = new BB_Instance(context, role_to_internet);
-           inst->init();
-        }
-
-        if (!inst->isUserExist())
-        {
-           cout << "User not found" << endl;
-           inst->finalize();
-           delete inst;
-           inst = new BB_Instance(context, role_to_internet);
-           inst->init();
-        }
-
-        if (role_to_internet)
-        {
-            inst->setClassroom();
-        }
-    }
-*/
-
 }
 
 
