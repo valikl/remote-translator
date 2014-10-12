@@ -2,6 +2,31 @@
 #include "audiosettings.h"
 #include "common_gui.h"
 
+#define TRY_AND_THROW(func, wname, type) \
+try \
+{ \
+    (func); \
+} \
+catch(BB_Exception excp) \
+{ \
+    QString typestr = type == GROUP_TYPE_SOURCES ? "SOURCES " : type == GROUP_TYPE_RECEIVERS ? "RECEIVERS " : "RESTRICTED "; \
+    QString errstr = typestr + QString::fromStdWString(wname) + ": " + QString::fromStdWString(excp.GetInfo()); \
+    excp.SetInfo(errstr.toStdWString()); \
+    throw excp; \
+}
+
+#define TRY_CRITICAL(func) \
+try \
+{ \
+    (func); \
+} \
+catch(BB_Exception excp) \
+{ \
+    QMessageBox::critical(NULL, "Error:", QString::fromStdWString(excp.GetInfo())); \
+    emit fatal_error(QString::fromStdWString(excp.GetInfo())); \
+    return; \
+}
+
 void TTInstView::setError(int code)
 {
     errcode = (InstErrCode)code;
@@ -109,9 +134,22 @@ void TTInstView::createNameLabel(QString name)
 
 void TTInstView::init()
 {
-    TRY_FUNC_WITH_RETURN(initAudio());
     createStatus();
     setLayout();
+}
+
+void TTInstView::connectInst()
+{
+    try
+    {
+        initAudio();
+    }
+    catch(BB_Exception excp)
+    {
+        showStatusState(is_connected);
+        throw excp;
+    }
+    showStatusState(is_connected);
 }
 
 void TTInstView::showStatusState(bool is_ok)
@@ -204,20 +242,23 @@ void TTInstViewSource::initAudio()
     is_connected = false;
 
     //Timer for micophone progress bar
-    microphone_timer = new QTimer(this);
-    connect(microphone_timer, SIGNAL(timeout()), this, SLOT(on_MicrophoneTimeout()));
+    if (microphone_timer == NULL)
+    {
+        microphone_timer = new QTimer(this);
+        connect(microphone_timer, SIGNAL(timeout()), this, SLOT(on_MicrophoneTimeout()));
+    }
 
     wstring wname = getName().toStdWString();
     BB_GroupElementConfig config = ConfigMgr.GetGroupElementConfig(getType(), wname);
 
     BB_GroupMgrSource& mgr = getType() == GROUP_TYPE_SOURCES ? SourcesMgr : RestrictedMgr;
-    TRY_FUNC_WITH_RETURN(mgr.AddInstance(wname, config.m_InputSoundDevId, config.m_OutputSoundDevId, this));
+    TRY_AND_THROW(mgr.AddInstance(wname, config.m_InputSoundDevId, config.m_OutputSoundDevId, this), wname, getType());
 
-    TRY_FUNC_WITH_RETURN(mgr.EnableDenoising(wname, config.m_noiseCancel));
-    TRY_FUNC_WITH_RETURN(mgr.EnableEchoCancellation(wname, config.m_echoCancel));
-    TRY_FUNC_WITH_RETURN(mgr.EnableVoiceActivation(wname, config.m_EnableVoiceActivation));
-    TRY_FUNC_WITH_RETURN(mgr.SetAGCEnable(wname, config.m_AGC.m_enable, &(config.m_AGC)));
-    TRY_FUNC_WITH_RETURN(mgr.UpdateMicrophoneGainLevel(wname, config.m_MicGainLevel));
+    mgr.EnableDenoising(wname, config.m_noiseCancel);
+    mgr.EnableEchoCancellation(wname, config.m_echoCancel);
+    mgr.EnableVoiceActivation(wname, config.m_EnableVoiceActivation);
+    mgr.SetAGCEnable(wname, config.m_AGC.m_enable, &(config.m_AGC));
+    mgr.UpdateMicrophoneGainLevel(wname, config.m_MicGainLevel);
 
     microphone_timer->start(100);
     is_connected = true;
@@ -228,9 +269,8 @@ void TTInstViewSource::reconnect()
     microphone_timer->stop();
     wstring wname = getName().toStdWString();
     BB_GroupMgrSource& mgr = getType() == GROUP_TYPE_SOURCES ? SourcesMgr : RestrictedMgr;
-    TRY_FUNC(mgr.RemoveInstance(wname));
-    TRY_FUNC(initAudio());
-    showStatusState(is_connected);
+    mgr.RemoveInstance(wname);
+    TRY_CRITICAL(connectInst());
 }
 
 void TTInstViewSource::createSoundBar()
@@ -268,7 +308,7 @@ void TTInstViewSource::on_MicrophoneTimeout()
 
     int level;
     wstring wname = getName().toStdWString();
-    TRY_FUNC(level = mgr.GetMicrophoneLevel(wname));
+    level = mgr.GetMicrophoneLevel(wname);
     soundBar->setValue(level);
 }
 
@@ -292,15 +332,14 @@ void TTInstViewReceiver::initAudio()
     is_connected = false;
     wstring wname = getName().toStdWString();
     BB_GroupElementConfig config = ConfigMgr.GetGroupElementConfig(GROUP_TYPE_RECEIVERS, wname);
-    TRY_FUNC_WITH_RETURN(ReceiversMgr.AddInstance(wname, config.m_InputSoundDevId, config.m_OutputSoundDevId, this));
-    TRY_FUNC_WITH_RETURN(ReceiversMgr.UpdateVolumeLevel(wname, config.m_SrcVolumeLevel));
+    TRY_AND_THROW(ReceiversMgr.AddInstance(wname, config.m_InputSoundDevId, config.m_OutputSoundDevId, this), wname, GROUP_TYPE_RECEIVERS);
+    ReceiversMgr.UpdateVolumeLevel(wname, config.m_SrcVolumeLevel);
     is_connected = true;
 }
 
 void TTInstViewReceiver::reconnect()
 {
     wstring wname = getName().toStdWString();
-    TRY_FUNC(ReceiversMgr.RemoveInstance(wname));
-    TRY_FUNC(initAudio());
-    showStatusState(is_connected);
+    ReceiversMgr.RemoveInstance(wname);
+    TRY_CRITICAL(connectInst());
 }

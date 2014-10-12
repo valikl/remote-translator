@@ -7,13 +7,19 @@
 
 using namespace std;
 
-#define TRY_INIT(init) \
+#define TRY_CRITICAL(act, name) \
 try \
 { \
-    (init); \
+    (act); \
 } \
 catch(BB_Exception excp) \
 { \
+    if (name != "") \
+    { \
+        QString errstr = QString(name) + ": " + QString::fromStdWString(excp.GetInfo()); \
+        excp.SetInfo(errstr.toStdWString()); \
+    } \
+    QMessageBox::critical(NULL, "Error:", QString::fromStdWString(excp.GetInfo())); \
     fatal_errlist.push_back(getErrStr(excp)); \
 }
 
@@ -21,7 +27,6 @@ QString getErrStr(BB_Exception excp)
 {
     QDateTime current = QDateTime::currentDateTime();
     QString errstr = QString::fromStdWString(excp.GetInfo());
-    QMessageBox::critical(NULL, "Error:", errstr);
     errstr = current.toString() + " " + errstr;
     return errstr;
 }
@@ -47,10 +52,10 @@ void ControlPanel::catchFatalError(QString errstr)
 void ControlPanel::init()
 {
     // Initialize configuration manager and group managers
-    TRY_INIT(ConfigMgr.init(false));
-    TRY_INIT(SourcesMgr.init());
-    TRY_INIT(RestrictedMgr.init());
-    TRY_INIT(ReceiversMgr.init());
+    TRY_CRITICAL(ConfigMgr.init(false), "Configuration");
+    TRY_CRITICAL(SourcesMgr.init(), "SOURCES");
+    TRY_CRITICAL(RestrictedMgr.init(), "RESTRICTED");
+    TRY_CRITICAL(ReceiversMgr.init(), "RECEIVERS");
 
     // Draw widget elements
     drawMenuBar();
@@ -111,6 +116,7 @@ void ControlPanel::drawInstancesBox(GroupType type, QString box_name, QGroupBox*
             iview = new TTInstViewReceiver(iname);
         else
             iview = new TTInstViewSource(iname, type);
+        TRY_CRITICAL(iview->connectInst(), "");
         layout->addWidget(iview);
 
         connect(iview, SIGNAL(warning(QString)), this, SLOT(catchError(QString)));
