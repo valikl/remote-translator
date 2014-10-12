@@ -372,7 +372,12 @@ void RemoteTranslatorUI::connectTranslator()
     if (!TRANSLATOR.isLocalDstConnected())
     {
         ui->chooseTransButton->setEnabled(false);
-        return;
+        ui->chooseTransButton->setCheckable(false);
+    }
+    else
+    {
+        ui->chooseTransButton->setEnabled(true);
+        ui->chooseTransButton->setCheckable(true);
     }
 
     //Activate Audio filters
@@ -393,8 +398,6 @@ void RemoteTranslatorUI::connectTranslator()
     ui->ServerSelfTestEn->setEnabled(true);
     ui->MicMuteBut->setCheckable(true);
     ui->TrgMuteBut->setCheckable(true);
-    ui->chooseTransButton->setEnabled(true);
-    ui->chooseTransButton->setCheckable(true);
 
 
     chatWriter=new ChatWriter(false);
