@@ -1,0 +1,3 @@
+all:
+	g++  -m32 tt.cpp Instance.cpp -I../.. -L../../../ -lTeamTalk4 -o ttserverlog
+#	g++  -m32 t.cpp -I../.. -L../../../ -lTeamTalk4 -o ttserverlog
