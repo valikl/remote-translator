@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'remotetranslatorui.ui'
 **
-** Created: Fri Nov 7 04:31:53 2014
+** Created: Fri Nov 7 04:50:14 2014
 **      by: Qt User Interface Compiler version 4.8.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -52,7 +52,6 @@ public:
     QLabel *label;
     QLabel *label_2;
     QLineEdit *NickName;
-    QLabel *label_9;
     QLabel *label_4;
     QComboBox *SrcLangList;
     QLabel *label_5;
@@ -60,6 +59,7 @@ public:
     QPushButton *LangConnect;
     QLabel *label_13;
     QCheckBox *ServerSelfTestEn;
+    QLabel *label_9;
     QWidget *translateControl;
     QGridLayout *gridLayout_3;
     QLabel *label_10;
@@ -134,6 +134,13 @@ public:
         gridLayout_2->setObjectName(QString::fromUtf8("gridLayout_2"));
         label = new QLabel(connectControl);
         label->setObjectName(QString::fromUtf8("label"));
+        QSizePolicy sizePolicy1(QSizePolicy::Preferred, QSizePolicy::Preferred);
+        sizePolicy1.setHorizontalStretch(0);
+        sizePolicy1.setVerticalStretch(0);
+        sizePolicy1.setHeightForWidth(label->sizePolicy().hasHeightForWidth());
+        label->setSizePolicy(sizePolicy1);
+        label->setAlignment(Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft);
+        label->setMargin(0);
 
         gridLayout_2->addWidget(label, 0, 0, 1, 4);
 
@@ -147,13 +154,10 @@ public:
 
         gridLayout_2->addWidget(NickName, 1, 1, 1, 2);
 
-        label_9 = new QLabel(connectControl);
-        label_9->setObjectName(QString::fromUtf8("label_9"));
-
-        gridLayout_2->addWidget(label_9, 2, 0, 1, 4);
-
         label_4 = new QLabel(connectControl);
         label_4->setObjectName(QString::fromUtf8("label_4"));
+        label_4->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
+        label_4->setMargin(0);
 
         gridLayout_2->addWidget(label_4, 3, 0, 1, 1);
 
@@ -186,6 +190,13 @@ public:
         ServerSelfTestEn->setObjectName(QString::fromUtf8("ServerSelfTestEn"));
 
         gridLayout_2->addWidget(ServerSelfTestEn, 6, 3, 1, 1);
+
+        label_9 = new QLabel(connectControl);
+        label_9->setObjectName(QString::fromUtf8("label_9"));
+        label_9->setLayoutDirection(Qt::LeftToRight);
+        label_9->setAlignment(Qt::AlignBottom|Qt::AlignHCenter);
+
+        gridLayout_2->addWidget(label_9, 2, 0, 1, 4);
 
         ControlTabs->addTab(connectControl, QString());
         translateControl = new QWidget();
@@ -348,7 +359,7 @@ public:
 
         retranslateUi(RemoteTranslatorUI);
 
-        ControlTabs->setCurrentIndex(1);
+        ControlTabs->setCurrentIndex(0);
 
 
         QMetaObject::connectSlotsByName(RemoteTranslatorUI);
@@ -374,11 +385,6 @@ public:
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; font-weight:600;\">NickName</span></p></body></html>", 0, QApplication::UnicodeUTF8));
-        label_9->setText(QApplication::translate("RemoteTranslatorUI", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-"p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:16pt; font-weight:600;\">Translation connection</span></p></body></html>", 0, QApplication::UnicodeUTF8));
         label_4->setText(QApplication::translate("RemoteTranslatorUI", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
@@ -396,6 +402,11 @@ public:
 "</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; font-weight:600;\">Self test</span></p></body></html>", 0, QApplication::UnicodeUTF8));
         ServerSelfTestEn->setText(QString());
+        label_9->setText(QApplication::translate("RemoteTranslatorUI", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:16pt; font-weight:600;\">Translation connection</span></p></body></html>", 0, QApplication::UnicodeUTF8));
         ControlTabs->setTabText(ControlTabs->indexOf(connectControl), QApplication::translate("RemoteTranslatorUI", "Tab 1", 0, QApplication::UnicodeUTF8));
         label_10->setText(QApplication::translate("RemoteTranslatorUI", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
